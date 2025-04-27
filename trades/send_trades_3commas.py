@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+import os
+import sys
+import time
+import json
+import redis
+import requests
+import hashlib
+import hmac
+import logging
+
+# Ensure root is in sys.path so "config" module works
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from config.cred_loader import load_credentials
+
+# Logging setup
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
+# Redis configuration
+REDIS_HOST = "localhost"
+REDIS_PORT = 6379
+REDIS_DB = 0
+FINAL_TRADES_KEY = "FINAL_TRADES"
+FINAL_FILTER_KEY = "FINAL_RRR_FILTERED_TRADES"
+SENT_TRADES_KEY = "SENT_TRADES"
+
+# Load credentials from config
+creds = load_credentials()
+BOT_ID = creds["3commas_bot_id"]
+EMAIL_TOKEN = creds["3commas_email_token"]
+DELAY_SECONDS = 0
+PRICE_MOVEMENT_THRESHOLD = 0.02  # 2.0%
+
+# 3Commas TradingView endpoint
+THREECOMMAS_URL = "https://app.3commas.io/trade_signal/trading_view"
+
+# Redis connection
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+
+def should_send_trade(symbol, current_price):
+    """
+    Prevent re-sending if price hasn't changed enough.
+    """
+    last_data = r.hget(SENT_TRADES_KEY, symbol)
+    if last_data is None:
+        return True
+    try:
+        last_price = json.loads(last_data)["entry_price"]
+        return abs(current_price - last_price) / last_price >= PRICE_MOVEMENT_THRESHOLD
+    except Exception:
+        return True
+
+def format_3commas_pair(symbol: str) -> str:
+    """
+    Converts a pair like BTCUSDT to the 3Commas format USDT_BTC.
+    """
+    if symbol.endswith("USDT"):
+        base = symbol.replace("USDT", "")
+        return f"USDT_{base}"
+    return f"USDT_{symbol}"
+
+def send_trade_to_3commas(symbol, current_price):
+    pair = format_3commas_pair(symbol)
+    payload = {
+        "message_type": "bot",
+        "bot_id": BOT_ID,
+        "email_token": EMAIL_TOKEN,
+        "delay_seconds": DELAY_SECONDS,
+        "pair": pair
+    }
+    try:
+        response = requests.post(THREECOMMAS_URL, json=payload, timeout=10)
+        response.raise_for_status()
+        logging.info(f"✅ Sent {pair} to 3Commas.")
+        r.hset(SENT_TRADES_KEY, symbol, json.dumps({"entry_price": current_price}))
+        return True
+    except Exception as e:
+        logging.error(f"❌ Failed to send {pair} to 3Commas: {e}")
+        return False
+
+def main():
+    logging.info("🚀 Sending final trades to 3Commas bot...")
+
+    try:
+        data = r.get(FINAL_TRADES_KEY)
+        if not data:
+            logging.info("No final trades in Redis.")
+            return
+        final_trades = json.loads(data)
+    except Exception as e:
+        logging.error(f"Error loading final trades: {e}")
+        return
+
+    # If final_trades is a list, try to load detailed trade info from FINAL_FILTER_KEY
+    if isinstance(final_trades, list):
+        logging.info("Final trades data is a list; attempting to load detailed trade info from FINAL_RRR_FILTERED_TRADES.")
+        detailed_data = r.get(FINAL_FILTER_KEY)
+        if not detailed_data:
+            logging.info("No detailed final trades in Redis.")
+            return
+        final_trades = json.loads(detailed_data)
+        if not isinstance(final_trades, dict):
+            logging.info("Detailed final trades data is not in dictionary format. Skipping trade dispatch.")
+            return
+
+    for symbol, trade_data in final_trades.items():
+        price = trade_data.get("market_price")
+        if not price:
+            continue
+        if should_send_trade(symbol, price):
+            send_trade_to_3commas(symbol, price)
+            time.sleep(1)
+        else:
+            logging.info(f"Skipping {symbol}: price change < {PRICE_MOVEMENT_THRESHOLD*100:.1f}%")
+
+    logging.info("✅ Trade sending process complete.")
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+import joblib
+import pandas as pd
+from pathlib import Path
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Path to the sklearn‐wrapped XGBRegressor saved via joblib.dump(...)
+MODEL_PATH = Path("/home/signal/market6/live/models/xgb_confidence_model.pkl")
+
+# These were your original training features
+FEATURE_COLUMNS = [
+    "step",
+    "entry_score",
+    "current_score",
+    "drawdown_pct",
+    "safu_score",
+    "macd_lift",
+    "rsi",
+    "rsi_slope",
+    "adx",
+    "confidence_score",
+    "tp1_shift",
+    "safu_good_but_zombie",
+    "snapshot_score_trend",
+    "snapshot_rsi_trend",
+    "snapshot_max_drawdown",
+    "snapshot_min_score",
+    "snapshot_min_rsi",
+    "snapshot_time_to_max_drawdown_min"
+]
+
+# Load the model once
+try:
+    MODEL = joblib.load(str(MODEL_PATH))
+    logger.info(f"Loaded confidence model from {MODEL_PATH}")
+except Exception as e:
+    logger.error(f"Failed to load confidence model: {e}")
+    MODEL = None
+
+
+def predict_confidence_score(trade_snapshot: dict) -> float:
+    """
+    Predict a confidence score using the trained XGBoost regression model.
+
+    Args:
+        trade_snapshot (dict): Flattened snapshot input or None.
+
+    Returns:
+        float: Predicted confidence score, or 0.0 fallback.
+    """
+    # Defensive check
+    if not trade_snapshot or not isinstance(trade_snapshot, dict):
+        logger.warning("Empty or invalid trade snapshot received; returning default confidence 0.0")
+        return 0.0
+
+    # Flatten nested snapshot_meta if present
+    meta = trade_snapshot.get("snapshot_meta")
+    if isinstance(meta, dict):
+        for k, v in meta.items():
+            trade_snapshot[f"snapshot_{k}"] = v
+        del trade_snapshot["snapshot_meta"]
+
+    # Prepare the row dict with all features
+    row = {}
+    for feat in FEATURE_COLUMNS:
+        val = trade_snapshot.get(feat, 0.0)
+        # Convert bool to float
+        if isinstance(val, bool):
+            val = float(val)
+        # Cast to float if possible
+        try:
+            val = float(val)
+        except Exception:
+            val = 0.0
+        row[feat] = val
+
+    # Create DataFrame
+    df = pd.DataFrame([row], columns=FEATURE_COLUMNS)
+
+    # Predict
+    if MODEL is None:
+        logger.error("No model loaded; cannot predict confidence score.")
+        return 0.0
+    try:
+        pred = MODEL.predict(df)[0]
+        return float(pred)
+    except Exception as e:
+        logger.error(f"Confidence prediction failed: {e}")
+        return 0.0

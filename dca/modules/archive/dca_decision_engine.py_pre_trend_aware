@@ -1,0 +1,84 @@
+def should_dca(trade, config, indicators, btc_status, entry_score, current_score, safu_score, tp1_sim_pct):
+    rejection_reason = None
+    recovery_odds = 0  # Default if not used
+
+    # 1. BTC Market Check
+    if config.get("use_btc_filter", True) and btc_status != "SAFE":
+        return False, "btc_unsafe", recovery_odds
+
+    # 2. Max Allocation Check
+    total_spent = float(trade.get("bought_volume") or 0)
+    num_so = trade.get("completed_safety_orders_count", 0)
+    so_volume_table = config.get("so_volume_table", [])
+    if num_so >= len(so_volume_table):
+        return False, "max_so", recovery_odds
+    next_so_cost = so_volume_table[num_so]
+    if total_spent + next_so_cost > float(config.get("max_trade_usdt", 2000)):
+        return False, "exceeds_max", recovery_odds
+
+    # 3. Indicator Health Check
+    if config.get("require_indicator_health", True):
+        thresholds = config.get("indicator_thresholds", {})
+        if indicators.get("rsi", 100) < thresholds.get("rsi", 45):
+            return False, "rsi_low", recovery_odds
+        if indicators.get("macd_histogram", 1) < thresholds.get("macd_histogram", 0):
+            return False, "macd_bearish", recovery_odds
+        if indicators.get("adx", 0) < thresholds.get("adx", 20):
+            return False, "adx_weak", recovery_odds
+
+    # 4. SAFU Score Check
+    if safu_score is None or safu_score < config.get("safu_score_threshold", 0.4):
+        return False, "safu_low", recovery_odds
+
+    # 5. Score Decay Guard
+    if current_score is not None and current_score < config.get("score_decay_min", 0.3):
+        return False, "score_decay", recovery_odds
+
+    # 6. Trajectory Check
+    if config.get("use_trajectory_check", True):
+        if indicators.get("macd_lift", 0) < config["trajectory_thresholds"].get("macd_lift_min", 0.00001):
+            return False, "macd_flat", recovery_odds
+        if indicators.get("rsi_slope", 0) < config["trajectory_thresholds"].get("rsi_slope_min", 0.1):
+            return False, "rsi_flat", recovery_odds
+
+    # 7. Drawdown Buffer Check
+    deviation_pct = trade.get("drawdown_pct", 0)
+    required_dd = (num_so + 2) * config.get("buffer_zone_pct", 0.3)
+    if deviation_pct < max(config.get("drawdown_trigger_pct", 1.5), required_dd):
+        return False, "drawdown_too_shallow", recovery_odds
+
+    # 8. TP1 Feasibility Check
+    if tp1_sim_pct < config.get("min_tp1_margin", 1.2):
+        return False, "tp1_not_feasible", recovery_odds
+
+    # 9. Recovery Odds (Rule-Based Estimate)
+    if config.get("require_recovery_odds", True):
+        recovery_odds = 0
+        if indicators.get("macd_lift", 0) > config["trajectory_thresholds"].get("macd_lift_min", 0):
+            recovery_odds += 0.3
+        if indicators.get("rsi_slope", 0) > config["trajectory_thresholds"].get("rsi_slope_min", 0):
+            recovery_odds += 0.3
+        if safu_score and safu_score > 0.6:
+            recovery_odds += 0.2
+        if indicators.get("rsi", 0) > 45:
+            recovery_odds += 0.2
+        recovery_odds = min(recovery_odds, 1.0)
+
+        if recovery_odds < config.get("min_recovery_probability", 0.5):
+           print(f"[DEBUG] recovery odds check:")
+           print(f"  • macd_lift: {indicators.get('macd_lift')} vs {config['trajectory_thresholds'].get('macd_lift_min')}")
+           print(f"  • rsi_slope: {indicators.get('rsi_slope')} vs {config['trajectory_thresholds'].get('rsi_slope_min')}")
+           print(f"  • safu_score: {safu_score}")
+           print(f"  • rsi: {indicators.get('rsi')}")
+           print(f"  => Computed recovery_odds: {recovery_odds}") 
+           return False, "recovery_odds_low", recovery_odds
+
+    return True, None, recovery_odds
+
+
+def how_much_to_dca(trade, config):
+    num_so = trade.get("completed_safety_orders_count", 0)
+    so_volume_table = config.get("so_volume_table", [])
+    if num_so >= len(so_volume_table):
+        return 0
+    return so_volume_table[num_so]

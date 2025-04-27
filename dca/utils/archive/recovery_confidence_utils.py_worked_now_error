@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+import joblib
+import pandas as pd
+from pathlib import Path
+
+# Path to the sklearn‐wrapped XGBRegressor saved via joblib.dump(...)
+MODEL_PATH = Path("/home/signal/market6/live/models/xgb_confidence_model.pkl")
+
+# These were your original training features
+FEATURE_COLUMNS = [
+    "step",
+    "entry_score",
+    "current_score",
+    "drawdown_pct",
+    "safu_score",
+    "macd_lift",
+    "rsi",
+    "rsi_slope",
+    "adx",
+    "confidence_score",
+    "tp1_shift",
+    "safu_good_but_zombie",
+    "snapshot_score_trend",
+    "snapshot_rsi_trend",
+    "snapshot_max_drawdown",
+    "snapshot_min_score",
+    "snapshot_min_rsi",
+    "snapshot_time_to_max_drawdown_min"
+]
+
+def predict_confidence_score(trade_snapshot: dict) -> float:
+    """
+    Load the sklearn‐wrapped model via joblib and predict a confidence score (regression).
+    """
+    # Load the model (sklearn XGBRegressor)
+    model = joblib.load(str(MODEL_PATH))
+
+    # Flatten nested snapshot_meta if present
+    if "snapshot_meta" in trade_snapshot:
+        for k, v in trade_snapshot["snapshot_meta"].items():
+            trade_snapshot[f"snapshot_{k}"] = v
+        del trade_snapshot["snapshot_meta"]
+
+    # Build a single‐row DataFrame with exactly the training columns
+    row = {}
+    for feat in FEATURE_COLUMNS:
+        val = trade_snapshot.get(feat, 0.0)
+        # Convert bool → float
+        if isinstance(val, bool):
+            val = float(val)
+        # Otherwise cast numeric or fallback
+        try:
+            val = float(val)
+        except Exception:
+            val = 0.0
+        row[feat] = val
+
+    df = pd.DataFrame([row], columns=FEATURE_COLUMNS)
+
+    # Run regression
+    pred = model.predict(df)[0]
+    return float(pred)

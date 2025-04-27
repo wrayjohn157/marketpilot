@@ -1,0 +1,98 @@
+# dca_decision_engine.py
+import math
+from datetime import datetime
+
+def simulate_tp1_shift(new_avg_price, current_price, tp1_pct=1.5):
+    """
+    Estimate the % move required from current price to hit TP1 based on new avg price.
+    """
+    if current_price == 0:
+        return float('inf')
+    target_price = new_avg_price * (1 + tp1_pct / 100)
+    tp1_shift_pct = ((target_price - current_price) / current_price) * 100
+    return round(tp1_shift_pct, 2)
+
+def should_dca(trade, indicators, btc_status, config, scores):
+    """
+    Evaluates whether a DCA step should be fired.
+
+    Args:
+        trade: dict from 3Commas (must include prices, SO used, deal_id)
+        indicators: dict of RSI, MACD histogram, ADX
+        btc_status: 'SAFE' or 'UNSAFE'
+        config: loaded YAML config dict
+        scores: dict with entry_score, current_score, safu_score
+
+    Returns:
+        (should_dca: bool, reason: str, extra: dict)
+    """
+    # Unpack inputs
+    total_spent = float(trade.get("bought_volume") or 0)
+    num_so = trade.get("completed_safety_orders_count", 0)
+    avg_entry_price = float(trade.get("average_buy_price") or trade.get("base_order_average_price") or 0)
+    current_price = float(trade.get("current_price") or 0)
+    deviation_pct = ((avg_entry_price - current_price) / avg_entry_price) * 100 if avg_entry_price else 0.0
+
+    entry_score = scores.get("entry_score")
+    current_score = scores.get("current_score")
+    safu_score = scores.get("safu_score")
+
+    # === Config ===
+    SO_VOLUME_TABLE = config.get("so_volume_table", [])
+    DCA_BUFFER_ZONE = config.get("buffer_zone_pct", 0.3)
+    DRAW_TRIGGER = config.get("drawdown_trigger_pct", 1.5)
+    MAX_USDT = float(config.get("max_trade_usdt", 2000))
+    SCORE_DECAY_MIN = config.get("score_decay_min", 0.3)
+    SAFU_THRESHOLD = config.get("safu_score_threshold", 0.4)
+    INDICATOR_THRESHOLDS = config.get("indicator_thresholds", {})
+    BTC_FILTER = config.get("use_btc_filter", True)
+    TRAJ_CHECK = config.get("use_trajectory_check", True)
+    TP1_TARGET = config.get("tp1_targets", [1.5])[0]  # use first as default
+
+    # === Step checks ===
+    if num_so >= len(SO_VOLUME_TABLE):
+        return False, "max_so_used", {}
+
+    if total_spent + SO_VOLUME_TABLE[num_so] > MAX_USDT:
+        return False, "exceeds_cap", {}
+
+    required_dd = (num_so + 2) * DCA_BUFFER_ZONE
+    if deviation_pct < max(DRAW_TRIGGER, required_dd):
+        return False, "drawdown_too_shallow", {"required": required_dd, "current": deviation_pct}
+
+    if BTC_FILTER and btc_status != "SAFE":
+        return False, "btc_unsafe", {}
+
+    if config.get("require_indicator_health", True):
+        if (
+            indicators.get("rsi", 100) < INDICATOR_THRESHOLDS.get("rsi", 45) or
+            indicators.get("macd_histogram", 1) < INDICATOR_THRESHOLDS.get("macd_histogram", 0.0) or
+            indicators.get("adx", 0) < INDICATOR_THRESHOLDS.get("adx", 20)
+        ):
+            return False, "indicators", indicators
+
+    if safu_score is None or safu_score < SAFU_THRESHOLD:
+        return False, "safu_score", {"score": safu_score, "threshold": SAFU_THRESHOLD}
+
+    if current_score is not None and current_score < SCORE_DECAY_MIN:
+        return False, "score_decay", {"score": current_score, "min": SCORE_DECAY_MIN}
+
+    if TRAJ_CHECK:
+        macd_lift = indicators.get("macd_lift", 0)
+        rsi_slope = indicators.get("rsi_slope", 0)
+        if macd_lift < config["trajectory_thresholds"].get("macd_lift_min", 0) or rsi_slope < config["trajectory_thresholds"].get("rsi_slope_min", 0):
+            return False, "trajectory", {"macd_lift": macd_lift, "rsi_slope": rsi_slope}
+
+    # === TP1 Feasibility ===
+    new_avg_price = (avg_entry_price * total_spent + current_price * SO_VOLUME_TABLE[num_so]) / (total_spent + SO_VOLUME_TABLE[num_so])
+    tp1_shift = simulate_tp1_shift(new_avg_price, current_price, TP1_TARGET)
+    if tp1_shift > TP1_TARGET * 3:  # Reject if TP1 would require 3x more movement than target
+        return False, "tp1_unrealistic", {"tp1_shift": tp1_shift, "limit": TP1_TARGET * 3}
+
+    return True, "pass", {
+        "required_dd": required_dd,
+        "tp1_shift": tp1_shift,
+        "volume": SO_VOLUME_TABLE[num_so],
+        "next_so_index": num_so + 1,
+        "deviation_pct": deviation_pct,
+    }

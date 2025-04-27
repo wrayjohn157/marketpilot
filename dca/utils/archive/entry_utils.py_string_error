@@ -1,0 +1,214 @@
+import os
+import json
+import time
+import requests
+import hmac
+import hashlib
+import pandas as pd
+from pathlib import Path
+from datetime import datetime, timezone
+from ta.trend import MACD, ADXIndicator
+from ta.momentum import RSIIndicator
+
+# === Paths ===
+CRED_PATH = Path("/home/signal/market6/config/paper_cred.json")
+SNAPSHOT_BASE = Path("/home/signal/market6/data/snapshots")
+FORK_HISTORY = Path("/home/signal/market6/output/fork_history")
+BTC_LOG_PATH = Path("/home/signal/market6/live/btc_logs")
+
+
+def get_live_3c_trades():
+    with open(CRED_PATH, "r") as f:
+        creds = json.load(f)
+
+    BOT_ID = creds["3commas_bot_id"]
+    API_KEY = creds["3commas_api_key"]
+    API_SECRET = creds["3commas_api_secret"]
+    path = "/public/api/ver1/deals?scope=active"
+    url = "https://api.3commas.io" + path
+    signature = hmac.new(API_SECRET.encode(), path.encode(), hashlib.sha256).hexdigest()
+
+    headers = {
+        "Apikey": API_KEY,
+        "Signature": signature
+    }
+
+    try:
+        res = requests.get(url, headers=headers, timeout=10)
+        res.raise_for_status()
+        return [d for d in res.json() if d.get("bot_id") == BOT_ID]
+    except Exception as e:
+        print(f"[ERROR] Failed to fetch 3Commas trades: {e}")
+        return []
+
+
+def send_dca_signal(symbol, volume=15):
+    with open(CRED_PATH, "r") as f:
+        creds = json.load(f)
+
+    payload = {
+        "bot_id": creds["3commas_bot_id"],
+        "email_token": creds.get("3commas_email_token"),
+        "pair": symbol,
+        "quantity": volume
+    }
+
+    query = "/public/api/ver1/bots_deal_add_funds_request"
+    url = "https://api.3commas.io" + query
+    body = json.dumps(payload)
+
+    timestamp = str(int(time.time()))
+    signature_payload = f"{timestamp}{body}".encode()
+    signature = hmac.new(
+        creds["3commas_api_secret"].encode(),
+        msg=signature_payload,
+        digestmod=hashlib.sha256
+    ).hexdigest()
+
+    headers = {
+        "APIKEY": creds["3commas_api_key"],
+        "Signature": signature,
+        "Timestamp": timestamp,
+        "Content-Type": "application/json"
+    }
+
+    try:
+        res = requests.post(url, headers=headers, data=body)
+        res.raise_for_status()
+        print(f"✅ DCA signal sent for {symbol} | Volume: {volume} USDT")
+    except Exception as e:
+        print(f"[ERROR] Failed to send DCA signal for {symbol}: {e}")
+
+
+def get_latest_indicators(symbol, tf="15m"):
+    path = SNAPSHOT_BASE / datetime.utcnow().strftime("%Y-%m-%d") / f"{symbol}_{tf}_klines.json"
+    if not path.exists():
+        print(f"[WARN] Missing snapshot for {symbol}")
+        return {}
+
+    try:
+        with open(path) as f:
+            raw = json.load(f)
+        if len(raw) < 50:
+            print(f"[WARN] Not enough candles to compute indicators for {symbol}")
+            return {}
+
+        df = pd.DataFrame(raw, columns=[
+            "timestamp", "open", "high", "low", "close", "volume",
+            "close_time", "quote_asset_volume", "num_trades",
+            "taker_base_volume", "taker_quote_volume", "ignore"
+        ])
+        df = df.astype({
+            "open": float, "high": float, "low": float,
+            "close": float, "volume": float
+        })
+
+        rsi_val = RSIIndicator(df["close"]).rsi().iloc[-1]
+        macd_val = MACD(df["close"]).macd_diff().iloc[-1]
+        adx_val = ADXIndicator(df["high"], df["low"], df["close"]).adx().iloc[-1]
+
+        return {
+            "rsi": round(float(rsi_val), 2),
+            "macd_histogram": round(float(macd_val), 5),
+            "adx": round(float(adx_val), 2)
+        }
+
+    except Exception as e:
+        print(f"[ERROR] Could not compute indicators for {symbol}: {e}")
+        return {}
+
+
+def load_fork_entry_score(symbol, entry_ts):
+    """Find closest entry score at or before the given entry_ts."""
+    best_match = None
+    best_time_diff = float('inf')
+
+    for folder in sorted(FORK_HISTORY.glob("*")):
+        path = folder / "fork_scores.jsonl"
+        if not path.exists():
+            continue
+        with open(path) as f:
+            for line in f:
+                obj = json.loads(line)
+                if obj.get("symbol") != symbol:
+                    continue
+                score_ts = obj.get("timestamp")
+                if not score_ts:
+                    continue
+                time_diff = entry_ts - int(score_ts / 1000)
+                if 0 <= time_diff < best_time_diff:
+                    best_time_diff = time_diff
+                    best_match = obj
+
+    if best_match and "score" in best_match:
+        return round(float(best_match["score"]), 4)
+
+    print(f"[WARN] No matching entry score found for {symbol} at ts={entry_ts}")
+    return None
+
+
+def get_current_fork_score(symbol):
+    """Use cached fork score only if recent (<10m), otherwise recompute."""
+    now_ts = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+
+    for folder in sorted(FORK_HISTORY.glob("*"), reverse=True):
+        path = folder / "fork_scores.jsonl"
+        if not path.exists():
+            continue
+        with open(path) as f:
+            for line in reversed(f.readlines()):
+                obj = json.loads(line)
+                if obj.get("symbol") != symbol:
+                    continue
+                score = obj.get("score")
+                score_ts = obj.get("timestamp")
+                if score is not None and score_ts:
+                    age_sec = now_ts - int(score_ts / 1000)
+                    if age_sec <= 600:
+                        return round(float(score), 3)
+                    else:
+                        print(f"[INFO] Cached score for {symbol} too old ({age_sec}s), recomputing...")
+                        return recompute_fork_score(symbol)
+
+    return recompute_fork_score(symbol)
+
+
+def recompute_fork_score(symbol):
+    indicators = get_latest_indicators(symbol)
+    if not indicators:
+        print(f"[WARN] Could not recompute fork score for {symbol} due to missing indicators.")
+        return None
+
+    score = 0.0
+    score += 1.0 if indicators.get("macd_histogram", -1) > 0 else 0
+    score += 1.0 if indicators.get("rsi", 0) > 45 else 0
+    score += 1.0 if indicators.get("adx", 0) > 20 else 0
+    final_score = round(score / 3, 3)
+    print(f"[DEBUG] Recomputed fork score for {symbol}: {final_score}")
+    return final_score
+
+
+def simulate_new_avg_price(current_avg, added_usdt, current_price):
+    try:
+        tokens = added_usdt / current_price
+        new_total_usdt = current_avg * tokens + added_usdt
+        new_total_tokens = tokens * 2
+        return new_total_usdt / new_total_tokens
+    except Exception as e:
+        print(f"[ERROR] Failed to simulate BE price: {e}")
+        return current_avg
+
+
+def load_btc_market_condition():
+    try:
+        today = datetime.utcnow().strftime("%Y-%m-%d")
+        path = BTC_LOG_PATH / today / "btc_snapshots.jsonl"
+        if not path.exists():
+            return None
+        with open(path) as f:
+            lines = f.readlines()
+        latest = json.loads(lines[-1])
+        return latest.get("market_condition")
+    except Exception as e:
+        print(f"[WARN] Failed to load BTC condition: {e}")
+        return None

@@ -1,0 +1,93 @@
+# === General Limits ===
+max_trade_usdt: 2000
+base_order_usdt: 20
+
+# === Trigger Requirements ===
+drawdown_trigger_pct: 1.1
+safu_score_threshold: 0.5
+score_decay_min: 0.3
+buffer_zone_pct: 0.0
+
+# === Indicator Guardrails ===
+require_indicator_health: true
+indicator_thresholds:
+  rsi: 45
+  macd_histogram: 0.0
+  adx: 10
+
+# === BTC Market Filter ===
+use_btc_filter: true
+btc_indicators:
+  rsi_max: 40
+  macd_histogram_max: 0.0
+  adx_max: 15
+
+# === Recovery Trajectory ===
+use_trajectory_check: true
+trajectory_thresholds:
+  macd_lift_min: 0.00005
+  rsi_slope_min: 1.0
+
+# === TP1 Feasibility Guard ===
+require_tp1_feasibility: true
+max_tp1_shift_pct: 2.0
+
+# === Recovery Odds Guard ===
+require_recovery_odds: true
+min_recovery_probability: 0.5
+min_confidence_odds: 0.65
+
+# === Confidence-Based DCA Override ===
+use_confidence_override: true
+confidence_dca_guard:         # ← renamed from confidence_override
+  safu_score_min: 0.5
+  macd_lift_min: 0.00005
+  rsi_slope_min: 1.0
+
+# === Minimum Impact Guard ===
+min_be_improvement_pct: 0.8
+
+# === Smart SO volume logic ===
+so_volume_table:
+  - 20
+  - 10
+  - 19
+  - 36.1
+  - 68.59
+  - 130.32
+  - 247.61
+  - 470.46
+  - 893.87
+
+# === TP1 reference distances ===
+tp1_targets:
+  - 0.4
+  - 1.1
+  - 1.7
+  - 2.4
+  - 3.0
+  - 3.9
+  - 5.2
+  - 7.1
+  - 10.0
+
+# === Zombie Tag ===
+zombie_tag:
+  enabled: true
+  min_drawdown_pct: 0.5
+  max_drawdown_pct: 5
+  max_score: 0.3
+  require_zero_recovery_odds: true
+  max_macd_lift: 0.0
+  max_rsi_slope: 0.0
+
+# === ML Spend Model Settings ===
+use_ml_spend_model: true
+spend_adjustment_rules:
+  min_volume: 20
+  max_multiplier: 3.0
+  tp1_shift_soft_cap: 2.5
+  low_dd_pct_limit: 1.0
+
+# === Logging Options ===
+log_verbose: true

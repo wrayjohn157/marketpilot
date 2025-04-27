@@ -1,0 +1,32 @@
+# === Core Packages ===
+fastapi
+uvicorn
+pydantic
+python-multipart
+aiohttp
+requests
+PyYAML
+
+# === ML & Data ===
+scikit-learn
+xgboost
+pandas
+numpy
+
+# === Dashboard / Frontend (Optional: Dev-only) ===
+# If you ever run the frontend locally
+# (Usually you use npm/yarn for React, but VS Code plugins sometimes like to see these)
+jinja2
+
+# === Dev Tools ===
+black
+flake8
+
+# === Redis (if used for caching or backend) ===
+redis
+
+# === Date Handling ===
+python-dateutil
+
+# === Others ===
+tqdm

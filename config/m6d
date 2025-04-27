@@ -1,0 +1,10 @@
+tv_screener:
+  enabled: true
+  weights:
+    rsi_above_50: 0.2
+    macd_positive: 0.2
+    price_above_ema20: 0.2
+    price_above_ema50: 0.2
+    stoch_k_gt_d: 0.1
+    adx_above_20: 0.1
+  score_threshold: 0.6

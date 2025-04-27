@@ -1,0 +1,47 @@
+# spend_predictor.py
+import pandas as pd
+import joblib
+from pathlib import Path
+
+# Path to the trained XGBoost model saved via joblib
+MODEL_PATH = Path("/home/signal/market6/live/models/xgb_spend_model.pkl")
+
+# Load the model with joblib (since it was saved via joblib.dump)
+try:
+    model = joblib.load(MODEL_PATH)
+    print(f"🧠 Loaded spend model from {MODEL_PATH}")
+except Exception as e:
+    raise RuntimeError(f"Failed to load spend model: {e}")
+
+# The exact feature list your model was trained on
+REQUIRED_FEATURES = [
+    "entry_score", "current_score", "drawdown_pct", "safu_score", "macd_lift",
+    "rsi", "rsi_slope", "adx", "tp1_shift", "recovery_odds", "confidence_score",
+    "zombie_tagged", "btc_rsi", "btc_macd_histogram", "btc_adx", "btc_status"
+]
+
+def predict_spend_volume(feature_dict: dict) -> float:
+    """
+    Predict DCA spend volume given feature values.
+
+    Args:
+        feature_dict (dict): Mapping from feature names to values. Must contain all REQUIRED_FEATURES.
+
+    Returns:
+        float: Predicted spend volume.
+    """
+    # Validate and order features
+    missing = [f for f in REQUIRED_FEATURES if f not in feature_dict]
+    if missing:
+        raise ValueError(f"Missing feature(s) for prediction: {missing}")
+    
+    # Build DataFrame row in correct order
+    row = {feat: feature_dict[feat] for feat in REQUIRED_FEATURES}
+    X = pd.DataFrame([row], columns=REQUIRED_FEATURES)
+
+    # Predict
+    try:
+        pred = model.predict(X)[0]
+        return float(pred)
+    except Exception as e:
+        raise RuntimeError(f"Prediction failed: {e}")

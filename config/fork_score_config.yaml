@@ -1,0 +1,18 @@
+min_score: 0.73
+
+weights:
+  macd_histogram: 0.20
+  macd_bearish_cross: -0.25
+  rsi_recovery: 0.20
+  stoch_rsi_cross: 0.20
+  stoch_overbought_penalty: -0.15
+  adx_rising: 0.15
+  ema_price_reclaim: 0.15
+  mean_reversion_score: 0.20
+  volume_penalty: -0.25
+  stoch_rsi_slope: 0.20   # ⬅️ NEW
+
+options:
+  use_stoch_ob_penalty: true
+  use_volume_penalty: true
+  use_macd_bearish_check: false

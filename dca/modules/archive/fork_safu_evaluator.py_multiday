@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+import os
+import json
+import logging
+from pathlib import Path
+from datetime import datetime
+
+import numpy as np
+
+from modules.indicator_utils import calculate_indicators_from_klines
+from utils.kline_utils import load_klines_from_snapshot
+
+# === Config ===
+SNAPSHOT_DIR = Path("/home/signal/market6/data/snapshots")
+CONFIG_PATH = Path("/home/signal/market6/config/fork_safu_config.yaml")
+
+# === Load config once ===
+with open(CONFIG_PATH, "r") as f:
+    CONFIG = json.load(f)
+
+def get_safu_score(symbol, entry_price, current_price, entry_ts=None):
+    # Determine snapshot date
+    if entry_ts:
+        entry_dt = datetime.utcfromtimestamp(entry_ts / 1000)
+        snapshot_date = entry_dt.strftime("%Y-%m-%d")
+    else:
+        snapshot_date = datetime.utcnow().strftime("%Y-%m-%d")
+
+    # Try loading klines from proper snapshot folder
+    kline_path = SNAPSHOT_DIR / snapshot_date / f"{symbol}_15m_klines.json"
+    if not kline_path.exists():
+        logging.warning(f"[WARN] Missing snapshot for {symbol} on {snapshot_date}")
+        return 0.75  # Neutral fallback
+
+    klines = load_klines_from_snapshot(kline_path)
+    if not klines or len(klines) < 10:
+        logging.warning(f"[WARN] Not enough klines for {symbol}")
+        return 0.75
+
+    indicators = calculate_indicators_from_klines(klines)
+
+    # === SAFU scoring logic ===
+    score = 1.0
+    penalties = []
+
+    if indicators.get("macd_histogram", 0) < 0:
+        penalties.append("macd_hist")
+        score -= 0.15
+    if indicators.get("rsi14", 50) < 40:
+        penalties.append("rsi")
+        score -= 0.15
+    if indicators.get("vwap", current_price + 1) > current_price:
+        penalties.append("vwap")
+        score -= 0.15
+    if indicators.get("volume_drop_pct", 0) > 50:
+        penalties.append("volume")
+        score -= 0.15
+    if (entry_price - current_price) / entry_price > 0.08:
+        penalties.append("drawdown")
+        score -= 0.2
+
+    score = max(score, 0.0)
+    logging.debug(f"[SAFU] {symbol} | Score: {score:.2f} | Penalties: {penalties}")
+    return score

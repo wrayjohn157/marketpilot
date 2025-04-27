@@ -1,0 +1,14 @@
+min_score: 0.4
+telegram_alerts: true
+auto_close: false
+
+weights:
+  btc_rsi_below_30: 0.15
+  btc_price_below_ema: 0.10
+  btc_adx_above_30: 0.10
+  token_price_below_vwap: 0.15
+  token_macd_bearish: 0.10
+  token_rsi_below_35: 0.10
+  token_volume_drop: 0.15
+  drawdown_gt_6: 0.05
+  drawdown_gt_7: 0.10
