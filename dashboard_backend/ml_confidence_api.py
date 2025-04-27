@@ -1,11 +1,16 @@
+# /market7/dashboard_backend/ml_confidence_api.py
+
 from fastapi import APIRouter
 import redis
 import json
 from pathlib import Path
+from config.config_loader import PATHS
 
 router = APIRouter()
 r = redis.Redis(host="localhost", port=6379, decode_responses=True)
-CACHE_PATH = Path("/home/signal/market6/dashboard_backend/cache/ml_confidence.json")
+
+# === Paths ===
+CACHE_PATH = PATHS["live_logs"] / "ml_confidence.json"
 
 @router.get("/ml/confidence")
 def get_confidence_data():
@@ -13,7 +18,7 @@ def get_confidence_data():
         raw = r.get("confidence_list")
         if raw:
             return json.loads(raw)
-    except:
+    except Exception:
         pass
 
     # Fallback to local file
@@ -21,7 +26,7 @@ def get_confidence_data():
         try:
             with open(CACHE_PATH) as f:
                 return json.load(f)
-        except:
+        except Exception:
             pass
 
     return []
