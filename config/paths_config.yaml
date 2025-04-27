@@ -10,3 +10,5 @@ paper_cred_path: /home/signal/market7/config/paper_cred.json
 tv_history_path: /home/signal/market7/output/tv_history
 final_fork_rrr_trades: /home/signal/market7/output/final_fork_rrr_trades.json
 fork_tv_adjusted: /home/signal/market7/output/fork_tv_adjusted.jsonl
+dashboard_cache: /home/signal/market7/dashboard_backend/cache
+backtest_summary_path: /home/signal/market7/backtest/data/summary

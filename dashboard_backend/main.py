@@ -6,6 +6,8 @@ from pathlib import Path
 import json
 import redis
 
+from config.config_loader import PATHS
+
 # === FastAPI ===
 app = FastAPI()
 
@@ -15,7 +17,7 @@ r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 # === Allow CORS from anywhere (or restrict to your domain) ===
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace with ["https://entropy157.com"] to restrict
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,9 +37,9 @@ app.include_router(price_refresh_router)
 def root():
     return f"""
     <html>
-        <head><title>Market6 Dashboard API</title></head>
+        <head><title>Market7 Dashboard API</title></head>
         <body>
-            <h2>🚀 Market6 Dashboard Backend</h2>
+            <h2>🚀 Market7 Dashboard Backend</h2>
             <p>Available Endpoints:</p>
             <ul>
                 <li><a href="/metrics">/metrics</a></li>
@@ -45,7 +47,7 @@ def root():
                 <li><a href="/all-trade-health">/all-trade-health</a></li>
                 <li><a href="/active-trades-detailed">/active-trades-detailed</a></li>
                 <li><a href="/backtest/summary">/backtest/summary</a></li>
-                <li><a href="/backtest/summary/2025-04-01">/backtest/summary/&lt;YYYY-MM-DD&gt;</a></li>
+                <li><a href="/backtest/summary/&lt;YYYY-MM-DD&gt;">/backtest/summary/&lt;YYYY-MM-DD&gt;</a></li>
                 <li><a href="/3commas/metrics">/3commas/metrics</a></li>
                 <li><a href="/fork/metrics" target="_blank">/fork/metrics</a></li>
                 <li><a href="/dca-trades-active" target="_blank">/dca-trades-active</a></li>
@@ -96,7 +98,7 @@ def get_btc_context():
 
 @app.get("/fork/metrics")
 def serve_cached_metrics():
-    path = "/home/signal/market6/dashboard_backend/cache/fork_metrics.json"
+    path = PATHS["dashboard_cache"] / "fork_metrics.json"
     try:
         with open(path) as f:
             return json.load(f)
@@ -235,7 +237,7 @@ def threecommas_metrics():
 @app.get("/backtest/summary")
 def get_backtest_summary():
     today = datetime.utcnow().strftime("%Y-%m-%d")
-    summary_path = Path(f"/home/signal/market6/backtest/data/summary/{today}_summary.json")
+    summary_path = PATHS["backtest_summary_path"] / f"{today}_summary.json"
     if not summary_path.exists():
         return {"error": f"Summary for {today} not found."}
     try:
@@ -246,7 +248,7 @@ def get_backtest_summary():
 
 @app.get("/backtest/summary/{date}")
 def get_summary_by_date(date: str):
-    summary_path = Path(f"/home/signal/market6/backtest/data/summary/{date}_summary.json")
+    summary_path = PATHS["backtest_summary_path"] / f"{date}_summary.json"
     if not summary_path.exists():
         return {"error": f"Summary for {date} not found."}
     try:
