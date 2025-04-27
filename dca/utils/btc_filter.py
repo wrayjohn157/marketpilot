@@ -1,10 +1,15 @@
+#!/usr/bin/env python3
+
 import json
 import logging
 from datetime import datetime
 from pathlib import Path
 
-BTC_SNAPSHOT_BASE = Path("/home/signal/market6/live/btc_logs")
+# === Dynamic Paths ===
+BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7
+BTC_SNAPSHOT_BASE = BASE_DIR / "live" / "btc_logs"
 
+# === BTC Snapshot Loader ===
 def get_latest_btc_snapshot():
     today = datetime.utcnow().strftime("%Y-%m-%d")
     filepath = BTC_SNAPSHOT_BASE / today / "btc_snapshots.jsonl"
@@ -22,6 +27,7 @@ def get_latest_btc_snapshot():
         logging.warning(f"[BTC] Failed to read snapshot: {e}")
         return None
 
+# === BTC Safety Evaluator ===
 def is_btc_unsafe(cfg):
     snapshot = get_latest_btc_snapshot()
     if not snapshot:

@@ -32,13 +32,16 @@ from dca.utils.tv_utils import load_tv_kicker
 from dca.utils.zombie_utils import is_zombie_trade
 from dca.utils.spend_predictor import predict_spend_volume, adjust_volume
 from dca.utils.trade_health_evaluator import evaluate_trade_health
+from config.config_loader import PATHS
 
-CONFIG_PATH = Path("/home/signal/market6/dca/config/dca_config.yaml")
-LOG_DIR = Path("/home/signal/market6/dca/logs")
-SNAPSHOT_DIR = Path("/home/signal/market6/live/ml_dataset/recovery_snapshots")
+CONFIG_PATH = PATHS["base"] / "dca" / "config" / "dca_config.yaml"
+LOG_DIR = PATHS["base"] / "dca" / "logs"
+SNAPSHOT_DIR = PATHS["base"] / "live" / "ml_dataset" / "recovery_snapshots"
 DCA_TRACKING_PATH = LOG_DIR / "dca_tracking" / "dca_fired.jsonl"
+
 SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
 DCA_TRACKING_PATH.parent.mkdir(parents=True, exist_ok=True)
+
 
 with open(CONFIG_PATH, "r") as f:
     config = yaml.safe_load(f)

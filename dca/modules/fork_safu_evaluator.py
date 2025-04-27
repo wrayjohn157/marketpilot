@@ -9,8 +9,9 @@ from ta.trend import MACD
 from ta.momentum import RSIIndicator
 
 # === Paths ===
-SAFU_CONFIG_PATH = Path("/home/signal/market6/config/fork_safu_config.yaml")
-SNAPSHOT_BASE = Path("/home/signal/market6/data/snapshots")
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+SAFU_CONFIG_PATH = BASE_DIR / "config" / "fork_safu_config.yaml"
+SNAPSHOT_BASE = BASE_DIR / "data" / "snapshots"
 
 # === Load config ===
 with open(SAFU_CONFIG_PATH) as f:
@@ -22,7 +23,7 @@ MIN_SCORE = safu_cfg.get("min_score", 0.4)
 logger = logging.getLogger("safu_eval")
 logger.setLevel(logging.INFO)
 
-def load_indicators_from_disk(symbol, tf="15m"):
+def load_indicators_from_disk(symbol: str, tf: str = "15m") -> dict:
     date_str = datetime.utcnow().strftime("%Y-%m-%d")
     path = SNAPSHOT_BASE / date_str / f"{symbol}_{tf}_klines.json"
     if not path.exists():

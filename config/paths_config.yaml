@@ -1,0 +1,12 @@
+# /market7/config/paths_config.yaml
+
+base_path: /home/signal/market7
+snapshots_path: /home/signal/market7/data/snapshots
+fork_history_path: /home/signal/market7/output/fork_history
+btc_logs_path: /home/signal/market7/live/btc_logs
+live_logs_path: /home/signal/market7/live/logs
+models_path: /home/signal/market7/live/models
+paper_cred_path: /home/signal/market7/config/paper_cred.json
+tv_history_path: /home/signal/market7/output/tv_history
+final_fork_rrr_trades: /home/signal/market7/output/final_fork_rrr_trades.json
+fork_tv_adjusted: /home/signal/market7/output/fork_tv_adjusted.jsonl

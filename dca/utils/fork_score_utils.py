@@ -7,8 +7,9 @@ from typing import Optional, Tuple
 
 from indicators.fork_score_filter import compute_subscores
 
-# === Paths ===
-FORK_HISTORY_BASE = Path("/home/signal/market6/output/fork_history")
+# === Dynamic Paths ===
+BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7
+FORK_HISTORY_BASE = BASE_DIR / "output" / "fork_history"
 
 # === Entry Score Loader ===
 def load_fork_entry_score(symbol: str, entry_ts: int) -> Optional[float]:
@@ -37,10 +38,9 @@ def load_fork_entry_score(symbol: str, entry_ts: int) -> Optional[float]:
             if not score_ts_raw or not str(score_ts_raw).isdigit():
                 continue
             record_ts = int(score_ts_raw)  # record_ts in milliseconds
-            # Only consider records that occurred at or before the trade's entry time.
             if record_ts > entry_ts:
                 continue
-            delta = entry_ts - record_ts  # delta in ms
+            delta = entry_ts - record_ts
             if delta < smallest_delta:
                 smallest_delta = delta
                 best_match = obj
@@ -51,11 +51,10 @@ def load_fork_entry_score(symbol: str, entry_ts: int) -> Optional[float]:
     print(f"[WARN] No matching entry score found for {symbol} at ts={entry_ts}")
     return None
 
-# === Recent Score Loader (use this before fallback) ===
+# === Recent Score Loader ===
 def load_recent_score(symbol: str, now_ts: int) -> Optional[Tuple[float, int]]:
     """
-    Return a tuple (score, record_ts) for the most recent fork score record within 10 minutes of now.
-    now_ts is the current timestamp in milliseconds. Only records with timestamp <= now_ts are considered.
+    Return (score, record_ts) for the most recent fork score record within 10 minutes of now_ts.
     """
     date_str = datetime.utcfromtimestamp(now_ts / 1000).strftime("%Y-%m-%d")
     path = FORK_HISTORY_BASE / date_str / "fork_scores.jsonl"
@@ -75,11 +74,10 @@ def load_recent_score(symbol: str, now_ts: int) -> Optional[Tuple[float, int]]:
             if record.get("symbol") != symbol:
                 continue
             ts = int(record.get("timestamp", 0))
-            # Only consider records from the past (i.e. ts <= now_ts)
             if ts > now_ts:
                 continue
-            diff = now_ts - ts  # elapsed time in ms
-            if diff <= 600_000 and diff < best_diff:  # within 10 minutes
+            diff = now_ts - ts
+            if diff <= 600_000 and diff < best_diff:
                 best = record
                 best_diff = diff
                 best_record_ts = ts
@@ -88,10 +86,10 @@ def load_recent_score(symbol: str, now_ts: int) -> Optional[Tuple[float, int]]:
         return best["score"], best_record_ts
     return None
 
-# === Fallback — Recalculate Using Full Fork Logic ===
+# === Fallback Fork Scorer ===
 def compute_fork_score(symbol: str) -> Optional[float]:
     """
-    Fallback: use the fork_score_filter subscores logic to recalculate.
+    Fallback: recalculate fork score using the fork_score_filter subscores logic.
     """
     try:
         score, _, _, _ = compute_subscores(symbol)

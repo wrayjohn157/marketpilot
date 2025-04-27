@@ -1,15 +1,43 @@
+#!/usr/bin/env python3
+"""
+Zombie Trade Tagging Utilities for Smart DCA.
+"""
+
 import yaml
 from pathlib import Path
 
-CONFIG_PATH = Path("/home/signal/market6/dca/config/dca_config.yaml")
+# === Paths ===
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+CONFIG_PATH = BASE_DIR / "dca" / "config" / "dca_config.yaml"
 
-with open(CONFIG_PATH, "r") as f:
-    config = yaml.safe_load(f)
+# === Config Loader ===
+def load_zombie_config():
+    if not CONFIG_PATH.exists():
+        return {}
+    try:
+        with open(CONFIG_PATH, "r") as f:
+            config = yaml.safe_load(f)
+        return config.get("zombie_tag", {})
+    except Exception as e:
+        print(f"[WARN] Failed to load zombie config: {e}")
+        return {}
 
-zombie_config = config.get("zombie_tag", {})
+zombie_config = load_zombie_config()
 ENABLED = zombie_config.get("enabled", False)
 
+# === Zombie Detection ===
 def is_zombie_trade(indicators, recovery_odds, current_score):
+    """
+    Determines if a trade should be tagged as a zombie trade based on drawdown, score, recovery odds, and indicator slopes.
+
+    Args:
+        indicators (dict): Current indicator values.
+        recovery_odds (float): Current recovery odds prediction.
+        current_score (float): Current fork score.
+
+    Returns:
+        bool: True if the trade is considered a zombie, False otherwise.
+    """
     if not ENABLED:
         return False
 
