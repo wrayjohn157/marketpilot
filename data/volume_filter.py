@@ -1,25 +1,27 @@
 #!/usr/bin/env python3
 import requests
 import json
-import os
 import logging
-from datetime import datetime
 import redis
+from datetime import datetime
+from pathlib import Path
 
-# Setup logging
+# === Import centralized paths ===
+from config.config_loader import PATHS
+
+# === Setup logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
-# Output file in the correct Market 6 location
-BASE_PATH = os.path.dirname(__file__)
-OUTPUT_FILE = os.path.join(BASE_PATH, "..", "output", "filtered_pairs.json")
+# === Paths ===
+OUTPUT_FILE = PATHS["filtered_pairs"]
 
-# Volume threshold (in USDT)
+# === Volume threshold (in USDT) ===
 MIN_VOLUME_USDT = 3_000_000
 
-# Redis setup
+# === Redis setup ===
 r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
-# Excluded base tokens
+# === Excluded base tokens ===
 EXCLUDED_BASES = [
     "USDT", "USDC", "FDUSD", "TUSD", "BUSD", "DAI",
     "EUR", "TRY", "BRL", "GBP", "UAH", "USD",
@@ -68,12 +70,13 @@ def main():
     count = len(qualified_symbols)
     logging.info(f"✅ Qualified symbols: {count} passed all volume and Redis checks.")
 
-    # Save to output directory
+    # Save to output file
+    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_FILE, "w") as f:
         json.dump(qualified_symbols, f, indent=4)
     logging.info(f"💾 Filtered pairs saved to: {OUTPUT_FILE}")
 
-    # Update Redis with metadata
+    # Update Redis metadata
     timestamp = datetime.utcnow().isoformat()
     r.set("last_scan_vol", timestamp)
     r.set("volume_filter_count", count)

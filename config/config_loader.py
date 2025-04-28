@@ -19,4 +19,14 @@ PATHS = {
     "tv_history": Path(raw_config["tv_history_path"]),
     "final_fork_rrr_trades": Path(raw_config["final_fork_rrr_trades"]),
     "fork_tv_adjusted": Path(raw_config["fork_tv_adjusted"]),
+    "filtered_pairs": Path(raw_config["filtered_pairs_path"]),
 }
+
+# === Optional safety validation ===
+expected_keys = {
+    "base", "snapshots", "fork_history", "btc_logs", "live_logs", "models",
+    "paper_cred", "tv_history", "final_fork_rrr_trades", "fork_tv_adjusted", "filtered_pairs"
+}
+missing_keys = expected_keys - PATHS.keys()
+if missing_keys:
+    raise ValueError(f"Missing config path(s) in paths_config.yaml: {missing_keys}")

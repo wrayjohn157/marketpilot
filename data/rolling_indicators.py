@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 import time
 import json
 import redis
@@ -7,14 +6,18 @@ import logging
 import requests
 import pandas as pd
 from datetime import datetime
+from pathlib import Path
 from ta.momentum import StochRSIIndicator, RSIIndicator
 from ta.trend import EMAIndicator, ADXIndicator, MACD, PSARIndicator
 from ta.volatility import AverageTrueRange
 
-# Logging
+# === Import central paths ===
+from config.config_loader import PATHS
+
+# === Logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-# Configuration
+# === Configuration ===
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 REDIS_DB = 0
@@ -22,17 +25,17 @@ REFRESH_INTERVAL = 60
 KLINE_LIMIT = 210
 TIMEFRAMES = ["15m", "1h", "4h"]
 
-# Paths
-BASE_PATH = os.path.dirname(__file__)
-FILTERED_FILE = os.path.join(BASE_PATH, "filtered_pairs.json")
+# === Paths ===
+FILTERED_FILE = PATHS["filtered_pairs"]
+SNAPSHOTS_BASE = PATHS["snapshots"]
+
+# === Redis ===
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
 def get_snapshot_dir():
-    path = os.path.join(BASE_PATH, "snapshots", datetime.utcnow().strftime("%Y-%m-%d"))
-    os.makedirs(path, exist_ok=True)
+    path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
+    path.mkdir(parents=True, exist_ok=True)
     return path
-
-# Redis
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
 def fetch_klines(symbol, interval, limit=150):
     url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
@@ -81,7 +84,7 @@ def compute_indicators(df):
     return indicators
 
 def load_filtered_tokens():
-    if not os.path.exists(FILTERED_FILE):
+    if not FILTERED_FILE.exists():
         logging.error("Missing filtered_pairs.json")
         return []
     with open(FILTERED_FILE, "r") as f:
@@ -89,7 +92,7 @@ def load_filtered_tokens():
 
 def save_to_disk(symbol, tf, indicators):
     snapshot_dir = get_snapshot_dir()
-    filename = os.path.join(snapshot_dir, f"{symbol.upper()}_{tf}.json")
+    filename = snapshot_dir / f"{symbol.upper()}_{tf}.json"
     try:
         with open(filename, "w") as f:
             json.dump(indicators, f, indent=2)

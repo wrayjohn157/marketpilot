@@ -1,34 +1,37 @@
 #!/usr/bin/env python3
-import os
 import time
 import json
 import redis
 import logging
 import requests
 from datetime import datetime
+from pathlib import Path
 
-# Logging
+# === Import central paths ===
+from config.config_loader import PATHS
+
+# === Logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-# Redis config
+# === Redis config ===
 r = redis.Redis(host="localhost", port=6379, db=0)
 
-# Timeframes + settings
+# === Timeframes + settings ===
 TIMEFRAMES = ["15m", "1h", "4h"]
 KLINE_LIMIT = 210
 REFRESH_INTERVAL = 60
 
-# Filtered tokens file
-BASE_PATH = os.path.dirname(__file__)
-FILTERED_FILE = os.path.join(BASE_PATH, "filtered_pairs.json")
+# === Paths ===
+FILTERED_FILE = PATHS["filtered_pairs"]
+SNAPSHOTS_BASE = PATHS["snapshots"]
 
 def get_snapshot_dir():
-    path = os.path.join(BASE_PATH, "snapshots", datetime.utcnow().strftime("%Y-%m-%d"))
-    os.makedirs(path, exist_ok=True)
+    path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
+    path.mkdir(parents=True, exist_ok=True)
     return path
 
 def load_filtered_tokens():
-    if not os.path.exists(FILTERED_FILE):
+    if not FILTERED_FILE.exists():
         logging.error("Missing filtered_pairs.json")
         return []
     with open(FILTERED_FILE, "r") as f:
@@ -45,7 +48,7 @@ def fetch_klines(symbol, interval, limit=150):
 
 def save_klines_to_disk(symbol, tf, data):
     snapshot_dir = get_snapshot_dir()
-    filename = os.path.join(snapshot_dir, f"{symbol.upper()}_{tf}_klines.json")
+    filename = snapshot_dir / f"{symbol.upper()}_{tf}_klines.json"
     try:
         with open(filename, "w") as f:
             json.dump(data, f)
