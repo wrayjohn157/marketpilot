@@ -1,26 +1,36 @@
 #!/usr/bin/env python3
-import os
 import json
 import redis
 import logging
+from pathlib import Path
+import yaml
 
+# === Logging setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
+# === Load config paths ===
+CONFIG_PATH = "/home/signal/market7/config/paths_config.yaml"
+with open(CONFIG_PATH) as f:
+    paths = yaml.safe_load(f)
+
+# Input file path
+INPUT_FILE = Path(paths["dashboard_cache"]) / "market_scan.json"
 
 # Redis config
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 REDIS_DB = 0
 
-# Input JSON file path
-BASE_PATH = os.path.dirname(__file__)
-INPUT_FILE = os.path.join(BASE_PATH, "market_scan.json")
-
-# Connect to Redis
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+# Redis connection
+try:
+    r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
+except Exception as e:
+    logging.error(f"Redis connection error: {e}")
+    exit(1)
 
 def store_to_redis():
-    if not os.path.exists(INPUT_FILE):
-        logging.error(f"Input file not found: {INPUT_FILE}")
+    if not INPUT_FILE.exists():
+        logging.error(f"❌ Input file not found: {INPUT_FILE}")
         return
 
     with open(INPUT_FILE, "r") as f:

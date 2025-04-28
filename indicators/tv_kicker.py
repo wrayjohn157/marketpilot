@@ -4,12 +4,14 @@ import logging
 from pathlib import Path
 from datetime import datetime
 import time
+from utils.path_utils import load_paths
 
-# === Config ===
-INPUT_FILE = Path("/home/signal/market6/output/fork_backtest_candidates.json")
-TV_FILE = Path("/home/signal/market6/output/tv_screener_raw_dict.txt")
-FORK_TV_OUTPUT = Path("/home/signal/market6/output/fork_tv_adjusted.jsonl")
-TV_HISTORY_BASE = Path("/home/signal/market6/output/tv_history")
+# === Load Config ===
+paths = load_paths()
+INPUT_FILE = Path(paths["fork_backtest_candidates_path"])
+TV_FILE = Path(paths["tv_history_path"]) / "tv_screener_raw_dict.txt"
+FORK_TV_OUTPUT = Path(paths["fork_tv_adjusted"])
+TV_HISTORY_BASE = Path(paths["tv_history_path"])
 
 TV_SCORE_WEIGHTS = {
     "strong_buy": 0.30,
@@ -21,17 +23,21 @@ TV_SCORE_WEIGHTS = {
 
 MIN_PASS_SCORE = 0.73
 
-# === Logging ===
+# === Setup Logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
+# === Functions ===
+
 def load_candidates(path: Path):
+    if not path.exists():
+        logging.error(f"[ERROR] Missing input file: {path}")
+        return []
     with open(path) as f:
         first_char = f.read(1)
         f.seek(0)
         if first_char == "[":
             try:
-                data = json.load(f)
-                return data
+                return json.load(f)
             except Exception as e:
                 logging.error(f"[ERROR] Failed to parse JSON array: {e}")
                 return []
@@ -41,23 +47,23 @@ def load_candidates(path: Path):
                 try:
                     entries.append(json.loads(line.strip()))
                 except Exception as e:
-                    logging.warning("⚠️ Skipping bad line: %s", e)
+                    logging.warning(f"⚠️ Skipping bad line: {e}")
             return entries
 
 def load_tv_tags(path: Path):
     if not path.exists():
-        logging.warning("⚠️ TV file not found: %s", path)
+        logging.warning(f"⚠️ TV screener file not found: {path}")
         return {}
-    with open(path) as f:
-        try:
+    try:
+        with open(path) as f:
             tv_data = json.load(f)
             return {k.upper(): v.get("15m", "neutral") for k, v in tv_data.items()}
-        except Exception as e:
-            logging.error("[TV] Failed to parse: %s", e)
-            return {}
+    except Exception as e:
+        logging.error(f"[TV] Failed to parse TV file: {e}")
+        return {}
 
 def main():
-    logging.info("📡 Loading TV tags and fork candidates…")
+    logging.info("📡 Loading TV tags and fork candidates...")
     candidates = load_candidates(INPUT_FILE)
     tv_tags = load_tv_tags(TV_FILE)
 
@@ -67,6 +73,7 @@ def main():
     history_file = history_dir / "tv_kicker.jsonl"
 
     count_passed = 0
+
     with open(FORK_TV_OUTPUT, "w") as f_out, open(history_file, "a") as f_log:
         for item in candidates:
             symbol = item.get("symbol", "").upper()
@@ -93,20 +100,11 @@ def main():
 
             f_log.write(json.dumps(entry) + "\n")
 
-            # CLI feedback
-            if passed:
-                icon = "✅"
-            elif adjusted_score > base_score:
-                icon = "🟢"
-            elif adjusted_score < base_score:
-                icon = "🔻"
-            else:
-                icon = "➖"
+            icon = "✅" if passed else ("🟢" if adjusted_score > base_score else "🔻" if adjusted_score < base_score else "➖")
+            logging.info(f"{icon} {symbol} | {base_score:.4f} → {adjusted_score:.4f} | TV: {tv_tag}")
 
-            logging.info("%s %s | %.4f → %.4f | TV: %s", icon, symbol, base_score, adjusted_score, tv_tag)
-
-    logging.info("🟩 Saved %d trades to %s", count_passed, FORK_TV_OUTPUT)
-    logging.info("📚 Persistent log: %s", history_file)
+    logging.info(f"🟩 Saved {count_passed} trades to {FORK_TV_OUTPUT}")
+    logging.info(f"📚 Persistent log written to {history_file}")
 
 if __name__ == "__main__":
     main()

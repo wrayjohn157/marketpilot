@@ -1,25 +1,30 @@
+#!/usr/bin/env python3
 import redis
 import json
-import datetime
 import logging
+from datetime import datetime
+from utils.path_utils import load_paths
 
-logging.basicConfig(level=logging.INFO)
-r = redis.Redis()
+# === Setup ===
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+paths = load_paths()
 
-OUTPUT_FILE = "../output/approved_trades.json"
-FORK_FILE = "../output/final_forked_trades.json"
+# === Paths from config ===
+OUTPUT_FILE = paths["final_fork_rrr_trades"]
+FORK_FILE = paths["fork_candidates_path"]
+
 VOLUME_PASSED_SET = "VOLUME_PASSED_TOKENS"
 
-# Load BTC condition from Redis
+# Load BTC condition
 try:
-    market_condition = r.get("btc_condition")
-    market_condition = market_condition.decode() if market_condition else "neutral"
+    market_condition = r.get("btc_condition") or "neutral"
     logging.info(f"📈 BTC Market Condition: {market_condition}")
 except Exception as e:
     market_condition = "neutral"
     logging.warning(f"⚠️ Failed to fetch btc_condition from Redis, using default: {e}")
 
-# Define thresholds per market condition
+# Thresholds
 thresholds = {
     "neutral": {
         "15m": {"qqe_min": 20, "qqe_max": 50, "rsi_range": [35, 65], "stoch_max": 0.8, "stoch_oversold": 0.3},
@@ -38,6 +43,7 @@ thresholds = {
     }
 }
 
+# === Functions ===
 
 def evaluate(symbol, tf, ind):
     t = thresholds.get(market_condition, thresholds["neutral"]).get(tf, {})
@@ -77,7 +83,6 @@ def evaluate(symbol, tf, ind):
             if ind["StochRSI_K"] > t["stoch_oversold"]:
                 reasons.append(f"Stoch_K {ind['StochRSI_K']} > oversold {t['stoch_oversold']}")
                 passed = False
-
         elif market_condition == "bullish":
             if ind.get("ADX14", 0) < t.get("adx_min", 20):
                 reasons.append(f"ADX {ind.get('ADX14', 0)} < {t.get('adx_min', 20)}")
@@ -85,7 +90,6 @@ def evaluate(symbol, tf, ind):
             if ind.get("RSI14", 0) > t.get("rsi_max", 75):
                 reasons.append(f"RSI {ind.get('RSI14', 0)} > {t.get('rsi_max', 75)}")
                 passed = False
-
         elif market_condition == "bearish":
             if ind.get("RSI14", 0) > t.get("rsi_max", 45):
                 reasons.append(f"RSI {ind.get('RSI14', 0)} > {t.get('rsi_max', 45)}")
@@ -105,12 +109,10 @@ def evaluate(symbol, tf, ind):
             if ind["StochRSI_K"] > t["stoch_oversold"]:
                 reasons.append(f"Stoch_K {ind['StochRSI_K']} > oversold {t['stoch_oversold']}")
                 passed = False
-
         elif market_condition == "bullish":
             if not (t.get("qqe_min", 55) <= ind.get("QQE", 0) <= t.get("qqe_max", 80)):
                 reasons.append(f"QQE {ind.get('QQE', 0)} not in {t.get('qqe_min', 55)}–{t.get('qqe_max', 80)}")
                 passed = False
-
         elif market_condition == "bearish":
             if ind.get("QQE", 0) > t.get("qqe_max", 50):
                 reasons.append(f"QQE {ind.get('QQE', 0)} > {t.get('qqe_max', 50)}")
@@ -120,7 +122,6 @@ def evaluate(symbol, tf, ind):
                 passed = False
 
     return passed, reasons
-
 
 def check_fork_criteria(ind):
     score = 0
@@ -151,7 +152,6 @@ def check_fork_criteria(ind):
 
     return score >= 2, reasons
 
-
 def main():
     approved = {}
     fork_queue = {}
@@ -159,7 +159,7 @@ def main():
     logging.info(f"📊 Evaluating {len(symbols)} symbols...")
 
     for symbol in symbols:
-        symbol_clean = symbol.decode().replace("USDT_", "").replace("_USDT", "").replace("USDT", "")
+        symbol_clean = symbol.replace("USDT_", "").replace("_USDT", "").replace("USDT", "")
         logging.info(f"🔎 {symbol_clean}")
 
         tf_passed = []
@@ -179,12 +179,11 @@ def main():
             else:
                 tf_debug.append((tf, reasons))
 
-                # Fork candidate scan
                 is_fork, flags = check_fork_criteria(ind)
                 if is_fork:
                     fork_reasons[tf] = flags
 
-        if len(tf_passed) == 2: #was 3
+        if len(tf_passed) == 2:
             approved[symbol_clean] = {
                 "timeframes": tf_passed,
                 "indicator_data": {
@@ -192,7 +191,6 @@ def main():
                 }
             }
             logging.info(f"✅ PASSED: {symbol_clean}")
-
         elif fork_reasons:
             fork_queue[symbol_clean] = {
                 "timeframes_failed": [x[0] for x in tf_debug],
@@ -205,7 +203,6 @@ def main():
             for tf, flags in fork_reasons.items():
                 for reason in flags:
                     logging.info(f"    {tf}: {reason}")
-
         else:
             logging.info(f"❌ FAILED: {symbol_clean}")
             for tf, reasons in tf_debug:
@@ -220,9 +217,9 @@ def main():
 
     r.set("tech_filter_count_in", len(symbols))
     r.set("tech_filter_count_out", len(approved))
-    r.set("last_scan_tech", datetime.datetime.utcnow().isoformat())
-    logging.info(f"💾 Saved {len(approved)} approved | 🌀 Saved {len(fork_queue)} fork candidates")
+    r.set("last_scan_tech", datetime.utcnow().isoformat())
 
+    logging.info(f"💾 Saved {len(approved)} approved | 🌀 Saved {len(fork_queue)} fork candidates")
 
 if __name__ == "__main__":
     main()

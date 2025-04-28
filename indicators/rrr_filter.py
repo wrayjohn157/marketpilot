@@ -1,28 +1,35 @@
 #!/usr/bin/env python3
-import os
-import sys
 import json
 import redis
-import datetime
+import logging
+from datetime import datetime
+from pathlib import Path
+import yaml
 
-# ✅ Add project root to sys.path so absolute imports work
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from indicators.rrr_filter.run_rrr_filter import run_rrr_filter
 
-from rrr_filter.run_rrr_filter import run_rrr_filter
+# === Load config paths ===
+CONFIG_PATH = "/home/signal/market7/config/paths_config.yaml"
+with open(CONFIG_PATH) as f:
+    paths = yaml.safe_load(f)
 
-# Redis setup
-r = redis.Redis(decode_responses=True)
-
-# Absolute file paths
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))  # /home/signal/taapi/market6
-APPROVED_FILE = os.path.join(BASE_DIR, "output", "approved_trades.json")
-RRR_PASS_FILE = os.path.join(BASE_DIR, "output", "rrr_passed.json")
+APPROVED_FILE = Path(paths["final_fork_rrr_trades"])
+RRR_PASS_FILE = Path(paths["fork_backtest_candidates_path"])
 
 # Redis keys
 FINAL_FILTER_KEY = "FINAL_RRR_FILTERED_TRADES"
 FINAL_TRADES_KEY = "FINAL_TRADES"
+
+# Redis setup
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+
+# Logging setup
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
+# Constants
 EMA_WINDOW = 5
 
+# === Helper Functions ===
 def get_indicator(symbol, tf):
     key = f"{symbol}_{tf}"
     data = r.get(key)
@@ -44,24 +51,23 @@ def make_json_serializable(obj):
         return obj
     return str(obj)
 
+# === Main Execution ===
 def main():
-    print("🚀 Running RRR filter engine...")
+    logging.info("🚀 Running RRR filter engine...")
 
     # Clear old Redis keys
     r.delete(FINAL_FILTER_KEY)
     r.delete(FINAL_TRADES_KEY)
 
-    if not os.path.exists(APPROVED_FILE):
-        print(f"❌ Missing file: {APPROVED_FILE}")
+    if not APPROVED_FILE.exists():
+        logging.error(f"❌ Missing approved trades file: {APPROVED_FILE}")
         return
 
-    with open(APPROVED_FILE, "r") as f:
+    with open(APPROVED_FILE) as f:
         symbols = json.load(f)
 
     filtered = {}
-    rejections = 0
-    skips = 0
-    failures = 0
+    rejections = skips = failures = 0
 
     for symbol in symbols:
         s = symbol.upper()
@@ -70,15 +76,15 @@ def main():
         klines = get_klines(s, "15m")
 
         if not ind_1h:
-            print(f"⚠️ Skipping {s}: missing 1h indicators")
+            logging.warning(f"⚠️ Skipping {s}: missing 1h indicators")
             skips += 1
             continue
         if not ind_15m:
-            print(f"⚠️ Skipping {s}: missing 15m indicators")
+            logging.warning(f"⚠️ Skipping {s}: missing 15m indicators")
             skips += 1
             continue
         if len(klines) < EMA_WINDOW + 6:
-            print(f"⚠️ Skipping {s}: not enough klines ({len(klines)} candles)")
+            logging.warning(f"⚠️ Skipping {s}: not enough klines ({len(klines)} candles)")
             skips += 1
             continue
 
@@ -94,52 +100,50 @@ def main():
                 }
             )
         except Exception as e:
-            print(f"❌ Error scoring {s}: {e}")
+            logging.error(f"❌ Error scoring {s}: {e}")
             failures += 1
             continue
 
         if not result:
-            print(f"❌ No result returned for {s}")
+            logging.error(f"❌ No result returned for {s}")
             failures += 1
             continue
 
         score = result.get("score", 0)
         if result.get("passed"):
-            result["pair"] = f"USDT_{s}"
-            result["exchange"] = "binance"
-            result["type"] = "long"
-            result["market_price"] = ind_1h.get("latest_close")
+            result.update({
+                "pair": f"USDT_{s}",
+                "exchange": "binance",
+                "type": "long",
+                "market_price": ind_1h.get("latest_close")
+            })
             filtered[s] = make_json_serializable(result)
-            print(f"✅ Passed: {s} | Score: {score:.2f}")
+            logging.info(f"✅ Passed: {s} | Score: {score:.2f}")
         else:
-            print(f"❌ Rejected: {s} | Score: {score:.2f}")
+            logging.info(f"❌ Rejected: {s} | Score: {score:.2f}")
             reasons = result.get("reasons", [])
-            if reasons:
-                for reason in reasons:
-                    print(f"    🪫 {reason}")
-            else:
-                print("    ⚠️ No rejection reasons provided.")
+            for reason in reasons:
+                logging.info(f"    🪫 {reason}")
             rejections += 1
 
-    # Save final trades to file
+    # Save outputs
     with open(RRR_PASS_FILE, "w") as f:
         json.dump(filtered, f, indent=2)
 
-    # Save to Redis
     r.set(FINAL_FILTER_KEY, json.dumps(filtered))
     r.set(FINAL_TRADES_KEY, json.dumps(list(filtered.keys())))
-    r.set("last_scan_rrr", datetime.datetime.utcnow().isoformat())
+    r.set("last_scan_rrr", datetime.utcnow().isoformat())
     r.set("rrr_filter_count_in", len(symbols))
     r.set("rrr_filter_count_out", len(filtered))
     r.set("final_trades_count", len(filtered))
 
     # Summary
-    print(f"\n📊 RRR Filter Summary:")
-    print(f" - ✅ Passed:   {len(filtered)}")
-    print(f" - ❌ Rejected: {rejections}")
-    print(f" - ⚠️ Skipped:  {skips}")
-    print(f" - 💥 Errors:   {failures}")
-    print(f" - 📄 Saved final trades to: {RRR_PASS_FILE}")
+    logging.info("\n📊 RRR Filter Summary:")
+    logging.info(f" - ✅ Passed:   {len(filtered)}")
+    logging.info(f" - ❌ Rejected: {rejections}")
+    logging.info(f" - ⚠️ Skipped:  {skips}")
+    logging.info(f" - 💥 Errors:   {failures}")
+    logging.info(f" - 📄 Saved final trades to: {RRR_PASS_FILE}")
 
 if __name__ == "__main__":
     main()

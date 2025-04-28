@@ -14,3 +14,6 @@ dashboard_cache: /home/signal/market7/dashboard_backend/cache
 backtest_summary_path: /home/signal/market7/backtest/data/summary
 fork_candidates_path: /home/signal/market7/output/fork_candidates.json
 fork_backtest_candidates_path: /home/signal/market7/output/fork_backtest_candidates.json
+dca_tracking_log: /home/signal/market7/dca/logs/dca_tracking/dca_fired.jsonl
+dca_log_base: /home/signal/market7/dca/logs/
+ml_dataset_base: /home/signal/market7/live/ml_dataset/
