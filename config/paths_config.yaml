@@ -12,3 +12,5 @@ final_fork_rrr_trades: /home/signal/market7/output/final_fork_rrr_trades.json
 fork_tv_adjusted: /home/signal/market7/output/fork_tv_adjusted.jsonl
 dashboard_cache: /home/signal/market7/dashboard_backend/cache
 backtest_summary_path: /home/signal/market7/backtest/data/summary
+fork_candidates_path: /home/signal/market7/output/fork_candidates.json
+fork_backtest_candidates_path: /home/signal/market7/output/fork_backtest_candidates.json

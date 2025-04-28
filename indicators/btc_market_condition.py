@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
+import sys
+from pathlib import Path
+
+# === Patch sys.path to project root ===
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 import logging
 import redis
 import json
-from local_indicators import fetch_binance_klines, compute_ema, compute_adx
+from utils.local_indicators import fetch_binance_klines, compute_ema, compute_adx
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')

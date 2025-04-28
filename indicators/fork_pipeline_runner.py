@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import json
 import logging
 import os
@@ -5,7 +6,9 @@ from pathlib import Path
 from datetime import datetime
 import redis
 
-# ===== CONFIG =====
+# === CONFIG ===
+from config.config_loader import PATHS
+
 INDICATOR_WEIGHTS = {
     "MACD_Histogram": 0.2,
     "RSI14": 0.2,
@@ -15,11 +18,11 @@ INDICATOR_WEIGHTS = {
 }
 MIN_SCORE = 0.65
 
-FORK_INPUT_FILE = "/home/signal/market6/output/fork_candidates.json"
-FINAL_OUTPUT_FILE = "/home/signal/market6/output/final_fork_rrr_trades.json"
-BACKTEST_CANDIDATES_FILE = "/home/signal/market6/output/fork_backtest_candidates.json"
-FORK_HISTORY_BASE = Path("/home/signal/market6/output/fork_history")
-SNAPSHOT_BASE = Path("/home/signal/market6/data/snapshots")
+FORK_INPUT_FILE = str(Path(PATHS["base_path"]) / "output" / "fork_candidates.json")
+FINAL_OUTPUT_FILE = PATHS["final_fork_rrr_trades"]
+BACKTEST_CANDIDATES_FILE = str(Path(PATHS["base_path"]) / "output" / "fork_backtest_candidates.json")
+FORK_HISTORY_BASE = Path(PATHS["fork_history_path"])
+SNAPSHOT_BASE = Path(PATHS["snapshots_path"])
 
 REDIS_SET = "fork_score:approved"
 REDIS_FINAL_TRADES = "fork_score:final"
