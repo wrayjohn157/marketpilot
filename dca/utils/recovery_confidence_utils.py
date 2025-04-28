@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 # === Dynamic Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7
-MODEL_PATH = BASE_DIR / "live" / "models" / "xgb_confidence_model.pkl"
-SNAPSHOT_DIR = BASE_DIR / "live" / "ml_dataset" / "recovery_snapshots"
+MODEL_PATH = BASE_DIR / "ml" / "models" / "xgb_confidence_model.pkl"
+SNAPSHOT_DIR = BASE_DIR / "ml" / "datasets" / "recovery_snapshots"
 
 # === Finalized feature list matching model input ===
 FEATURE_COLUMNS = [
@@ -26,9 +26,9 @@ FEATURE_COLUMNS = [
 # === Load Model Once ===
 try:
     MODEL = joblib.load(str(MODEL_PATH))
-    logger.debug(f"Loaded confidence model from {MODEL_PATH}")
+    logger.info(f"✅ Loaded confidence model from {MODEL_PATH}")
 except Exception as e:
-    logger.error(f"Failed to load confidence model: {e}")
+    logger.error(f"❌ Failed to load confidence model: {e}")
     MODEL = None
 
 
@@ -38,7 +38,7 @@ def predict_confidence_score(trade_snapshot: dict) -> float:
     Will auto-inject 'snapshot_*' features if available from recovery snapshots.
     """
     if not isinstance(trade_snapshot, dict):
-        logger.warning("Invalid trade_snapshot; returning 0.0")
+        logger.warning("⚠️ Invalid trade_snapshot; returning 0.0")
         return 0.0
 
     # Extract deal and asset
@@ -62,7 +62,7 @@ def predict_confidence_score(trade_snapshot: dict) -> float:
                             trade_snapshot[feat] = last[feat]
                 logger.debug(f"✅ Injected snapshot features from {snap_file.name}")
         except Exception as e:
-            logger.warning(f"Could not load snapshot {snap_file.name}: {e}")
+            logger.warning(f"⚠️ Could not load snapshot {snap_file.name}: {e}")
 
     # Build model input row
     row = {}
@@ -78,11 +78,11 @@ def predict_confidence_score(trade_snapshot: dict) -> float:
     df = pd.DataFrame([row], columns=FEATURE_COLUMNS)
 
     if MODEL is None:
-        logger.error("No confidence model loaded; prediction unavailable.")
+        logger.error("❌ No confidence model loaded; prediction unavailable.")
         return 0.0
 
     try:
         return round(float(MODEL.predict(df)[0]), 4)
     except Exception as e:
-        logger.error(f"Confidence prediction failed: {e}")
+        logger.error(f"❌ Confidence prediction failed: {e}")
         return 0.0

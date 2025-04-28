@@ -7,8 +7,8 @@ from pathlib import Path
 
 # === Dynamic Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7
-RECOVERY_MODEL_PATH = BASE_DIR / "live" / "models" / "xgb_recovery_model.pkl"
-SNAPSHOT_PATH = BASE_DIR / "live" / "ml_dataset" / "recovery_snapshots"
+RECOVERY_MODEL_PATH = BASE_DIR / "ml" / "models" / "xgb_recovery_model.pkl"
+SNAPSHOT_PATH = BASE_DIR / "ml" / "datasets" / "recovery_snapshots"
 
 # === Feature List for the Model ===
 EXPECTED_FEATURES = [

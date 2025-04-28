@@ -10,7 +10,7 @@ import logging
 
 # === Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7
-MODEL_PATH = BASE_DIR / "live" / "models" / "xgb_spend_model.pkl"
+MODEL_PATH = BASE_DIR / "ml" / "models" / "xgb_spend_model.pkl"
 
 # === Configure logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
