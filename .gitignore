@@ -1,25 +1,54 @@
-# Virtual Environment
-venv/
-
-# Python cache
+# === Python backend ignores ===
 __pycache__/
 *.pyc
-
-# Logs
+*.pyo
+*.pyd
 *.log
-*.jsonl
-/live/
-/output/
-/dca_logs/
-
-# Models
-/models/
-
-# VSCode
-.vscode/
-
-# Other
 .env
-*.db
-*.sqlite
+venv/
+env/
+*.sqlite3
+
+# === React frontend ignores ===
+node_modules/
+build/
+dist/
+.cache/
+.yarn/
+.npm/
+
+# === System files ===
+.DS_Store
+Thumbs.db
+
+# === Project-specific ignores ===
+# Secrets and credentials
 config/paper_cred.json
+
+# Logs and temp
+logs/
+*.log
+*.tmp
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# === Git ===
+# (Prevent accidentally adding local config scripts)
+*.bak
+*.swp
+*.lock
+*.pid
+
+# === Optional: backup/archives ===
+*.zip
+*.tar.gz
+*.rar
+
+# === Credentials ===
+/config/paper_cred.json
+/dca/config/cred.json
+
