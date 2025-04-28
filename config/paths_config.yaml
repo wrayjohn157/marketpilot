@@ -17,3 +17,4 @@ fork_backtest_candidates_path: /home/signal/market7/output/fork_backtest_candida
 dca_tracking_log: /home/signal/market7/dca/logs/dca_tracking/dca_fired.jsonl
 dca_log_base: /home/signal/market7/dca/logs/
 ml_dataset_base: /home/signal/market7/live/ml_dataset/
+tv_screener_config_path: /home/signal/market7/config/tv_screener_config.yaml

@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+import redis
+import json
 from .evaluate import evaluate_trade
 from .time_to_profit import analyze_time_to_tp1
 from .trend_slope import calculate_ema_slope
-import redis
-import json
 
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
+# Redis setup
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 def run_rrr_filter(symbol, klines, atr, adx, ema_values):
     # TP1 vs ATR score
@@ -21,7 +23,7 @@ def run_rrr_filter(symbol, klines, atr, adx, ema_values):
     # Time-to-TP1 score
     ttp_score = analyze_time_to_tp1(klines)
 
-    # Merge with existing Redis data
+    # Update Redis (merge Time_to_TP1 into existing data)
     redis_key = f"{symbol}_1h"
     existing_data = r.get(redis_key)
     if existing_data:
@@ -36,7 +38,7 @@ def run_rrr_filter(symbol, klines, atr, adx, ema_values):
     r.set(redis_key, json.dumps(existing_data))
     print(f"✅ Saved Time_to_TP1 for {symbol}: {ttp_score}")
 
-    # Evaluate full trade
+    # Evaluate
     passed, score, reasons = evaluate_trade(tp1_score, ema_score, adx_score, ttp_score)
 
     print(f"🔎 RRR Evaluation for {symbol}")
@@ -45,8 +47,9 @@ def run_rrr_filter(symbol, klines, atr, adx, ema_values):
     print(f" - ADX Score:  {adx_score:.3f}")
     print(f" - TTP Score:  {ttp_score:.3f}")
     print(f" - Final Score: {score:.3f} → {'✅ PASS' if passed else '❌ FAIL'}")
-    if not passed:
-        print(f"   Rejection Reasons: {reasons}")
+    if not passed and reasons:
+        for reason in reasons:
+            print(f"    🪫 {reason}")
 
     return {
         "symbol": symbol,
@@ -64,25 +67,19 @@ def run_rrr_filter(symbol, klines, atr, adx, ema_values):
         }
     }
 
-# --- EXECUTION BLOCK ---
+# Optional CLI debug runner
 if __name__ == "__main__":
     symbol = "ETH"
 
-    # Load klines from Redis list
+    # Load klines
     kline_key = f"{symbol}_15m_klines"
     klines_raw = r.lrange(kline_key, 0, -1)
-    if klines_raw:
-        klines = [json.loads(k) for k in klines_raw]
-        print(f"📈 Pulled {len(klines)} klines from Redis for {symbol}")
-    else:
-        print(f"❌ No klines found for {symbol} (Redis key: {kline_key})")
-        klines = []
-
+    klines = [json.loads(k) for k in klines_raw] if klines_raw else []
     if not klines or len(klines) < 20:
-        print(f"⚠️ Insufficient klines for {symbol}, skipping RRR filter")
+        print(f"⚠️ Insufficient klines for {symbol}")
         exit()
 
-    # Load additional metrics
+    # Load indicators
     info_key = f"{symbol}_1h"
     info_raw = r.get(info_key)
     info = json.loads(info_raw) if info_raw else {}

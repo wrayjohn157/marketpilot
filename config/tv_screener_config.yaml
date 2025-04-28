@@ -1,0 +1,10 @@
+# /market7/config/tv_screener_config.yaml
+
+tv_screener:
+  enabled: true
+  
+  weights:
+    strong_buy: 0.5
+    buy: 0.25
+
+  score_threshold: 0.7

@@ -5,14 +5,20 @@ import glob
 import numpy as np
 from pathlib import Path
 from datetime import datetime
+from utils.path_utils import load_paths
 
 # === Config ===
-SNAPSHOT_DIR = "/home/signal/market6/data/snapshots"
-OUTPUT_FILE = "/home/signal/market6/output/tv_screener_raw_dict.txt"
+paths = load_paths()
+SNAPSHOT_DIR = paths["snapshots_path"]
+TV_HISTORY_DIR = paths["tv_history_path"]
 TARGET_TIMEFRAME = "15m"
 
-# === Ensure output folder exists ===
-Path(os.path.dirname(OUTPUT_FILE)).mkdir(parents=True, exist_ok=True)
+# === Prepare paths ===
+today = datetime.utcnow().strftime("%Y-%m-%d")
+snapshot_path = os.path.join(SNAPSHOT_DIR, today)
+tv_day_folder = os.path.join(TV_HISTORY_DIR, today)
+os.makedirs(tv_day_folder, exist_ok=True)
+OUTPUT_FILE = os.path.join(tv_day_folder, "tv_screener_raw_dict.txt")
 
 # === Helper Functions ===
 def load_klines(file_path):
@@ -39,7 +45,7 @@ def compute_tv_rating(klines):
     ema_12 = np.mean(closes[-12:])
     ema_26 = np.mean(closes[-26:])
     macd = ema_12 - ema_26
-    macd_signal = np.mean([ema_12 - ema_26 for _ in range(9)])  # static smoothing
+    macd_signal = np.mean([ema_12 - ema_26 for _ in range(9)])
     macd_hist = macd - macd_signal
 
     # ADX (simplified)
@@ -69,8 +75,6 @@ def compute_tv_rating(klines):
         return "sell"
 
 # === Main Logic ===
-today = datetime.utcnow().strftime("%Y-%m-%d")
-snapshot_path = os.path.join(SNAPSHOT_DIR, today)
 files = glob.glob(f"{snapshot_path}/*_{TARGET_TIMEFRAME}_klines.json")
 
 tv_dict = {}

@@ -4,8 +4,13 @@ import logging
 from pathlib import Path
 import yaml
 
-CONFIG_PATH = Path("/home/signal/market6/config/tv_screener_config.yaml")
-RAW_FILE    = Path("/home/signal/market6/output/tv_screener_raw_dict.txt")
+# === Load path config ===
+CONFIG_FILE = Path(__file__).resolve().parents[2] / "config" / "paths_config.yaml"
+with open(CONFIG_FILE) as f:
+    paths = yaml.safe_load(f)
+
+TV_CONFIG_PATH = Path(paths.get("tv_screener_config_path", "/home/signal/market7/config/tv_screener_config.yaml"))
+RAW_FILE = Path(paths.get("tv_history_path", "/home/signal/market7/output/tv_history")) / "tv_screener_raw_dict.txt"
 
 def get_tv_rating(symbol: str, screener_data: dict) -> tuple[float, bool]:
     symbol = symbol.upper()
@@ -17,10 +22,10 @@ def get_tv_rating(symbol: str, screener_data: dict) -> tuple[float, bool]:
 
 def load_config() -> dict:
     try:
-        full = yaml.safe_load(CONFIG_PATH.read_text())
+        full = yaml.safe_load(TV_CONFIG_PATH.read_text())
         return full.get("tv_screener", {})
     except Exception as e:
-        logging.warning(f"[TV] Could not load config: {e}")
+        logging.warning(f"[TV] Could not load TV screener config: {e}")
         return {}
 
 def tv_screener_score(symbol: str, timeframe: str = "15m") -> float:
@@ -28,9 +33,9 @@ def tv_screener_score(symbol: str, timeframe: str = "15m") -> float:
     if not cfg.get("enabled", False):
         return 0.0
 
-    weights   = cfg.get("weights", {})
-    strong_w  = weights.get("strong_buy", 1.0)
-    buy_w     = weights.get("buy",        0.5)
+    weights = cfg.get("weights", {})
+    strong_w = weights.get("strong_buy", 1.0)
+    buy_w = weights.get("buy", 0.5)
     threshold = cfg.get("score_threshold", 0.6)
 
     if not RAW_FILE.exists():
@@ -43,7 +48,7 @@ def tv_screener_score(symbol: str, timeframe: str = "15m") -> float:
         logging.warning(f"[TV] Failed to parse raw screener file: {e}")
         return 0.0
 
-    entry  = data.get(symbol.upper(), {})
+    entry = data.get(symbol.upper(), {})
     rating = entry.get(timeframe, "").lower()
 
     if "strong" in rating:

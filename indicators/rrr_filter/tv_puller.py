@@ -3,14 +3,18 @@ import requests
 import json
 import logging
 from pathlib import Path
+import yaml
 
-# where tv_screener_score.py expects it
-OUTPUT = Path("/home/signal/market6/output/tv_screener_raw_dict.txt")
+# === Setup ===
+CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "paths_config.yaml"
+with open(CONFIG_PATH) as f:
+    paths = yaml.safe_load(f)
 
-# TradingView’s crypto scanner endpoint
+OUTPUT = Path(paths["tv_history_path"]) / "tv_screener_raw_dict.txt"  # save under /output/tv_history/
+
 URL = "https://scanner.tradingview.com/crypto/scan"
 
-# map their numeric ratings → human strings
+# Map numeric TradingView ratings to human-readable
 RATING_MAP = {
     1.0: "Strong Buy",
     0.5: "Buy",
@@ -19,50 +23,41 @@ RATING_MAP = {
    -1.0: "Strong Sell"
 }
 
-def fetch(timeframe="1hr"):
+def fetch_tv_recommendations(timeframe="1hr"):
     payload = {
-        "filter": [
-            { "left": "exchange", "operation": "equal", "right": "BINANCE" }
-        ],
-        "symbols": {
-            "query": { "types": [] }
-        },
+        "filter": [{"left": "exchange", "operation": "equal", "right": "BINANCE"}],
+        "symbols": {"query": {"types": []}},
         "columns": ["Recommend.All"],
-        "options": { "lang": "en" }
+        "options": {"lang": "en"}
     }
-
     resp = requests.post(URL, json=payload, timeout=10)
     resp.raise_for_status()
     data = resp.json().get("data", [])
     out = {}
 
     for row in data:
-        # row["s"] looks like "BINANCE:BTCUSDT"
-        exchange_and_pair = row.get("s", "")
-        parts = exchange_and_pair.split(":", 1)
+        parts = row.get("s", "").split(":", 1)
         if len(parts) != 2:
             continue
         _, pair = parts
         if not pair.endswith("USDT"):
             continue
-        sym = pair[:-4]  # strip "USDT" → "BTC", "DOGE", etc.
-
+        symbol = pair[:-4]  # Strip "USDT"
         raw_rating = row.get("d", [None])[0]
-        human = RATING_MAP.get(raw_rating, "Neutral")
-        out[sym] = {timeframe: human}
+        out[symbol.upper()] = {timeframe: RATING_MAP.get(raw_rating, "Neutral")}
 
     return out
 
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
     try:
-        d = fetch()
+        ratings = fetch_tv_recommendations()
         OUTPUT.parent.mkdir(parents=True, exist_ok=True)
         with open(OUTPUT, "w") as f:
-            json.dump(d, f, indent=2)
-        logging.info(f"Wrote {len(d)} symbols to {OUTPUT}")
+            json.dump(ratings, f, indent=2)
+        logging.info(f"✅ Wrote {len(ratings)} symbols to {OUTPUT}")
     except Exception:
-        logging.exception("Failed to fetch TV screener data")
+        logging.exception("❌ Failed to fetch TV screener data")
 
 if __name__ == "__main__":
     main()
