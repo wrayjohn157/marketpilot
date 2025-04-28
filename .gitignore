@@ -51,3 +51,9 @@ live/ml_dataset/
 *.zip
 *.tar.gz
 *.rar
+
+# === Local runtime data ===
+/dashboard_backend/btc_logs/
+/data/snapshots/
+/live/
+/output/
