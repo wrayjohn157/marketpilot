@@ -9,6 +9,7 @@ import hashlib
 import hmac
 import argparse
 from datetime import datetime
+
 from config.config_loader import PATHS
 from fork.utils.fork_entry_logger import log_fork_entry
 from dca.utils.entry_utils import get_entry_price, compute_score_hash
@@ -23,7 +24,7 @@ SENT_KEY = "FORK_SENT_TRADES"
 THREECOMMAS_URL = "https://app.3commas.io/trade_signal/trading_view"
 THREECOMMAS_BASE_URL = "https://api.3commas.io"
 
-# Logging
+# === Logging Setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 # === Load Credentials ===
@@ -104,7 +105,7 @@ def load_fork_trades(tv_mode: bool):
         return []
 
     with open(path, "r") as f:
-        if path.endswith(".jsonl"):
+        if path.suffix == ".jsonl":
             return [json.loads(line.strip()) for line in f if line.strip()]
         else:
             return json.load(f)
