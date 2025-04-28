@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === Global Styles === */
+html, body {
+  @apply bg-gray-950 text-white antialiased;
+}
+
+/* Smooth transitions on interactive elements */
+a, button {
+  @apply transition-colors duration-200;
+}
+
+/* === Optional: Scrollbar Customization === */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #374151; /* Tailwind gray-700 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #1f2937; /* Tailwind gray-900 */
+}
+
+/* Smooth width transitions for progress bars */
+div[class*="PriceProgressBar"] > div {
+  transition: width 0.5s ease, left 0.5s ease;
+}
