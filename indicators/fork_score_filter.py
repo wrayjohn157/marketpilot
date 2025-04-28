@@ -16,12 +16,18 @@ CURRENT_FILE = Path(__file__).resolve()
 PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
-CONFIG_PATH = Path("/home/signal/market6/config/fork_score_config.yaml")
-FORK_INPUT_FILE = PROJECT_ROOT / "output" / "final_forked_trades.json"
-OUTPUT_FILE = PROJECT_ROOT / "output" / "final_fork_rrr_trades.json"
-BACKTEST_CANDIDATES_FILE = PROJECT_ROOT / "output" / "fork_backtest_candidates.json"
-FORK_HISTORY_BASE = Path("/home/signal/market6/output/fork_history")
-SNAPSHOT_BASE = Path("/home/signal/market6/data/snapshots")
+# --- Load paths_config ---
+PATHS_FILE = Path("/home/signal/market7/config/paths_config.yaml")
+with open(PATHS_FILE) as pf:
+    PATHS = yaml.safe_load(pf)
+
+# --- Updated Paths ---
+CONFIG_PATH = Path(PATHS["base_path"]) / "config" / "fork_score_config.yaml"
+FORK_INPUT_FILE = Path(PATHS["base_path"]) / "output" / "final_forked_trades.json"
+OUTPUT_FILE = Path(PATHS["final_fork_rrr_trades"])
+BACKTEST_CANDIDATES_FILE = Path(PATHS["base_path"]) / "output" / "fork_backtest_candidates.json"
+FORK_HISTORY_BASE = Path(PATHS["fork_history_path"])
+SNAPSHOT_BASE = Path(PATHS["snapshots_path"])
 
 REDIS_SET = "FORK_RRR_PASSED"
 REDIS_FINAL_TRADES = "FORK_FINAL_TRADES"
@@ -73,7 +79,7 @@ def compute_stoch_slope(symbol):
     try:
         with open(filepath) as f:
             klines = json.load(f)
-        closes = [float(k[4]) for k in klines][-30:]  # last 30 closes
+        closes = [float(k[4]) for k in klines][-30:]
         if len(closes) < 20:
             return 0.0, None
         df = pd.DataFrame({"close": closes})
@@ -84,7 +90,7 @@ def compute_stoch_slope(symbol):
             score = max(0.0, min(round(slope * 5, 4), 1.0))
             return score, round(slope, 6)
     except Exception as e:
-        logging.warning(f"[WARN] Failed to compute stoch slope from klines for {symbol}: {e}")
+        logging.warning(f"[WARN] Failed to compute stoch slope for {symbol}: {e}")
     return 0.0, None
 
 def load_kline_volumes(symbol):
