@@ -24,11 +24,16 @@ Thumbs.db
 # === Project-specific ignores ===
 # Secrets and credentials
 config/paper_cred.json
+/dca/config/cred.json
 
 # Logs and temp
 logs/
 *.log
 *.tmp
+
+# Output folders
+ml/datasets/recovery_snapshots/
+live/ml_dataset/
 
 # Editor/IDE files
 .vscode/
@@ -37,7 +42,6 @@ logs/
 *.sublime-project
 
 # === Git ===
-# (Prevent accidentally adding local config scripts)
 *.bak
 *.swp
 *.lock
@@ -47,8 +51,3 @@ logs/
 *.zip
 *.tar.gz
 *.rar
-
-# === Credentials ===
-/config/paper_cred.json
-/dca/config/cred.json
-
