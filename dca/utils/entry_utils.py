@@ -69,6 +69,17 @@ def send_dca_signal(pair, volume=15):
     except Exception as e:
         print(f"[ERROR] Failed to send DCA signal for {pair}: {e}")
 
+def load_kline_df(path):
+    with open(path) as f:
+        raw = json.load(f)
+    df = pd.DataFrame(raw, columns=[
+        "time", "open", "high", "low", "close", "volume",
+        "close_time", "qav", "num_trades", "tb_base_vol",
+        "tbqav", "ignore"
+    ])
+    df = df.astype({"open": float, "high": float, "low": float, "close": float, "volume": float})
+    return df
+
 def get_latest_indicators(symbol, tf="15m"):
     try:
         today = datetime.utcnow().strftime("%Y-%m-%d")
@@ -77,7 +88,7 @@ def get_latest_indicators(symbol, tf="15m"):
             print(f"[WARN] Missing snapshot for {symbol}")
             return {}
 
-        df = pd.read_json(path)
+        df = load_kline_df(path)
         if len(df) < 50:
             print(f"[WARN] Not enough candles to compute indicators for {symbol}")
             return {}
@@ -101,9 +112,8 @@ def get_rsi_slope(symbol, tf="15m", window=3):
         path = SNAPSHOT_BASE / today / f"{symbol}_{tf}_klines.json"
         if not path.exists():
             return 0.0
-        df = pd.read_json(path)
-        close = df["close"].astype(float)
-        rsi_series = RSIIndicator(close).rsi().dropna()
+        df = load_kline_df(path)
+        rsi_series = RSIIndicator(df["close"]).rsi().dropna()
         if len(rsi_series) < window:
             return 0.0
         return round(rsi_series.iloc[-1] - rsi_series.iloc[-window], 4)
@@ -117,9 +127,8 @@ def get_macd_lift(symbol, tf="15m", window=3):
         path = SNAPSHOT_BASE / today / f"{symbol}_{tf}_klines.json"
         if not path.exists():
             return 0.0
-        df = pd.read_json(path)
-        close = df["close"].astype(float)
-        macd_series = MACD(close).macd_diff().dropna()
+        df = load_kline_df(path)
+        macd_series = MACD(df["close"]).macd_diff().dropna()
         if len(macd_series) < window:
             return 0.0
         return round(macd_series.iloc[-1] - macd_series.iloc[-window], 5)

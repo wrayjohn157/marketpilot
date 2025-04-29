@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
+import sys
+import os
 import requests
 import json
 import logging
 import redis
 from datetime import datetime
 from pathlib import Path
+
+# === Add project root to path ===
+CURRENT_FILE = Path(__file__).resolve()
+PROJECT_ROOT = CURRENT_FILE.parent.parent
+sys.path.append(str(PROJECT_ROOT))
 
 # === Import centralized paths ===
 from config.config_loader import PATHS
@@ -43,7 +50,6 @@ def fetch_binance_volume_data():
     for item in data:
         symbol = item["symbol"]
 
-        # USDT only, skip leveraged pairs
         if not symbol.endswith("USDT") or any(x in symbol for x in ["UP", "DOWN", "BULL", "BEAR"]):
             continue
 
@@ -54,7 +60,6 @@ def fetch_binance_volume_data():
         try:
             quote_volume = float(item["quoteVolume"])
             if quote_volume >= MIN_VOLUME_USDT:
-                # ✅ Validate Redis key exists
                 redis_key = f"{base}_15m_klines"
                 if not r.exists(redis_key):
                     logging.warning(f"⛔ Skipping {base}: Redis key '{redis_key}' not found.")
@@ -70,19 +75,16 @@ def main():
     count = len(qualified_symbols)
     logging.info(f"✅ Qualified symbols: {count} passed all volume and Redis checks.")
 
-    # Save to output file
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_FILE, "w") as f:
         json.dump(qualified_symbols, f, indent=4)
     logging.info(f"💾 Filtered pairs saved to: {OUTPUT_FILE}")
 
-    # Update Redis metadata
     timestamp = datetime.utcnow().isoformat()
     r.set("last_scan_vol", timestamp)
     r.set("volume_filter_count", count)
     logging.info(f"📦 Redis updated: last_scan_vol={timestamp}, volume_filter_count={count}")
 
-    # Store token set in Redis
     VOLUME_PASSED_SET = "VOLUME_PASSED_TOKENS"
     r.delete(VOLUME_PASSED_SET)
     for token in qualified_symbols:

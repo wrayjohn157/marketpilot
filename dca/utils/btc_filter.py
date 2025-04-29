@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-import json
 import logging
-from datetime import datetime
+import json
 from pathlib import Path
+from datetime import datetime
 
 # === Dynamic Paths ===
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7
-BTC_SNAPSHOT_BASE = BASE_DIR / "live" / "btc_logs"
+BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /home/signal/market7
+BTC_SNAPSHOT_BASE = BASE_DIR / "dashboard_backend" / "btc_logs" #BTC_SNAPSHOT_BASE = BASE_DIR / "dashboard_backend" / "snapshots" / "btc_"
 
 # === BTC Snapshot Loader ===
 def get_latest_btc_snapshot():
@@ -50,8 +50,6 @@ def is_btc_unsafe(cfg):
         return True
     return False
 
+# === Status Returner ===
 def get_btc_status(cfg):
-    """
-    Returns a readable BTC market status string: 'SAFE' or 'UNSAFE'
-    """
     return "UNSAFE" if is_btc_unsafe(cfg) else "SAFE"
