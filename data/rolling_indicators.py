@@ -1,23 +1,24 @@
+# /home/signal/market7/data/rolling_indicators.py
+
 #!/usr/bin/env python3
 import sys
 import os
-from pathlib import Path
-
-# === Patch sys.path to reach /market7 for config access ===
-CURRENT_FILE = Path(__file__).resolve()
-PROJECT_ROOT = CURRENT_FILE.parents[1]  # /home/signal/market7
-sys.path.append(str(PROJECT_ROOT))
-
 import time
 import json
 import redis
 import logging
 import requests
 import pandas as pd
+from pathlib import Path
 from datetime import datetime
 from ta.momentum import StochRSIIndicator, RSIIndicator
 from ta.trend import EMAIndicator, ADXIndicator, MACD, PSARIndicator
 from ta.volatility import AverageTrueRange
+
+# === Patch sys.path to reach /market7 ===
+CURRENT_FILE = Path(__file__).resolve()
+PROJECT_ROOT = CURRENT_FILE.parents[1]
+sys.path.append(str(PROJECT_ROOT))
 
 # === Import central paths ===
 from config.config_loader import PATHS
@@ -36,6 +37,7 @@ TIMEFRAMES = ["15m", "1h", "4h"]
 # === Paths ===
 FILTERED_FILE = PATHS["filtered_pairs"]
 SNAPSHOTS_BASE = PATHS["snapshots"]
+FORK_METRICS_FILE = Path("/home/signal/market7/dashboard_backend/cache/fork_metrics.json")
 
 # === Redis ===
 r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
@@ -49,9 +51,10 @@ def fetch_klines(symbol, interval, limit=150):
     url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
     try:
         resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
         df = pd.DataFrame(resp.json(), columns=[
-            "time", "open", "high", "low", "close", "volume", "close_time",
-            "qav", "num_trades", "tb_base_vol", "tbqav", "ignore"
+            "time", "open", "high", "low", "close", "volume",
+            "close_time", "qav", "num_trades", "tb_base_vol", "tbqav", "ignore"
         ])
         df = df.astype({"open": float, "high": float, "low": float, "close": float, "volume": float})
         return df
@@ -91,12 +94,28 @@ def compute_indicators(df):
 
     return indicators
 
-def load_filtered_tokens():
-    if not FILTERED_FILE.exists():
-        logging.error("Missing filtered_pairs.json")
-        return []
-    with open(FILTERED_FILE, "r") as f:
-        return json.load(f)
+def load_symbols():
+    filtered = set()
+    active = set()
+
+    if FILTERED_FILE.exists():
+        with open(FILTERED_FILE, "r") as f:
+            filtered = set(json.load(f))
+
+    if FORK_METRICS_FILE.exists():
+        try:
+            with open(FORK_METRICS_FILE, "r") as f:
+                fork_metrics = json.load(f)
+                active = set([d["pair"].replace("USDT_", "") for d in fork_metrics.get("metrics", {}).get("active_deals", [])])
+        except Exception as e:
+            logging.warning(f"⚠️ Failed to load active forks from fork_metrics.json: {e}")
+
+    symbols = sorted(filtered.union(active))
+
+    if not symbols:
+        logging.warning("⚠️ No symbols found from filtered_pairs.json or fork_metrics.json.")
+
+    return symbols
 
 def save_to_disk(symbol, tf, indicators):
     snapshot_dir = get_snapshot_dir()
@@ -111,7 +130,7 @@ def save_to_disk(symbol, tf, indicators):
 def main():
     logging.info("📊 Starting indicator updater...")
     while True:
-        symbols = load_filtered_tokens()
+        symbols = load_symbols()
         for symbol in symbols:
             full_symbol = symbol.upper() + "USDT"
             for tf in TIMEFRAMES:
@@ -122,7 +141,6 @@ def main():
                 key = f"{symbol.upper()}_{tf}"
                 r.set(key, json.dumps(indicators))
 
-                # ✅ Write individual indicators for fork scoring
                 try:
                     r.set(f"{symbol.upper()}_{tf}_RSI14", indicators["RSI14"])
                     r.set(f"{symbol.upper()}_{tf}_StochRSI_K", indicators["StochRSI_K"])

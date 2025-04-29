@@ -26,7 +26,11 @@ from dca.utils.fork_score_utils import compute_fork_score
 from dca.modules.fork_safu_evaluator import get_safu_score
 from dca.utils.btc_filter import get_btc_status
 from dca.modules.dca_decision_engine import should_dca
-from dca.utils.recovery_odds_utils import get_latest_snapshot, predict_recovery_odds
+from dca.utils.recovery_odds_utils import (
+    get_latest_snapshot,
+    predict_recovery_odds,
+    SNAPSHOT_PATH,
+)
 from dca.utils.recovery_confidence_utils import predict_confidence_score
 from dca.utils.tv_utils import load_tv_kicker
 from dca.utils.zombie_utils import is_zombie_trade
@@ -36,7 +40,7 @@ from config.config_loader import PATHS
 
 CONFIG_PATH = PATHS["base"] / "dca" / "config" / "dca_config.yaml"
 LOG_DIR = PATHS["base"] / "dca" / "logs"
-SNAPSHOT_DIR = PATHS["base"] / "live" / "ml_dataset" / "recovery_snapshots"
+SNAPSHOT_DIR = SNAPSHOT_PATH
 DCA_TRACKING_PATH = LOG_DIR / "dca_tracking" / "dca_fired.jsonl"
 
 SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)

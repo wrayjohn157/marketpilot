@@ -32,35 +32,36 @@ router = APIRouter()
 
 @router.get("/dca-trades-active")
 def get_dca_trades_active():
-    # Load active trades from 3Commas
+    # Load live trades from 3Commas
     active_trades = get_live_3c_trades()
-    active_deal_map = {}
+    symbol_map = {}
+
     for t in active_trades:
         pair = t.get("pair", "")
         symbol = pair.replace("USDT_", "")
         deal_id = t.get("id")
-        active_deal_map[symbol] = deal_id
+        symbol_map[symbol] = {
+            "deal_id": deal_id,
+            "symbol": pair,
+            "step": t.get("completed_safety_orders_count", 0),
+            "current_price": t.get("current_price"),
+            "avg_entry_price": t.get("average_enter_price"),
+        }
 
-    # Load local DCA log entries
-    if not DCA_LOG_PATH.exists():
-        return {"count": 0, "dca_trades": []}
+    # Enrich with local DCA logs if available
+    if DCA_LOG_PATH.exists():
+        with open(DCA_LOG_PATH, "r") as f:
+            for line in f:
+                try:
+                    log = json.loads(line)
+                    symbol = log.get("short_symbol") or log.get("symbol", "").replace("USDT_", "")
+                    if symbol in symbol_map:
+                        symbol_map[symbol].update(log)
+                        symbol_map[symbol]["sparkline_data"] = get_sparkline_data(symbol)
+                except Exception:
+                    continue
 
-    latest_by_symbol = {}
-    with open(DCA_LOG_PATH, "r") as f:
-        for line in f:
-            try:
-                data = json.loads(line)
-                symbol = data.get("short_symbol") or data.get("symbol", "").replace("USDT_", "")
-                ts = data.get("timestamp")
-
-                if symbol in active_deal_map:
-                    existing = latest_by_symbol.get(symbol)
-                    if not existing or ts > existing.get("timestamp", ""):
-                        data["deal_id"] = active_deal_map[symbol]
-                        data["sparkline_data"] = get_sparkline_data(symbol)
-                        latest_by_symbol[symbol] = data
-            except Exception:
-                continue
-
-    results = list(latest_by_symbol.values())
-    return {"count": len(results), "dca_trades": results}
+    return {
+        "count": len(symbol_map),
+        "dca_trades": list(symbol_map.values())
+    }

@@ -1,3 +1,5 @@
+# /home/signal/market7/data/rolling_klines.py
+
 #!/usr/bin/env python3
 import time
 import json
@@ -31,26 +33,48 @@ REFRESH_INTERVAL = 60
 FILTERED_FILE = PATHS["filtered_pairs"]
 BINANCE_SYMBOLS_FILE = PATHS["binance_symbols"]
 SNAPSHOTS_BASE = PATHS["snapshots"]
+FORK_METRICS_FILE = Path("/home/signal/market7/dashboard_backend/cache/fork_metrics.json")
 
 def get_snapshot_dir():
     path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
     path.mkdir(parents=True, exist_ok=True)
     return path
 
+def load_active_fork_symbols():
+    active_symbols = set()
+    try:
+        if FORK_METRICS_FILE.exists():
+            with open(FORK_METRICS_FILE, "r") as f:
+                data = json.load(f)
+            active_deals = data.get("metrics", {}).get("active_deals", [])
+            for deal in active_deals:
+                pair = deal.get("pair", "")
+                if pair.startswith("USDT_"):
+                    symbol = pair.replace("USDT_", "")
+                    active_symbols.add(symbol)
+    except Exception as e:
+        logging.warning(f"⚠️ Failed to load active fork symbols: {e}")
+    return active_symbols
+
 def load_symbols():
-    # Prefer filtered_pairs.json if it exists
+    filtered = set()
+    active = set()
+
     if FILTERED_FILE.exists():
         with open(FILTERED_FILE, "r") as f:
-            return json.load(f)
-    # Otherwise fallback to binance_symbols.json
-    if BINANCE_SYMBOLS_FILE.exists():
-        with open(BINANCE_SYMBOLS_FILE, "r") as f:
-            return json.load(f)
-    logging.error("❌ Missing both filtered_pairs.json and binance_symbols.json")
-    return []
+            filtered = set(json.load(f))
+
+    active = load_active_fork_symbols()
+
+    symbols = sorted(filtered.union(active))
+
+    if not symbols:
+        logging.warning("⚠️ No symbols found from filtered_pairs.json or active fork trades.")
+
+    return symbols
 
 def fetch_klines(symbol, interval, limit=150):
-    url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
+    url = f"https://api.binance.com/api/v3/klines?symbol={symbol}USDT&interval={interval}&limit={limit}"
     try:
         resp = requests.get(url, timeout=10)
         resp.raise_for_status()
@@ -74,17 +98,16 @@ def main():
     while True:
         symbols = load_symbols()
         if not symbols:
-            logging.warning("⚠️ No symbols loaded. Sleeping...")
             time.sleep(REFRESH_INTERVAL)
             continue
 
         for symbol in symbols:
-            full_symbol = symbol.upper() + "USDT"
+            full_symbol = symbol.upper()
             for tf in TIMEFRAMES:
                 data = fetch_klines(full_symbol, tf, limit=KLINE_LIMIT)
                 if data is None or len(data) < 100:
                     continue
-                redis_key = f"{symbol.upper()}_{tf}_klines"
+                redis_key = f"{full_symbol}_{tf}_klines"
                 try:
                     r.delete(redis_key)
                     r.rpush(redis_key, *[json.dumps(entry) for entry in data])
@@ -93,6 +116,7 @@ def main():
                     save_klines_to_disk(symbol, tf, data)
                 except Exception as e:
                     logging.error(f"❌ Redis error for {redis_key}: {e}")
+
         time.sleep(REFRESH_INTERVAL)
 
 if __name__ == "__main__":

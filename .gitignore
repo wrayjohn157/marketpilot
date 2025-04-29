@@ -58,3 +58,6 @@ live/ml_dataset/
 /live/
 /output/
 data/filtered_pairs.json
+
+# === ML Snap-Shot Deal Data ===
+ml/datasets/recovery_snapshots/*.jsonl
