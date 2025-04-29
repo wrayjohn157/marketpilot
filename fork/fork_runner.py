@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import sys
 import json
 import time
 import redis
@@ -8,11 +9,17 @@ import requests
 import hashlib
 import hmac
 import argparse
+from pathlib import Path
 from datetime import datetime
+
+# === Patch: Add project root to sys.path ===
+CURRENT_FILE = Path(__file__).resolve()
+PROJECT_ROOT = CURRENT_FILE.parent.parent
+sys.path.append(str(PROJECT_ROOT))
 
 from config.config_loader import PATHS
 from fork.utils.fork_entry_logger import log_fork_entry
-from dca.utils.entry_utils import get_entry_price, compute_score_hash
+from fork.utils.entry_utils import get_entry_price, compute_score_hash #from dca.utils.entry_utils import get_entry_price, compute_score_hash
 
 # === CONFIG ===
 FORK_TRADES_PATH = PATHS["final_fork_rrr_trades"]

@@ -2,44 +2,26 @@ from datetime import datetime
 from pathlib import Path
 import json
 
-from live.utils.entry_utils import save_daily_entry, load_registry, save_registry
+# No need for this anymore:
+# from fork.utils.entry_utils import save_daily_entry
 
 # Constants
-REGISTRY_PATH = Path("/home/signal/market6/live/logs/fork_registry.json")
+FORK_HISTORY_BASE = Path("/home/signal/market7/output/fork_history")
 
 def log_fork_entry(entry: dict):
-    """Logs a new fork entry and updates the per-date registry with metadata."""
+    """Logs a new fork entry into /output/fork_history/{DATE}/fork_scores.jsonl"""
     now = datetime.utcnow()
     date_str = now.strftime("%Y-%m-%d")
-    full_symbol = entry.get("symbol", "UNKNOWN")
 
-    # Load registry
-    registry = load_registry()
+    save_dir = FORK_HISTORY_BASE / date_str
+    save_dir.mkdir(parents=True, exist_ok=True)
 
-    # Ensure date section exists
-    if date_str not in registry or not isinstance(registry[date_str], dict):
-        registry[date_str] = {}
+    save_path = save_dir / "fork_scores.jsonl"
 
-    # Avoid duplicate
-    if full_symbol in registry[date_str]:
-        print(f"⏩ SKIPPED — {full_symbol} already logged for {date_str}")
-        return
+    with open(save_path, "a") as f:
+        f.write(json.dumps(entry) + "\n")
 
-    # Add metadata and mark the entry as active
-    registry[date_str][full_symbol] = {
-        "entry_time": entry.get("entry_time"),
-        "entry_ts_iso": entry.get("entry_ts_iso"),
-        "entry_price": entry.get("entry_price"),
-        "score_hash": entry.get("score_hash"),
-        "source": entry.get("source"),
-        "status": "active",  # Updated from "pending" to "active"
-        "indicators": entry.get("indicators", {})
-    }
-
-    save_registry(registry)
-    save_daily_entry(entry)
-
-    print(f"✅ LOGGED — {full_symbol:<15} @ {entry.get('entry_price')} → fork_registry.json")
+    print(f"✅ LOGGED — {entry.get('symbol', 'UNKNOWN'):<15} @ {entry.get('entry_price')} → {save_path}")
 
 # Optional test call
 if __name__ == "__main__":
