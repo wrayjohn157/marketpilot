@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+import sys
+import os
+from pathlib import Path
+
+# === Patch sys.path to reach /market7 for config access ===
+CURRENT_FILE = Path(__file__).resolve()
+PROJECT_ROOT = CURRENT_FILE.parents[1]  # /home/signal/market7
+sys.path.append(str(PROJECT_ROOT))
+
 import time
 import json
 import redis
@@ -6,7 +15,6 @@ import logging
 import requests
 import pandas as pd
 from datetime import datetime
-from pathlib import Path
 from ta.momentum import StochRSIIndicator, RSIIndicator
 from ta.trend import EMAIndicator, ADXIndicator, MACD, PSARIndicator
 from ta.volatility import AverageTrueRange

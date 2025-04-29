@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
 import os
+import sys
 import json
 import glob
+import yaml
 import numpy as np
 from pathlib import Path
 from datetime import datetime
-from utils.path_utils import load_paths
 
-# === Config ===
-paths = load_paths()
+# === Patch sys.path to reach /market7/ ===
+CURRENT_FILE = Path(__file__).resolve()
+PROJECT_ROOT = CURRENT_FILE.parents[2]
+sys.path.append(str(PROJECT_ROOT))
+
+# === Load paths from YAML directly ===
+CONFIG_PATH = PROJECT_ROOT / "config" / "paths_config.yaml"
+with open(CONFIG_PATH) as f:
+    paths = yaml.safe_load(f)
+
 SNAPSHOT_DIR = paths["snapshots_path"]
 TV_HISTORY_DIR = paths["tv_history_path"]
 TARGET_TIMEFRAME = "15m"

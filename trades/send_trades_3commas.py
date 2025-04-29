@@ -8,39 +8,38 @@ import requests
 import hashlib
 import hmac
 import logging
+from pathlib import Path
 
-# Ensure root is in sys.path so "config" module works
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from config.cred_loader import load_credentials
-
-# Logging setup
+# === Logging setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-# Redis configuration
+# === Load credentials manually ===
+BASE_DIR = Path(__file__).resolve().parent.parent
+CRED_PATH = BASE_DIR / "config" / "paper_cred.json"
+
+with open(CRED_PATH) as f:
+    creds = json.load(f)
+
+BOT_ID = creds["3commas_bot_id"]
+EMAIL_TOKEN = creds["3commas_email_token"]
+
+# === Redis setup ===
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 REDIS_DB = 0
 FINAL_TRADES_KEY = "FINAL_TRADES"
 FINAL_FILTER_KEY = "FINAL_RRR_FILTERED_TRADES"
 SENT_TRADES_KEY = "SENT_TRADES"
-
-# Load credentials from config
-creds = load_credentials()
-BOT_ID = creds["3commas_bot_id"]
-EMAIL_TOKEN = creds["3commas_email_token"]
-DELAY_SECONDS = 0
-PRICE_MOVEMENT_THRESHOLD = 0.02  # 2.0%
-
-# 3Commas TradingView endpoint
-THREECOMMAS_URL = "https://app.3commas.io/trade_signal/trading_view"
-
-# Redis connection
 r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
+# === Constants ===
+DELAY_SECONDS = 0
+PRICE_MOVEMENT_THRESHOLD = 0.02  # 2%
+
+THREECOMMAS_URL = "https://app.3commas.io/trade_signal/trading_view"
+
+# === Functions ===
 def should_send_trade(symbol, current_price):
-    """
-    Prevent re-sending if price hasn't changed enough.
-    """
     last_data = r.hget(SENT_TRADES_KEY, symbol)
     if last_data is None:
         return True
@@ -51,9 +50,6 @@ def should_send_trade(symbol, current_price):
         return True
 
 def format_3commas_pair(symbol: str) -> str:
-    """
-    Converts a pair like BTCUSDT to the 3Commas format USDT_BTC.
-    """
     if symbol.endswith("USDT"):
         base = symbol.replace("USDT", "")
         return f"USDT_{base}"
@@ -91,16 +87,16 @@ def main():
         logging.error(f"Error loading final trades: {e}")
         return
 
-    # If final_trades is a list, try to load detailed trade info from FINAL_FILTER_KEY
+    # If final_trades is a list, try to load detailed trade info
     if isinstance(final_trades, list):
-        logging.info("Final trades data is a list; attempting to load detailed trade info from FINAL_RRR_FILTERED_TRADES.")
+        logging.info("Final trades is a list; loading detailed data from FINAL_RRR_FILTERED_TRADES.")
         detailed_data = r.get(FINAL_FILTER_KEY)
         if not detailed_data:
-            logging.info("No detailed final trades in Redis.")
+            logging.info("No detailed trades found.")
             return
         final_trades = json.loads(detailed_data)
         if not isinstance(final_trades, dict):
-            logging.info("Detailed final trades data is not in dictionary format. Skipping trade dispatch.")
+            logging.info("Detailed data is not a dict. Skipping dispatch.")
             return
 
     for symbol, trade_data in final_trades.items():
