@@ -21,7 +21,7 @@ with open(CONFIG_PATH) as f:
     paths = yaml.safe_load(f)
 
 APPROVED_FILE = Path(paths["final_fork_rrr_trades"])
-RRR_PASS_FILE = Path(paths["fork_trade_candidates_path"])  # ⬅️ PATCHED
+RRR_PASS_FILE = Path(paths["fork_trade_candidates_path"])
 
 # Redis keys
 FINAL_FILTER_KEY = "FINAL_RRR_FILTERED_TRADES"
@@ -69,7 +69,14 @@ def main():
     rejections = skips = failures = 0
 
     for symbol in symbols:
-        s = symbol.upper()
+        if isinstance(symbol, dict):
+            s = symbol.get("symbol", "").upper()
+        else:
+            s = symbol.upper()
+        if not s:
+            logging.warning("⚠️ Skipping entry with missing symbol")
+            continue
+
         ind_1h = get_indicator(s, "1h")
         ind_15m = get_indicator(s, "15m")
         klines = get_klines(s, "15m")

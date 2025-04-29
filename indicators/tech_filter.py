@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
+import sys
+from pathlib import Path
+
+# ✅ Inject base path so config/ can be imported when run via systemd
+CURRENT_FILE = Path(__file__).resolve()
+PROJECT_ROOT = CURRENT_FILE.parent.parent
+sys.path.append(str(PROJECT_ROOT))
+
 import redis
 import json
 import logging
 from datetime import datetime
-from pathlib import Path
 from config.config_loader import PATHS  # ✅ Use the loader
 
 # === Setup ===
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
+r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
 # === Load paths dynamically ===
 OUTPUT_FILE = PATHS["final_fork_rrr_trades"]
@@ -26,23 +35,40 @@ except Exception as e:
 # === Thresholds ===
 thresholds = {
     "neutral": {
-        "15m": {"qqe_min": 20, "qqe_max": 50, "rsi_range": [35, 65], "stoch_max": 0.8, "stoch_oversold": 0.3},
-        "1h": {"qqe_min": 30, "qqe_max": 50, "stoch_confirmation": 0.25, "stoch_oversold": 0.25},
-        "4h": {"qqe_min": 30, "qqe_max": 50, "stoch_confirmation": 0.3, "stoch_oversold": 0.2}
+        "15m": {
+            "qqe_min": 20,
+            "qqe_max": 50,
+            "rsi_range": [35, 65],
+            "stoch_max": 0.8,
+            "stoch_oversold": 0.3,
+        },
+        "1h": {
+            "qqe_min": 30,
+            "qqe_max": 50,
+            "stoch_confirmation": 0.25,
+            "stoch_oversold": 0.25,
+        },
+        "4h": {
+            "qqe_min": 30,
+            "qqe_max": 50,
+            "stoch_confirmation": 0.3,
+            "stoch_oversold": 0.2,
+        },
     },
     "bullish": {
         "15m": {"adx_min": 20, "rsi_max": 75, "use_psar": True},
         "1h": {"qqe_min": 55, "qqe_max": 80, "use_psar": True},
-        "4h": {"qqe_min": 55, "qqe_max": 80, "use_psar": True}
+        "4h": {"qqe_min": 55, "qqe_max": 80, "use_psar": True},
     },
     "bearish": {
         "15m": {"rsi_max": 45, "use_psar": True},
         "1h": {"qqe_max": 50, "use_psar": True},
-        "4h": {"qqe_max": 50, "use_psar": True}
-    }
+        "4h": {"qqe_max": 50, "use_psar": True},
+    },
 }
 
 # === Functions (your originals) ===
+
 
 def evaluate(symbol, tf, ind):
     t = thresholds.get(market_condition, thresholds["neutral"]).get(tf, {})
@@ -61,11 +87,15 @@ def evaluate(symbol, tf, ind):
     if hist is not None and hist_prev is not None:
         if market_condition == "bullish":
             if hist < hist_prev:
-                reasons.append(f"{tf} MACD Histogram not rising ({hist:.4f} < {hist_prev:.4f})")
+                reasons.append(
+                    f"{tf} MACD Histogram not rising ({hist:.4f} < {hist_prev:.4f})"
+                )
                 passed = False
         else:
             if hist < hist_prev and hist < 0:
-                reasons.append(f"{tf} MACD Histogram declining ({hist:.4f} < {hist_prev:.4f})")
+                reasons.append(
+                    f"{tf} MACD Histogram declining ({hist:.4f} < {hist_prev:.4f})"
+                )
                 passed = False
 
     if tf == "15m":
@@ -80,7 +110,9 @@ def evaluate(symbol, tf, ind):
                 reasons.append(f"Stoch_K {ind['StochRSI_K']} > {t['stoch_max']}")
                 passed = False
             if ind["StochRSI_K"] > t["stoch_oversold"]:
-                reasons.append(f"Stoch_K {ind['StochRSI_K']} > oversold {t['stoch_oversold']}")
+                reasons.append(
+                    f"Stoch_K {ind['StochRSI_K']} > oversold {t['stoch_oversold']}"
+                )
                 passed = False
         elif market_condition == "bullish":
             if ind.get("ADX14", 0) < t.get("adx_min", 20):
@@ -93,8 +125,12 @@ def evaluate(symbol, tf, ind):
             if ind.get("RSI14", 0) > t.get("rsi_max", 45):
                 reasons.append(f"RSI {ind.get('RSI14', 0)} > {t.get('rsi_max', 45)}")
                 passed = False
-            if t.get("use_psar", False) and ind.get("PSAR", 0) <= ind.get("latest_close", 0):
-                reasons.append(f"PSAR {ind.get('PSAR', 0)} not above close {ind.get('latest_close', 0)}")
+            if t.get("use_psar", False) and ind.get("PSAR", 0) <= ind.get(
+                "latest_close", 0
+            ):
+                reasons.append(
+                    f"PSAR {ind.get('PSAR', 0)} not above close {ind.get('latest_close', 0)}"
+                )
                 passed = False
 
     elif tf in ["1h", "4h"]:
@@ -103,24 +139,35 @@ def evaluate(symbol, tf, ind):
                 reasons.append(f"QQE {ind['QQE']} < {t['qqe_min']}")
                 passed = False
             if ind["StochRSI_K"] < t["stoch_confirmation"]:
-                reasons.append(f"Stoch_K {ind['StochRSI_K']} < confirm {t['stoch_confirmation']}")
+                reasons.append(
+                    f"Stoch_K {ind['StochRSI_K']} < confirm {t['stoch_confirmation']}"
+                )
                 passed = False
             if ind["StochRSI_K"] > t["stoch_oversold"]:
-                reasons.append(f"Stoch_K {ind['StochRSI_K']} > oversold {t['stoch_oversold']}")
+                reasons.append(
+                    f"Stoch_K {ind['StochRSI_K']} > oversold {t['stoch_oversold']}"
+                )
                 passed = False
         elif market_condition == "bullish":
             if not (t.get("qqe_min", 55) <= ind.get("QQE", 0) <= t.get("qqe_max", 80)):
-                reasons.append(f"QQE {ind.get('QQE', 0)} not in {t.get('qqe_min', 55)}–{t.get('qqe_max', 80)}")
+                reasons.append(
+                    f"QQE {ind.get('QQE', 0)} not in {t.get('qqe_min', 55)}–{t.get('qqe_max', 80)}"
+                )
                 passed = False
         elif market_condition == "bearish":
             if ind.get("QQE", 0) > t.get("qqe_max", 50):
                 reasons.append(f"QQE {ind.get('QQE', 0)} > {t.get('qqe_max', 50)}")
                 passed = False
-            if t.get("use_psar", False) and ind.get("PSAR", 0) <= ind.get("latest_close", 0):
-                reasons.append(f"PSAR {ind.get('PSAR', 0)} not above close {ind.get('latest_close', 0)}")
+            if t.get("use_psar", False) and ind.get("PSAR", 0) <= ind.get(
+                "latest_close", 0
+            ):
+                reasons.append(
+                    f"PSAR {ind.get('PSAR', 0)} not above close {ind.get('latest_close', 0)}"
+                )
                 passed = False
 
     return passed, reasons
+
 
 def check_fork_criteria(ind):
     score = 0
@@ -151,6 +198,7 @@ def check_fork_criteria(ind):
 
     return score >= 2, reasons
 
+
 # === main() ===
 def main():
     approved = {}
@@ -159,7 +207,9 @@ def main():
     logging.info(f"📊 Evaluating {len(symbols)} symbols...")
 
     for symbol in symbols:
-        symbol_clean = symbol.replace("USDT_", "").replace("_USDT", "").replace("USDT", "")
+        symbol_clean = (
+            symbol.replace("USDT_", "").replace("_USDT", "").replace("USDT", "")
+        )
         logging.info(f"🔎 {symbol_clean}")
 
         tf_passed = []
@@ -188,7 +238,7 @@ def main():
                 "timeframes": tf_passed,
                 "indicator_data": {
                     "1h": json.loads(r.get(f"{symbol_clean}_1h") or "{}")
-                }
+                },
             }
             logging.info(f"✅ PASSED: {symbol_clean}")
         elif fork_reasons:
@@ -197,7 +247,7 @@ def main():
                 "reasons": fork_reasons,
                 "indicator_data": {
                     "1h": json.loads(r.get(f"{symbol_clean}_1h") or "{}")
-                }
+                },
             }
             logging.info(f"🌀 FORKED: {symbol_clean}")
             for tf, flags in fork_reasons.items():
@@ -219,7 +269,13 @@ def main():
     r.set("tech_filter_count_out", len(approved))
     r.set("last_scan_tech", datetime.utcnow().isoformat())
 
-    logging.info(f"💾 Saved {len(approved)} approved | 🌀 Saved {len(fork_queue)} fork candidates")
+    logging.info(
+        f"💾 Saved {len(approved)} approved | 🌀 Saved {len(fork_queue)} fork candidates"
+    )
+
 
 if __name__ == "__main__":
     main()
+import sys
+
+sys.exit(0)
