@@ -2,18 +2,21 @@
 import redis
 import json
 import logging
+import yaml
 from datetime import datetime
-from utils.path_utils import load_paths
+from pathlib import Path
 
 # === Setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 r = redis.Redis(host='localhost', port=6379, decode_responses=True)
-paths = load_paths()
 
-# === Paths from config ===
-OUTPUT_FILE = paths["final_fork_rrr_trades"]
-FORK_FILE = paths["fork_candidates_path"]
+# === Load paths from config ===
+CONFIG_PATH = "/home/signal/market7/config/paths_config.yaml"
+with open(CONFIG_PATH) as f:
+    paths = yaml.safe_load(f)
 
+OUTPUT_FILE = Path(paths["final_fork_rrr_trades"])
+FORK_FILE = Path(paths["fork_candidates_path"])
 VOLUME_PASSED_SET = "VOLUME_PASSED_TOKENS"
 
 # Load BTC condition

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import sys
+import os
 import json
 import redis
 import logging
@@ -6,10 +8,15 @@ from datetime import datetime
 from pathlib import Path
 import yaml
 
+# Add root to sys.path
+CURRENT_FILE = Path(__file__).resolve()
+PROJECT_ROOT = CURRENT_FILE.parent.parent
+sys.path.append(str(PROJECT_ROOT))
+
 from indicators.rrr_filter.run_rrr_filter import run_rrr_filter
 
 # === Load config paths ===
-CONFIG_PATH = "/home/signal/market7/config/paths_config.yaml"
+CONFIG_PATH = PROJECT_ROOT / "config" / "paths_config.yaml"
 with open(CONFIG_PATH) as f:
     paths = yaml.safe_load(f)
 
@@ -20,16 +27,11 @@ RRR_PASS_FILE = Path(paths["fork_backtest_candidates_path"])
 FINAL_FILTER_KEY = "FINAL_RRR_FILTERED_TRADES"
 FINAL_TRADES_KEY = "FINAL_TRADES"
 
-# Redis setup
 r = redis.Redis(host='localhost', port=6379, decode_responses=True)
-
-# Logging setup
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-# Constants
 EMA_WINDOW = 5
 
-# === Helper Functions ===
 def get_indicator(symbol, tf):
     key = f"{symbol}_{tf}"
     data = r.get(key)
@@ -51,11 +53,8 @@ def make_json_serializable(obj):
         return obj
     return str(obj)
 
-# === Main Execution ===
 def main():
     logging.info("🚀 Running RRR filter engine...")
-
-    # Clear old Redis keys
     r.delete(FINAL_FILTER_KEY)
     r.delete(FINAL_TRADES_KEY)
 
@@ -121,12 +120,10 @@ def main():
             logging.info(f"✅ Passed: {s} | Score: {score:.2f}")
         else:
             logging.info(f"❌ Rejected: {s} | Score: {score:.2f}")
-            reasons = result.get("reasons", [])
-            for reason in reasons:
+            for reason in result.get("reasons", []):
                 logging.info(f"    🪫 {reason}")
             rejections += 1
 
-    # Save outputs
     with open(RRR_PASS_FILE, "w") as f:
         json.dump(filtered, f, indent=2)
 
@@ -137,7 +134,6 @@ def main():
     r.set("rrr_filter_count_out", len(filtered))
     r.set("final_trades_count", len(filtered))
 
-    # Summary
     logging.info("\n📊 RRR Filter Summary:")
     logging.info(f" - ✅ Passed:   {len(filtered)}")
     logging.info(f" - ❌ Rejected: {rejections}")
