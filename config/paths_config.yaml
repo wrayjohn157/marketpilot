@@ -20,3 +20,7 @@ ml_dataset_base: /home/signal/market7/live/ml_dataset/
 tv_screener_config_path: /home/signal/market7/config/tv_screener_config.yaml
 filtered_pairs_path: /home/signal/market7/data/filtered_pairs.json
 kline_snapshots: /home/signal/market7/data/snapshots
+fork_candidates_path: /home/signal/market7/output/fork_candidates.json
+fork_backtest_candidates_path: /home/signal/market7/output/fork_backtest_candidates.json
+fork_trade_candidates_path: /home/signal/market7/output/fork_trade_candidates.json  
+final_forked_trades: /home/signal/market7/output/final_forked_trades.json

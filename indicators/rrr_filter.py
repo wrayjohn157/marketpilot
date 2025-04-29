@@ -21,7 +21,7 @@ with open(CONFIG_PATH) as f:
     paths = yaml.safe_load(f)
 
 APPROVED_FILE = Path(paths["final_fork_rrr_trades"])
-RRR_PASS_FILE = Path(paths["fork_backtest_candidates_path"])
+RRR_PASS_FILE = Path(paths["fork_trade_candidates_path"])  # ⬅️ PATCHED
 
 # Redis keys
 FINAL_FILTER_KEY = "FINAL_RRR_FILTERED_TRADES"
@@ -139,7 +139,7 @@ def main():
     logging.info(f" - ❌ Rejected: {rejections}")
     logging.info(f" - ⚠️ Skipped:  {skips}")
     logging.info(f" - 💥 Errors:   {failures}")
-    logging.info(f" - 📄 Saved final trades to: {RRR_PASS_FILE}")
+    logging.info(f" - 📄 Saved fork trade candidates to: {RRR_PASS_FILE}")
 
 if __name__ == "__main__":
     main()

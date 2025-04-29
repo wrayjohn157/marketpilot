@@ -16,23 +16,20 @@ CURRENT_FILE = Path(__file__).resolve()
 PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
-# --- Load paths_config ---
-PATHS_FILE = Path("/home/signal/market7/config/paths_config.yaml")
-with open(PATHS_FILE) as pf:
-    PATHS = yaml.safe_load(pf)
+# --- Load paths from config_loader ---
+from config.config_loader import PATHS
 
-# --- Updated Paths ---
-CONFIG_PATH = Path(PATHS["base_path"]) / "config" / "fork_score_config.yaml"
-FORK_INPUT_FILE = Path(PATHS["base_path"]) / "output" / "final_forked_trades.json"
-OUTPUT_FILE = Path(PATHS["final_fork_rrr_trades"])
-BACKTEST_CANDIDATES_FILE = Path(PATHS["base_path"]) / "output" / "fork_backtest_candidates.json"
-FORK_HISTORY_BASE = Path(PATHS["fork_history_path"])
-SNAPSHOT_BASE = Path(PATHS["snapshots_path"])
+CONFIG_PATH = PATHS["base"] / "config" / "fork_score_config.yaml"
+FORK_INPUT_FILE = PATHS["fork_candidates"]
+OUTPUT_FILE = PATHS["final_fork_rrr_trades"]
+BACKTEST_CANDIDATES_FILE = PATHS["fork_backtest_candidates"]
+FORK_HISTORY_BASE = PATHS["fork_history"]
+SNAPSHOT_BASE = PATHS["snapshots"]
 
 REDIS_SET = "FORK_RRR_PASSED"
 REDIS_FINAL_TRADES = "FORK_FINAL_TRADES"
 
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 # === Load config ===

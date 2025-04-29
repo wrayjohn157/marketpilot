@@ -2,21 +2,17 @@
 import redis
 import json
 import logging
-import yaml
 from datetime import datetime
 from pathlib import Path
+from config.config_loader import PATHS  # ✅ Use the loader
 
 # === Setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
-# === Load paths from config ===
-CONFIG_PATH = "/home/signal/market7/config/paths_config.yaml"
-with open(CONFIG_PATH) as f:
-    paths = yaml.safe_load(f)
-
-OUTPUT_FILE = Path(paths["final_fork_rrr_trades"])
-FORK_FILE = Path(paths["fork_candidates_path"])
+# === Load paths dynamically ===
+OUTPUT_FILE = PATHS["final_fork_rrr_trades"]
+FORK_FILE = PATHS["fork_candidates"]
 VOLUME_PASSED_SET = "VOLUME_PASSED_TOKENS"
 
 # Load BTC condition
@@ -27,7 +23,7 @@ except Exception as e:
     market_condition = "neutral"
     logging.warning(f"⚠️ Failed to fetch btc_condition from Redis, using default: {e}")
 
-# Thresholds
+# === Thresholds ===
 thresholds = {
     "neutral": {
         "15m": {"qqe_min": 20, "qqe_max": 50, "rsi_range": [35, 65], "stoch_max": 0.8, "stoch_oversold": 0.3},
@@ -46,7 +42,7 @@ thresholds = {
     }
 }
 
-# === Functions ===
+# === Functions (your originals) ===
 
 def evaluate(symbol, tf, ind):
     t = thresholds.get(market_condition, thresholds["neutral"]).get(tf, {})
@@ -155,6 +151,7 @@ def check_fork_criteria(ind):
 
     return score >= 2, reasons
 
+# === main() ===
 def main():
     approved = {}
     fork_queue = {}

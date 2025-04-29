@@ -4,14 +4,19 @@ import logging
 from pathlib import Path
 from datetime import datetime
 import time
-from utils.path_utils import load_paths
 
-# === Load Config ===
-paths = load_paths()
-INPUT_FILE = Path(paths["fork_backtest_candidates_path"])
-TV_FILE = Path(paths["tv_history_path"]) / "tv_screener_raw_dict.txt"
-FORK_TV_OUTPUT = Path(paths["fork_tv_adjusted"])
-TV_HISTORY_BASE = Path(paths["tv_history_path"])
+from config.config_loader import PATHS
+
+# === Setup Logging ===
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
+# === Paths ===
+INPUT_FILE = PATHS["fork_backtest_candidates"]
+FORK_TV_OUTPUT = PATHS["fork_tv_adjusted"]
+TV_HISTORY_BASE = PATHS["tv_history"]
+
+today_str = datetime.utcnow().strftime("%Y-%m-%d")
+TV_FILE = TV_HISTORY_BASE / today_str / "tv_screener_raw_dict.txt"
 
 TV_SCORE_WEIGHTS = {
     "strong_buy": 0.30,
@@ -22,11 +27,6 @@ TV_SCORE_WEIGHTS = {
 }
 
 MIN_PASS_SCORE = 0.73
-
-# === Setup Logging ===
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-
-# === Functions ===
 
 def load_candidates(path: Path):
     if not path.exists():
@@ -67,7 +67,6 @@ def main():
     candidates = load_candidates(INPUT_FILE)
     tv_tags = load_tv_tags(TV_FILE)
 
-    today_str = datetime.utcnow().strftime("%Y-%m-%d")
     history_dir = TV_HISTORY_BASE / today_str
     history_dir.mkdir(parents=True, exist_ok=True)
     history_file = history_dir / "tv_kicker.jsonl"
