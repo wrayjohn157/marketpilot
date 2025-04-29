@@ -134,7 +134,7 @@ def get_multi_pair_stats(bot_id: int, account_id: int):
         print("[ERROR] Fetching multi-pair stats:", resp.text)
         return {}
 
-# === Get Fork Metrics ===
+# === Get Fork Metrics Unified ===
 def get_fork_trade_metrics():
     active_deals = get_active_deals(BOT_ID)
     finished_deals = get_finished_deals(BOT_ID)
@@ -171,6 +171,15 @@ def get_fork_trade_metrics():
         }
     }
 
+# === Main Cache and Output Handler ===
 if __name__ == "__main__":
     result = get_fork_trade_metrics()
-    print(json.dumps(result, indent=2))
+    result["last_updated"] = datetime.utcnow().isoformat()
+
+    # Write to backend cache
+    cache_path = PATHS["base"] / "dashboard_backend" / "cache" / "fork_metrics.json"
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(cache_path, "w") as f:
+        json.dump(result, f, indent=2)
+
+    print(f"✅ Fork metrics refreshed and cached at {cache_path}")
