@@ -54,10 +54,26 @@ def get_live_3c_trades():
                 break
             page += 1
 
+        # Normalize fields for downstream use
+        for deal in all_deals:
+            deal["symbol"] = deal.get("pair")
+            deal["deal_id"] = deal.get("id")
+
+            avg_price = deal.get("bought_average_price")
+            if not avg_price and deal.get("bought_amount") and deal.get("bought_volume"):
+                try:
+                    avg_price = float(deal["bought_amount"]) / float(deal["bought_volume"])
+                except Exception:
+                    avg_price = None
+
+            deal["avg_entry_price"] = float(avg_price) if avg_price else None
+
         return all_deals
+
     except Exception as e:
         print(f"[ERROR] Failed to fetch 3Commas live trades: {e}")
         return []
+        print("[DEBUG] 3C Trade Normalization Active")
 
 def send_dca_signal(pair, volume=15):
     try:

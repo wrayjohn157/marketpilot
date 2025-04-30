@@ -28,10 +28,12 @@ from unified_fork_metrics import get_fork_trade_metrics
 from dca_status import router as dca_router
 from ml_confidence_api import router as ml_confidence_router
 from refresh_price_api import router as price_refresh_router
+from dca_trades_api import router as dca_trades_api_router
 
 app.include_router(dca_router)
 app.include_router(ml_confidence_router)
 app.include_router(price_refresh_router)
+app.include_router(dca_trades_api_router)
 
 @app.get("/", response_class=HTMLResponse)
 def root():

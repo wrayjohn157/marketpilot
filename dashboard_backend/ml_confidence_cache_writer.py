@@ -15,12 +15,15 @@ from dca.utils.entry_utils import get_live_3c_trades
 
 # === Config ===
 REDIS_KEY = "confidence_list"
-LOG_BASE = PATHS["live_logs"].parent / "dca" / "logs"   # /market7/live/dca/logs
-CACHE_PATH = PATHS["live_logs"] / "ml_confidence.json"
-MAX_ENTRIES = 20
+# normalized from your `dca_log_base:` in paths_config.yaml
+LOG_BASE = PATHS["dca_log"]
+# where to dump the JSON fallback cache
+CACHE_PATH = PATHS["dashboard_cache"] / "ml_confidence.json"
+MAX_ENTRIES = 50  # keep only the top-20 highest-confidence active trades
 DAYS_BACK = 5
 
 REDIS = redis.Redis(host="localhost", port=6379, db=0)
+
 
 def load_active_deal_ids():
     try:
@@ -29,6 +32,7 @@ def load_active_deal_ids():
     except Exception as e:
         print(f"❌ Failed to fetch active trades: {e}")
         return set()
+
 
 def scan_logs_for_active_deals(active_ids):
     latest_logs = {}
@@ -44,9 +48,13 @@ def scan_logs_for_active_deals(active_ids):
                     try:
                         row = json.loads(line)
                         deal_id = str(row.get("deal_id"))
-                        if deal_id in active_ids and isinstance(row.get("confidence_score"), (int, float)):
+                        if deal_id in active_ids and isinstance(
+                            row.get("confidence_score"), (int, float)
+                        ):
                             prev = latest_logs.get(deal_id)
-                            if not prev or row.get("timestamp", 0) > prev.get("timestamp", 0):
+                            if not prev or row.get("timestamp", 0) > prev.get(
+                                "timestamp", 0
+                            ):
                                 latest_logs[deal_id] = row
                     except json.JSONDecodeError:
                         continue
@@ -56,22 +64,27 @@ def scan_logs_for_active_deals(active_ids):
 
     return latest_logs
 
+
 def build_confidence_cache(deal_logs):
     filtered = [
-        row for row in deal_logs.values()
+        row
+        for row in deal_logs.values()
         if isinstance(row.get("confidence_score"), (int, float))
     ]
     sorted_logs = sorted(filtered, key=lambda x: x["confidence_score"], reverse=True)
 
     cache = []
     for row in sorted_logs[:MAX_ENTRIES]:
-        cache.append({
-            "symbol": row.get("symbol"),
-            "confidence_score": round(row["confidence_score"], 4),
-            "decision": row.get("decision", "n/a"),
-            "rejection_reason": row.get("rejection_reason", "n/a")
-        })
+        cache.append(
+            {
+                "symbol": row.get("symbol"),
+                "confidence_score": round(row["confidence_score"], 4),
+                "decision": row.get("decision", "n/a"),
+                "rejection_reason": row.get("rejection_reason", "n/a"),
+            }
+        )
     return cache
+
 
 def main():
     active_ids = load_active_deal_ids()
@@ -95,6 +108,7 @@ def main():
     with open(CACHE_PATH, "w") as f:
         json.dump(confidence_cache, f, indent=2)
     print(f"📁 Also saved to: {CACHE_PATH}")
+
 
 if __name__ == "__main__":
     main()
