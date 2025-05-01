@@ -10,6 +10,7 @@ const links = [
   { label: "Backtest", icon: "📚", path: "/backtest-summary" },
   { label: "ML Monitor", icon: "🤖", path: "/ml-monitor" },
   { label: "BTC Panel", icon: "⚠️", path: "/btc-panel" },
+  { label: "Fork Config", icon: "🛠️", path: "/fork-score" },  // ✅ NEW
 ];
 
 export default function Sidebar() {

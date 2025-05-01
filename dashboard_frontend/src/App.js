@@ -11,6 +11,7 @@ import DCATracker from "./pages/DcaTracker";
 import BacktestSummary from "./pages/BacktestSummary";
 import MLMonitor from "./pages/MLMonitor";
 import BTCRiskPanel from "./pages/BTCRiskPanel";
+import ForkScore from "./pages/ForkScore";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
               <Route path="/backtest-summary" element={<BacktestSummary />} />
               <Route path="/ml-monitor" element={<MLMonitor />} />
               <Route path="/btc-panel" element={<BTCRiskPanel />} />
+              <Route path="/fork-score" element={<ForkScore />} />
               <Route path="*" element={<Navigate to="/trade-dashboard" replace />} />
             </Routes>
           </main>
