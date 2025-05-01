@@ -62,3 +62,41 @@ data/filtered_pairs.json
 # === ML Snap-Shot Deal Data ===
 ml/datasets/recovery_snapshots/*.jsonl
 service
+
+
+# === Node ===
+node_modules/
+*.log
+npm-debug.log*
+
+# === React Build Output ===
+dashboard_frontend/build/
+dashboard_frontend/node_modules/
+
+# === Lint + Cache ===
+dashboard_frontend/node_modules/.cache/
+*.eslintcache
+.cache/
+
+# === Python ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+*.venv
+.env/
+.venv/
+
+# === VSCode / JetBrains ===
+.vscode/
+.idea/
+
+# === System ===
+.DS_Store
+Thumbs.db
+
+# === Misc ===
+*.swp
+*.bak
+*.tmp
