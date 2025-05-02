@@ -27,6 +27,13 @@ MIN_VOLUME_USDT = 3_000_000
 # === Redis setup ===
 r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
+# === Excluded base tokens ===
+EXCLUDED_BASES = [
+    "USDT", "USDC", "FDUSD", "TUSD", "BUSD", "DAI",
+    "EUR", "TRY", "BRL", "GBP", "UAH", "USD",
+    "WBTC", "WETH"
+]
+
 def fetch_volume_map():
     url = "https://api.binance.com/api/v3/ticker/24hr"
     try:
@@ -49,9 +56,17 @@ def main():
     qualified = []
 
     for base in all_symbols:
+        if base in EXCLUDED_BASES:
+            logging.info(f"🚫 Skipping {base}: excluded base token")
+            continue
+
         full_symbol = f"{base}USDT"
         vol = volume_map.get(full_symbol)
         if vol and vol >= MIN_VOLUME_USDT:
+            redis_key = f"{base}_15m_klines"
+            if not r.exists(redis_key):
+                logging.warning(f"⛔ Skipping {base}: Redis key '{redis_key}' not found.")
+                continue
             qualified.append(base)
         else:
             logging.warning(f"⛔ Skipping {base}: volume {vol} below threshold")
@@ -70,6 +85,7 @@ def main():
     r.delete("VOLUME_PASSED_TOKENS")
     for token in qualified:
         r.sadd("VOLUME_PASSED_TOKENS", token)
+    logging.info("🔁 Redis set 'VOLUME_PASSED_TOKENS' populated.")
 
 if __name__ == "__main__":
     main()

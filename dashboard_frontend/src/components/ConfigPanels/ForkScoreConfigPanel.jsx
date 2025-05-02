@@ -80,7 +80,7 @@ export default function ForkScoreConfigPanel() {
               step="0.01"
               value={config.min_score}
               onChange={e =>
-                updateSection("min_score", "", parseFloat(e.target.value))
+                setConfig((prev) => ({ ...prev, min_score: parseFloat(e.target.value) }))
               }
               className="w-24 sm:w-32 bg-gray-800 border-gray-600 text-white"
             />

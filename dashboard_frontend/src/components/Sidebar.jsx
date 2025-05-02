@@ -10,7 +10,8 @@ const links = [
   { label: "Backtest", icon: "📚", path: "/backtest-summary" },
   { label: "ML Monitor", icon: "🤖", path: "/ml-monitor" },
   { label: "BTC Panel", icon: "⚠️", path: "/btc-panel" },
-  { label: "Fork Config", icon: "🛠️", path: "/fork-score" },  // ✅ NEW
+  { label: "Fork Config", icon: "🛠️", path: "/fork-score" },
+  { label: "DCA Config", icon: "🛠️", path: "/dca-config" },
 ];
 
 export default function Sidebar() {
@@ -43,9 +44,11 @@ export default function Sidebar() {
           ${open ? "translate-x-0" : "-translate-x-full"}
           md:static md:translate-x-0 md:w-56 md:min-h-screen`}
       >
-        <div className="text-xl font-bold text-white mb-6 hidden md:block">
+        {/* Always-visible header */}
+        <div className="text-xl font-bold text-white mb-6 block">
           🧠 MarketPilot v2 🚧
         </div>
+
         {links.map((link) => (
           <NavLink
             key={link.path}
