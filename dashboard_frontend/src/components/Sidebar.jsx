@@ -1,3 +1,4 @@
+// src/components/Sidebar.jsx
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -19,8 +20,8 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Top Bar */}
-      <div className="md:hidden flex items-center justify-between p-4 bg-gray-900 border-b border-gray-800">
+      {/* Sticky Top Bar on Mobile */}
+      <div className="md:hidden sticky top-0 z-50 flex items-center justify-between p-4 bg-gray-900 border-b border-gray-800">
         <span className="text-lg font-bold text-white">🧠 MarketPilot v2 🚧</span>
         <button
           onClick={() => setOpen(!open)}
@@ -41,11 +42,11 @@ export default function Sidebar() {
       {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 z-40 h-full w-64 bg-gray-900 p-4 space-y-4 border-r border-gray-800 transform transition-transform duration-300
-          ${open ? "translate-x-0" : "-translate-x-full"}
-          md:static md:translate-x-0 md:w-56 md:min-h-screen`}
+        ${open ? "translate-x-0" : "-translate-x-full"}
+        md:static md:translate-x-0 md:w-56 md:min-h-screen md:sticky md:top-0`}
       >
-        {/* Always-visible header */}
-        <div className="text-xl font-bold text-white mb-6 block">
+        {/* Show heading always on desktop, and on mobile only when open */}
+        <div className={`text-xl font-bold text-white mb-6 ${open ? "block" : "hidden"} md:block`}>
           🧠 MarketPilot v2 🚧
         </div>
 
