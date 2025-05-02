@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 from datetime import datetime
 import time
+import yaml
 
 from config.config_loader import PATHS
 
@@ -17,17 +18,25 @@ TV_HISTORY_BASE = PATHS["tv_history"]
 
 today_str = datetime.utcnow().strftime("%Y-%m-%d")
 TV_FILE = TV_HISTORY_BASE / today_str / "tv_screener_raw_dict.txt"
+CONFIG_PATH = Path("/home/signal/market7/config/tv_screener_config.yaml")
 
-TV_SCORE_WEIGHTS = {
-    "strong_buy": 0.30,
-    "buy": 0.20,
-    "neutral": 0.00,
-    "sell": -0.20,
-    "strong_sell": -0.30
-}
+# === Load Config ===
+try:
+    config = yaml.safe_load(CONFIG_PATH.read_text())["tv_screener"]
+    TV_SCORE_WEIGHTS = config["weights"]
+    MIN_PASS_SCORE = config["score_threshold"]
+except Exception as e:
+    logging.warning(f"[TV_KICKER] Failed to load config, using defaults: {e}")
+    TV_SCORE_WEIGHTS = {
+        "strong_buy": 0.30,
+        "buy": 0.20,
+        "neutral": 0.00,
+        "sell": -0.20,
+        "strong_sell": -0.30
+    }
+    MIN_PASS_SCORE = 0.73
 
-MIN_PASS_SCORE = 0.73
-
+# === Loaders ===
 def load_candidates(path: Path):
     if not path.exists():
         logging.error(f"[ERROR] Missing input file: {path}")
@@ -62,6 +71,7 @@ def load_tv_tags(path: Path):
         logging.error(f"[TV] Failed to parse TV file: {e}")
         return {}
 
+# === Main Logic ===
 def main():
     logging.info("📡 Loading TV tags and fork candidates...")
     candidates = load_candidates(INPUT_FILE)
