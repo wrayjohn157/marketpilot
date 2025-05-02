@@ -13,6 +13,7 @@ const links = [
   { label: "BTC Panel", icon: "⚠️", path: "/btc-panel" },
   { label: "Fork Config", icon: "🛠️", path: "/fork-score" },
   { label: "DCA Config", icon: "🛠️", path: "/dca-config" },
+  { label: "TV Config", icon: "📺", path: "/tv-config" },
 ];
 
 export default function Sidebar() {

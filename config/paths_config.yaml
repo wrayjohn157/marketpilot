@@ -3,7 +3,7 @@
 base_path: /home/signal/market7
 snapshots_path: /home/signal/market7/data/snapshots
 fork_history_path: /home/signal/market7/output/fork_history
-btc_logs_path: /home/signal/market7/live/btc_logs
+btc_logs_path: /home/signal/market7/dashboard_backend/btc_logs
 live_logs_path: /home/signal/market7/live/logs
 models_path: /home/signal/market7/live/models
 paper_cred_path: /home/signal/market7/config/paper_cred.json
