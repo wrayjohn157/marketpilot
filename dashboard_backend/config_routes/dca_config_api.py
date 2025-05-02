@@ -1,18 +1,17 @@
-# /dashboard_backend/config_routes/fork_score_config_api.py
+# /dashboard_backend/config_routes/dca_config_api.py
 
 from fastapi import APIRouter, HTTPException
 from pathlib import Path
 import yaml
-import os
 
-CONFIG_PATH = Path("/home/signal/market7/config/fork_score_config.yaml")
+CONFIG_PATH = Path("/home/signal/market7/config/dca_config.yaml")
 
 router = APIRouter()
 
 # === Helpers ===
 def load_config():
     if not CONFIG_PATH.exists():
-        raise HTTPException(status_code=404, detail="fork_score_config.yaml not found")
+        raise HTTPException(status_code=404, detail="dca_config.yaml not found")
     with open(CONFIG_PATH, "r") as f:
         return yaml.safe_load(f)
 
@@ -22,12 +21,12 @@ def save_config(data):
 
 # === Routes ===
 
-@router.get("/config/fork_score")
-def read_fork_score_config():
+@router.get("/dca")
+def read_dca_config():
     return load_config()
 
-@router.post("/config/fork_score")
-def update_fork_score_config(patch: dict):
+@router.post("/dca")
+def update_dca_config(patch: dict):
     config = load_config()
 
     for key, val in patch.items():
