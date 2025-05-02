@@ -13,6 +13,7 @@ import MLMonitor from "./pages/MLMonitor";
 import BTCRiskPanel from "./pages/BTCRiskPanel";
 import ForkScore from "./pages/ForkScore";
 import DcaConfig from "./pages/DcaConfig";
+import TvScreenerConfig from "./pages/TvScreenerConfig";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route path="/btc-panel" element={<BTCRiskPanel />} />
               <Route path="/fork-score" element={<ForkScore />} />
               <Route path="/dca-config" element={<DcaConfig />} />
+              <Route path="/tv-config" element={<TvScreenerConfig />} />
               <Route path="*" element={<Navigate to="/trade-dashboard" replace />} />
             </Routes>
           </main>

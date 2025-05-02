@@ -11,6 +11,7 @@ import hmac
 import argparse
 from pathlib import Path
 from datetime import datetime
+import yaml
 
 # === Patch: Add project root to sys.path ===
 CURRENT_FILE = Path(__file__).resolve()
@@ -19,12 +20,16 @@ sys.path.append(str(PROJECT_ROOT))
 
 from config.config_loader import PATHS
 from fork.utils.fork_entry_logger import log_fork_entry
-from fork.utils.entry_utils import get_entry_price, compute_score_hash #from dca.utils.entry_utils import get_entry_price, compute_score_hash
+from fork.utils.entry_utils import get_entry_price, compute_score_hash
 
 # === CONFIG ===
 FORK_TRADES_PATH = PATHS["final_fork_rrr_trades"]
 FORK_TV_TRADES_PATH = PATHS["fork_tv_adjusted"]
 CRED_PATH = PATHS["paper_cred"]
+TV_CONFIG_PATH = PATHS["tv_screener_config"]
+BTC_LOGS_DIR = PATHS["btc_logs"]
+TV_KICKER_STATUS_PATH = Path("/home/signal/market7/output/tv_kicker_status.json")
+
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 SENT_KEY = "FORK_SENT_TRADES"
@@ -47,7 +52,7 @@ except Exception as e:
     logging.error(f"❌ Failed to load paper_cred.json: {e}")
     exit(1)
 
-# Initialize Redis
+# === Redis ===
 r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
 # === Helpers ===
@@ -86,10 +91,7 @@ def get_active_3c_trades():
         full_path = "/public/api/ver1/deals?scope=active"
         full_url = THREECOMMAS_BASE_URL + full_path
         signature = hmac.new(API_SECRET.encode("utf-8"), full_path.encode("utf-8"), hashlib.sha256).hexdigest()
-        headers = {
-            "Apikey": API_KEY,
-            "Signature": signature
-        }
+        headers = {"Apikey": API_KEY, "Signature": signature}
         res = requests.get(full_url, headers=headers, timeout=10)
         res.raise_for_status()
         deals = res.json()
@@ -110,21 +112,69 @@ def load_fork_trades(tv_mode: bool):
     if not os.path.exists(path):
         logging.error(f"❌ Missing: {path}")
         return []
-
     with open(path, "r") as f:
-        if path.suffix == ".jsonl":
-            return [json.loads(line.strip()) for line in f if line.strip()]
-        else:
-            return json.load(f)
+        return [json.loads(line.strip()) for line in f if line.strip()] if path.suffix == ".jsonl" else json.load(f)
 
-# === Main Runner ===
+def load_latest_btc_status():
+    try:
+        folders = sorted(
+            [f for f in os.listdir(BTC_LOGS_DIR) if f[:4].isdigit()], reverse=True
+        )
+        for folder in folders:
+            file_path = Path(BTC_LOGS_DIR) / folder / "btc_snapshots.jsonl"
+            if file_path.exists():
+                with open(file_path, "r") as f:
+                    lines = f.readlines()
+                    if lines:
+                        return json.loads(lines[-1])
+    except Exception as e:
+        logging.warning(f"[TV_KICKER] Could not determine BTC status: {e}")
+    return {"market_condition": "unknown"}
 
+def check_tv_kicker_status() -> dict:
+    try:
+        config = yaml.safe_load(TV_CONFIG_PATH.read_text()).get("tv_screener", {})
+        tv_enabled = config.get("enabled", False)
+        btc_filter_enabled = config.get("disable_if_btc_unhealthy", False)
+        btc_data = load_latest_btc_status()
+        btc_status = btc_data.get("market_condition", "unknown").lower()
+        tv_kicker_allowed = tv_enabled and (not btc_filter_enabled or btc_status == "bullish")
+        return {
+            "tv_enabled": tv_enabled,
+            "btc_filter_enabled": btc_filter_enabled,
+            "btc_status": btc_status,
+            "tv_kicker_allowed": tv_kicker_allowed
+        }
+    except Exception as e:
+        logging.error(f"❌ Failed to evaluate TV Screener config: {e}")
+        return {
+            "tv_enabled": False,
+            "btc_filter_enabled": False,
+            "btc_status": "unknown",
+            "tv_kicker_allowed": False
+        }
+
+# === Main ===
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--tv-mode", action="store_true", help="Use TV-kicker trades")
     args = parser.parse_args()
 
-    logging.info("🚀 Fork Trade Runner starting...")
+    logging.info("\U0001F680 Fork Trade Runner starting...")
+
+    # Evaluate TV Screener status
+    tv_status = check_tv_kicker_status()
+    status_str = f"\U0001F4CA TV Enabled: {'✅' if tv_status['tv_enabled'] else '❌'} | " \
+                 f"BTC Override Enabled: {'✅' if tv_status['btc_filter_enabled'] else '❌'} | " \
+                 f"BTC Status: {tv_status['btc_status'].upper()}"
+    logging.info(status_str)
+
+    TV_KICKER_STATUS_PATH.write_text(json.dumps(tv_status, indent=2))
+    logging.info(f"\U0001F4C1 Written to: {TV_KICKER_STATUS_PATH}")
+
+    if args.tv_mode and not tv_status["tv_kicker_allowed"]:
+        logging.warning("❌ TV mode requested but TV Screener is disabled (or BTC is unhealthy). Aborting.")
+        return
 
     fork_trades = load_fork_trades(args.tv_mode)
     if not fork_trades:
