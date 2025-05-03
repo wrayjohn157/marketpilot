@@ -25,3 +25,4 @@ fork_backtest_candidates_path: /home/signal/market7/output/fork_backtest_candida
 fork_trade_candidates_path: /home/signal/market7/output/fork_trade_candidates.json  
 final_forked_trades: /home/signal/market7/output/final_forked_trades.json
 binance_symbols: /home/signal/market7/data/binance_symbols.json
+dca_config_path: /home/signal/market7/config/dca_config.yaml
