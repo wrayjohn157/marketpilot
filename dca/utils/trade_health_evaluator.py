@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
 """
-Trade Health Evaluator for DCA module.
+Trade Health Evaluator for DCA module (config-aware).
 """
 
 import json
 import math
+import yaml
 from pathlib import Path
 
-# === Health Scoring Configuration ===
-HEALTH_CONFIG = {
+# === Load config ===
+CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "dca_config.yaml"
+with open(CONFIG_PATH, "r") as f:
+    config = yaml.safe_load(f)
+
+HEALTH_CONFIG = config.get("health_scoring", {})
+
+# === Defaults ===
+defaults = {
     "weights": {
         "recovery_odds": 0.4,
         "confidence_score": 0.3,
@@ -17,17 +25,22 @@ HEALTH_CONFIG = {
         "indicator_health": 0.1,
     },
     "decay_threshold": 0.3,
-    "rsi_min": 45,
-    "macd_histogram_min": 0.0,
-    "adx_min": 20,
+    "indicator_thresholds": {
+        "rsi_min": 45,
+        "macd_histogram_min": 0.0,
+        "adx_min": 20,
+    },
     "health_thresholds": {
         "healthy": 0.7,
         "weak": 0.4,
     },
 }
 
-# TODO: Externalize HEALTH_CONFIG to /config/dca_config.yaml for dynamic tuning.
-
+# === Safe access ===
+weights = HEALTH_CONFIG.get("weights", defaults["weights"])
+decay_threshold = HEALTH_CONFIG.get("decay_threshold", defaults["decay_threshold"])
+thresholds = HEALTH_CONFIG.get("indicator_thresholds", defaults["indicator_thresholds"])
+health_thresholds = HEALTH_CONFIG.get("health_thresholds", defaults["health_thresholds"])
 
 def evaluate_trade_health(trade):
     """
@@ -51,30 +64,30 @@ def evaluate_trade_health(trade):
 
     # Entry score decay penalty
     decay = current_score / entry_score if entry_score else 1
-    decay_penalty = 0 if decay > HEALTH_CONFIG["decay_threshold"] else (1 - decay)
+    decay_penalty = 0 if decay > decay_threshold else (1 - decay)
 
     # Indicator health (binary pass/fail)
     indicator_pass = (
-        (rsi >= HEALTH_CONFIG["rsi_min"])
-        and (macd_histogram >= HEALTH_CONFIG["macd_histogram_min"])
-        and (adx >= HEALTH_CONFIG["adx_min"])
+        (rsi >= thresholds.get("rsi_min", 45))
+        and (macd_histogram >= thresholds.get("macd_histogram_min", 0.0))
+        and (adx >= thresholds.get("adx_min", 20))
     )
     indicator_health = 1 if indicator_pass else 0
 
     # Composite health score
     score = (
-        recovery_odds * HEALTH_CONFIG["weights"]["recovery_odds"]
-        + confidence_score * HEALTH_CONFIG["weights"]["confidence_score"]
-        + safu_score * HEALTH_CONFIG["weights"]["safu_score"]
-        + (1 - decay_penalty) * HEALTH_CONFIG["weights"]["entry_score_decay"]
-        + indicator_health * HEALTH_CONFIG["weights"]["indicator_health"]
+        recovery_odds * weights.get("recovery_odds", 0.4)
+        + confidence_score * weights.get("confidence_score", 0.3)
+        + safu_score * weights.get("safu_score", 0.1)
+        + (1 - decay_penalty) * weights.get("entry_score_decay", 0.1)
+        + indicator_health * weights.get("indicator_health", 0.1)
     )
-    score = max(0, min(1, score))  # Clamp score to [0,1]
+    score = max(0, min(1, score))
 
     # Health label
-    if score >= HEALTH_CONFIG["health_thresholds"]["healthy"]:
+    if score >= health_thresholds.get("healthy", 0.7):
         status = "Healthy"
-    elif score >= HEALTH_CONFIG["health_thresholds"]["weak"]:
+    elif score >= health_thresholds.get("weak", 0.4):
         status = "Weak"
     else:
         status = "Zombie"
@@ -83,7 +96,6 @@ def evaluate_trade_health(trade):
         "health_score": round(score, 3),
         "health_status": status,
     }
-
 
 if __name__ == "__main__":
     # Example demo

@@ -148,7 +148,27 @@ export default function DcaConfigPanel() {
               <FieldGrid>
                 <SwitchField label="Enabled" checked={config.zombie_tag.enabled} onChange={(v) => updateField("zombie_tag", "enabled", v)} />
                 {Object.entries(config.zombie_tag).filter(([k]) => k !== "enabled").map(([k, v]) => (
-                  <NumericField key={k} label={prettyLabel(k)} value={v} onChange={(val) => updateField("zombie_tag", k, val)} />
+                  typeof v === "boolean" ? (
+                    <SwitchField key={k} label={prettyLabel(k)} checked={v} onChange={(val) => updateField("zombie_tag", k, val)} />
+                  ) : (
+                    <NumericField key={k} label={prettyLabel(k)} value={v} onChange={(val) => updateField("zombie_tag", k, val)} />
+                  )
+                ))}
+              </FieldGrid>
+            </Section>
+
+            <Section title="🧬 Health Scoring">
+              <FieldGrid>
+                <SwitchField label="Enabled" checked={config.health_scoring.enabled} onChange={(v) => updateField("health_scoring", "enabled", v)} />
+                {Object.entries(config.health_scoring.weights).map(([k, v]) => (
+                  <NumericField key={k} label={`Weight: ${prettyLabel(k)}`} value={v} onChange={(val) => updateField("health_scoring", "weights", { ...config.health_scoring.weights, [k]: val })} />
+                ))}
+                <NumericField label="Decay Threshold" value={config.health_scoring.decay_threshold} onChange={(v) => updateField("health_scoring", "decay_threshold", v)} />
+                {Object.entries(config.health_scoring.indicator_thresholds).map(([k, v]) => (
+                  <NumericField key={k} label={prettyLabel(k)} value={v} onChange={(val) => updateField("health_scoring", "indicator_thresholds", { ...config.health_scoring.indicator_thresholds, [k]: val })} />
+                ))}
+                {Object.entries(config.health_scoring.health_thresholds).map(([k, v]) => (
+                  <NumericField key={k} label={`Health Threshold: ${prettyLabel(k)}`} value={v} onChange={(val) => updateField("health_scoring", "health_thresholds", { ...config.health_scoring.health_thresholds, [k]: val })} />
                 ))}
               </FieldGrid>
             </Section>
