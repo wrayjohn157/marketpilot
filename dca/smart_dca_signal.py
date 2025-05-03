@@ -38,7 +38,7 @@ from dca.utils.spend_predictor import predict_spend_volume, adjust_volume
 from dca.utils.trade_health_evaluator import evaluate_trade_health
 from config.config_loader import PATHS
 
-CONFIG_PATH = PATHS["base"] / "dca" / "config" / "dca_config.yaml"
+CONFIG_PATH = PATHS["dca_config"] #CONFIG_PATH = PATHS["base"] / "dca" / "config" / "dca_config.yaml"
 LOG_DIR = PATHS["base"] / "dca" / "logs"
 SNAPSHOT_DIR = SNAPSHOT_PATH
 DCA_TRACKING_PATH = LOG_DIR / "dca_tracking" / "dca_fired.jsonl"
@@ -300,6 +300,7 @@ def run():
             current_score=current_score,
             safu_score=safu_score,
             tp1_sim_pct=tp1_shift,
+            recovery_odds=recovery_odds,
         )
 
         last_conf_score, last_tp1_shift = get_last_snapshot_values(

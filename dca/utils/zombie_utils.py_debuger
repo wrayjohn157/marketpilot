@@ -1,0 +1,35 @@
+def is_zombie_trade(indicators, recovery_odds, score):
+    from config.config_loader import PATHS
+    import yaml
+
+    config_path = PATHS["dca_config"]
+    with open(config_path, "r") as f:
+        config = yaml.safe_load(f)
+
+    cfg = config.get("zombie_tag", {})
+    if not cfg.get("enabled", True):
+        return False
+
+    dd = indicators.get("drawdown_pct", 0)
+    macd_lift = indicators.get("macd_lift", 1)
+    rsi_slope = indicators.get("rsi_slope", 1)
+
+    is_within_dd = cfg["min_drawdown_pct"] <= dd <= cfg["max_drawdown_pct"]
+    is_score_ok = score <= cfg["max_score"]
+    is_macd_ok = macd_lift <= cfg["max_macd_lift"]
+    is_rsi_ok = rsi_slope <= cfg["max_rsi_slope"]
+    is_odds_ok = recovery_odds == 0 if cfg.get("require_zero_recovery_odds", False) else True
+
+    debug_reasons = {
+        "drawdown_pct": f"{dd:.2f} vs {cfg['min_drawdown_pct']}–{cfg['max_drawdown_pct']} → {is_within_dd}",
+        "score": f"{score:.4f} ≤ {cfg['max_score']} → {is_score_ok}",
+        "macd_lift": f"{macd_lift:.5f} ≤ {cfg['max_macd_lift']} → {is_macd_ok}",
+        "rsi_slope": f"{rsi_slope:.4f} ≤ {cfg['max_rsi_slope']} → {is_rsi_ok}",
+        "recovery_odds_zero": f"{recovery_odds:.2f} == 0 → {is_odds_ok}",
+    }
+
+    print("[ZOMBIE DEBUG]", debug_reasons)
+
+    if all([is_within_dd, is_score_ok, is_macd_ok, is_rsi_ok, is_odds_ok]):
+        return True
+    return False

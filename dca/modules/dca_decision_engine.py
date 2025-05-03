@@ -1,7 +1,16 @@
-def should_dca(trade, config, indicators, btc_status, entry_score, current_score, safu_score, tp1_sim_pct):
-    rejection_reason = None
-    recovery_odds = 0  # Always computed now
+# /market7/dca/modules/dca_decision_engine.py
 
+def should_dca(
+    trade,
+    config,
+    indicators,
+    btc_status,
+    entry_score,
+    current_score,
+    safu_score,
+    tp1_sim_pct,
+    recovery_odds,
+):
     # === BTC Filter ===
     if config.get("use_btc_filter", True) and btc_status != "SAFE":
         return False, "btc_unsafe", recovery_odds
@@ -41,45 +50,26 @@ def should_dca(trade, config, indicators, btc_status, entry_score, current_score
         if indicators.get("rsi_slope", 0) < config["trajectory_thresholds"].get("rsi_slope_min", 0.1):
             return False, "rsi_flat", recovery_odds
 
-    # === Drawdown Buffer ===
-    deviation_pct = trade.get("drawdown_pct", 0)
-    required_dd = (num_so + 2) * config.get("buffer_zone_pct", 0.3)
+    # === Drawdown Trigger ===
+    deviation_pct = indicators.get("drawdown_pct", 0)
+    required_dd = (num_so + 2) * config.get("buffer_zone_pct", 0.0)
     if deviation_pct < max(config.get("drawdown_trigger_pct", 1.5), required_dd):
         return False, "drawdown_too_shallow", recovery_odds
 
     # === TP1 Feasibility ===
     if config.get("require_tp1_feasibility", True):
-        if tp1_sim_pct > config.get("max_tp1_shift_pct", 2.0):
+        if tp1_sim_pct > config.get("max_tp1_shift_pct", 25):
             return False, "tp1_not_feasible", recovery_odds
+        if tp1_sim_pct < 0:
+            return False, "tp1_shift_negative", recovery_odds
 
-    # === Recovery Odds (Always calculated) ===
-    recovery_odds = 0
-    if indicators.get("macd_lift", 0) > config["trajectory_thresholds"].get("macd_lift_min", 0):
-        recovery_odds += 0.3
-    if indicators.get("rsi_slope", 0) > config["trajectory_thresholds"].get("rsi_slope_min", 0):
-        recovery_odds += 0.3
-    if safu_score and safu_score > 0.6:
-        recovery_odds += 0.2
-    if indicators.get("rsi", 0) > 45:
-        recovery_odds += 0.2
-    recovery_odds = min(recovery_odds, 1.0)
-
+    # === Recovery Odds (passed from caller) ===
     if config.get("require_recovery_odds", True):
         if recovery_odds < config.get("min_recovery_probability", 0.5):
             return False, "recovery_odds_low", recovery_odds
 
-    # === Confidence Override ===
-    if config.get("use_confidence_override", False):
-        conf = config.get("confidence_override", {})
-        if (
-            safu_score >= conf.get("safu_score_min", 0.5) and
-            indicators.get("macd_lift", 0) > conf.get("macd_lift_min", 0.00005) and
-            indicators.get("rsi_slope", 0) > conf.get("rsi_slope_min", 1.0) and
-            deviation_pct >= config.get("drawdown_trigger_pct", 1.5)
-        ):
-            return True, "confidence_override", recovery_odds
-
     return True, None, recovery_odds
+
 
 def how_much_to_dca(trade, config):
     num_so = trade.get("completed_safety_orders_count", 0)

@@ -30,7 +30,7 @@ trajectory_thresholds:
 
 # === TP1 Feasibility Guard ===
 require_tp1_feasibility: true
-max_tp1_shift_pct: 7.0
+max_tp1_shift_pct: 30.0
 
 # === Recovery Odds Guard ===
 require_recovery_odds: true
