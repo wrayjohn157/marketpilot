@@ -32,6 +32,7 @@ from dca_trades_api import router as dca_trades_api_router
 from config_routes.fork_score_config_api import router as fork_score_config_router
 from config_routes.dca_config_api import router as dca_config_router
 from config_routes.tv_screener_config_api import router as tv_screener_config_router
+from eval_routes import dca_eval_api
 
 app.include_router(dca_router)
 app.include_router(ml_confidence_router)
@@ -40,6 +41,7 @@ app.include_router(dca_trades_api_router)
 app.include_router(fork_score_config_router, prefix="/config")
 app.include_router(dca_config_router, prefix="/config")
 app.include_router(tv_screener_config_router, prefix="/config")
+app.include_router(dca_eval_api.router)
 
 @app.get("/", response_class=HTMLResponse)
 def root():

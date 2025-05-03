@@ -227,6 +227,7 @@ def run():
                 "zombie_tagged": False,
                 "decision": "skipped",
                 "rejection_reason": reason,
+                "spent": total_spent,
             }
             write_log(log_entry)
             continue
@@ -443,6 +444,7 @@ def run():
             "decision": "skipped",
             "rejection_reason": reason,
         }
+        log_entry["spent"] = total_spent
 
         if not should_fire:
             print(f"[CHECK] Rejection reason: {reason}")
@@ -453,6 +455,7 @@ def run():
         if was_dca_fired_recently(deal_id, step):
             print("⏳ Already fired this step")
             log_entry["rejection_reason"] = "already_fired"
+            log_entry["spent"] = total_spent
             write_log(log_entry)
             continue
 

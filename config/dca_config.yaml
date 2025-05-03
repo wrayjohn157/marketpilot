@@ -75,4 +75,20 @@ spend_adjustment_rules:
   max_multiplier: 3
   tp1_shift_soft_cap: 2.5
   low_dd_pct_limit: 1
+health_scoring:
+  enabled: true
+  weights:
+    recovery_odds: 0.4
+    confidence_score: 0.3
+    safu_score: 0.1
+    entry_score_decay: 0.1
+    indicator_health: 0.1
+  decay_threshold: 0.3
+  indicator_thresholds:
+    rsi_min: 45
+    macd_histogram_min: 0
+    adx_min: 20
+  health_thresholds:
+    healthy: 0.7
+    weak: 0.4
 log_verbose: true
