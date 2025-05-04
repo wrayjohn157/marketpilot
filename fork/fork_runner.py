@@ -1,19 +1,10 @@
 #!/usr/bin/env python3
-import os
-import sys
-import json
-import time
-import redis
-import logging
-import requests
-import hashlib
-import hmac
-import argparse
+import os, sys, json, time, redis, logging, requests, hmac, hashlib, argparse
 from pathlib import Path
 from datetime import datetime
 import yaml
 
-# === Patch: Add project root to sys.path ===
+# === Project path patch ===
 CURRENT_FILE = Path(__file__).resolve()
 PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
@@ -22,48 +13,65 @@ from config.config_loader import PATHS
 from fork.utils.fork_entry_logger import log_fork_entry
 from fork.utils.entry_utils import get_entry_price, compute_score_hash
 
-# === CONFIG ===
-FORK_TRADES_PATH = PATHS["final_fork_rrr_trades"]
-FORK_TV_TRADES_PATH = PATHS["fork_tv_adjusted"]
-CRED_PATH = PATHS["paper_cred"]
+# === Paths from config ===
+FORK_RRR_PATH = PATHS["final_fork_rrr_trades"]
+FORK_TV_PATH = PATHS["fork_tv_adjusted"]
+FORK_BACKTEST_PATH = PATHS["fork_backtest_candidates"]
 TV_CONFIG_PATH = PATHS["tv_screener_config"]
-BTC_LOGS_DIR = PATHS["btc_logs"]
-TV_KICKER_STATUS_PATH = Path("/home/signal/market7/output/tv_kicker_status.json")
+CRED_PATH = PATHS["paper_cred"]
 
+# === Redis / 3Commas ===
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 SENT_KEY = "FORK_SENT_TRADES"
 THREECOMMAS_URL = "https://app.3commas.io/trade_signal/trading_view"
 THREECOMMAS_BASE_URL = "https://api.3commas.io"
 
-# === Logging Setup ===
+# === Logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-
-# === Load Credentials ===
-try:
-    with open(CRED_PATH, "r") as f:
-        creds = json.load(f)
-    BOT_ID = creds["3commas_bot_id"]
-    BOT_ID2 = creds.get("3commas_bot_id2")
-    EMAIL_TOKEN = creds["3commas_email_token"]
-    API_KEY = creds["3commas_api_key"]
-    API_SECRET = creds["3commas_api_secret"]
-except Exception as e:
-    logging.error(f"❌ Failed to load paper_cred.json: {e}")
-    exit(1)
-
-# === Redis ===
 r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
-# === Helpers ===
+# === Credentials ===
+with open(CRED_PATH, "r") as f:
+    creds = json.load(f)
+BOT_ID = creds["3commas_bot_id"]
+BOT_ID2 = creds.get("3commas_bot_id2")
+EMAIL_TOKEN = creds["3commas_email_token"]
+API_KEY = creds["3commas_api_key"]
+API_SECRET = creds["3commas_api_secret"]
 
-def format_3c_pair(symbol):
-    return f"USDT_{symbol.replace('USDT', '').replace('USDT_', '')}"
+# === TV Screener status ===
+def is_tv_enabled():
+    try:
+        config = yaml.safe_load(TV_CONFIG_PATH.read_text())
+        tv_enabled = config.get("tv_screener", {}).get("enabled", False)
+        return tv_enabled
+    except Exception as e:
+        logging.error(f"❌ Failed to read TV Screener config: {e}")
+        return False
 
-def sign_payload(payload: dict, token: str) -> dict:
-    query = "&".join(f"{k}={v}" for k, v in sorted(payload.items()))
-    signature = hmac.new(token.encode(), query.encode(), hashlib.sha256).hexdigest()
-    payload["sign"] = signature
+# === Load fork trades ===
+def load_trades(tv_enabled: bool):
+    path = FORK_TV_PATH if tv_enabled else FORK_RRR_PATH
+    if not path.exists():
+        logging.warning(f"⚠️ Trade path missing: {path}")
+        return []
+    if path.suffix == ".jsonl":
+        return [json.loads(line.strip()) for line in path.read_text().splitlines() if line.strip()]
+    return list(json.load(path).keys())  # legacy RRR list
+
+# === Clear stale files ===
+def clear_if_disabled():
+    logging.info("🚫 TV Screener disabled. Clearing adjusted/backtest outputs...")
+    FORK_TV_PATH.write_text("")
+    FORK_BACKTEST_PATH.write_text("")
+
+# === 3Commas helpers ===
+def format_pair(symbol): return f"USDT_{symbol.replace('USDT', '').replace('USDT_', '')}"
+
+def sign_payload(payload, token):
+    q = "&".join(f"{k}={v}" for k, v in sorted(payload.items()))
+    payload["sign"] = hmac.new(token.encode(), q.encode(), hashlib.sha256).hexdigest()
     return payload
 
 def send_to_3c(symbol, bot_id):
@@ -72,125 +80,49 @@ def send_to_3c(symbol, bot_id):
         "bot_id": bot_id,
         "email_token": EMAIL_TOKEN,
         "delay_seconds": 0,
-        "pair": format_3c_pair(symbol)
+        "pair": format_pair(symbol)
     }
-    signed_payload = sign_payload(payload.copy(), EMAIL_TOKEN)
-
     try:
-        res = requests.post(THREECOMMAS_URL, json=signed_payload, timeout=10)
+        res = requests.post(THREECOMMAS_URL, json=sign_payload(payload, EMAIL_TOKEN), timeout=10)
         res.raise_for_status()
         r.hset(SENT_KEY, f"{symbol}_{bot_id}", json.dumps({"sent": True, "timestamp": time.time()}))
-        logging.info(f"✅ Sent {symbol} to 3Commas bot {bot_id}.")
+        logging.info(f"✅ Sent {symbol} to 3Commas bot {bot_id}")
         return True
     except Exception as e:
-        logging.error(f"❌ Error sending {symbol} to bot {bot_id}: {e}")
+        logging.error(f"❌ Failed to send {symbol} to bot {bot_id}: {e}")
         return False
 
-def get_active_3c_trades():
+def get_active_trades():
     try:
-        full_path = "/public/api/ver1/deals?scope=active"
-        full_url = THREECOMMAS_BASE_URL + full_path
-        signature = hmac.new(API_SECRET.encode("utf-8"), full_path.encode("utf-8"), hashlib.sha256).hexdigest()
-        headers = {"Apikey": API_KEY, "Signature": signature}
-        res = requests.get(full_url, headers=headers, timeout=10)
+        path = "/public/api/ver1/deals?scope=active"
+        sig = hmac.new(API_SECRET.encode(), path.encode(), hashlib.sha256).hexdigest()
+        headers = {"Apikey": API_KEY, "Signature": sig}
+        res = requests.get(THREECOMMAS_BASE_URL + path, headers=headers)
         res.raise_for_status()
-        deals = res.json()
-        active = set()
-        for deal in deals:
-            if deal.get("status") != "bought":
-                continue
-            pair = deal.get("pair", "")
-            if pair.startswith("USDT_"):
-                active.add(pair.split("_")[1] + "USDT")
-        return active
+        return {deal["pair"].split("_")[1] + "USDT" for deal in res.json() if deal.get("status") == "bought"}
     except Exception as e:
-        logging.error(f"❌ Failed to fetch active trades: {e}")
+        logging.error(f"❌ Could not fetch active trades: {e}")
         return set()
 
-def load_fork_trades(tv_mode: bool):
-    path = FORK_TV_TRADES_PATH if tv_mode else FORK_TRADES_PATH
-    if not os.path.exists(path):
-        logging.error(f"❌ Missing: {path}")
-        return []
-    with open(path, "r") as f:
-        return [json.loads(line.strip()) for line in f if line.strip()] if path.suffix == ".jsonl" else json.load(f)
-
-def load_latest_btc_status():
-    try:
-        folders = sorted(
-            [f for f in os.listdir(BTC_LOGS_DIR) if f[:4].isdigit()], reverse=True
-        )
-        for folder in folders:
-            file_path = Path(BTC_LOGS_DIR) / folder / "btc_snapshots.jsonl"
-            if file_path.exists():
-                with open(file_path, "r") as f:
-                    lines = f.readlines()
-                    if lines:
-                        return json.loads(lines[-1])
-    except Exception as e:
-        logging.warning(f"[TV_KICKER] Could not determine BTC status: {e}")
-    return {"market_condition": "unknown"}
-
-def check_tv_kicker_status() -> dict:
-    try:
-        config = yaml.safe_load(TV_CONFIG_PATH.read_text()).get("tv_screener", {})
-        tv_enabled = config.get("enabled", False)
-        btc_filter_enabled = config.get("disable_if_btc_unhealthy", False)
-        btc_data = load_latest_btc_status()
-        btc_status = btc_data.get("market_condition", "unknown").lower()
-        tv_kicker_allowed = tv_enabled and (not btc_filter_enabled or btc_status == "bullish")
-        return {
-            "tv_enabled": tv_enabled,
-            "btc_filter_enabled": btc_filter_enabled,
-            "btc_status": btc_status,
-            "tv_kicker_allowed": tv_kicker_allowed
-        }
-    except Exception as e:
-        logging.error(f"❌ Failed to evaluate TV Screener config: {e}")
-        return {
-            "tv_enabled": False,
-            "btc_filter_enabled": False,
-            "btc_status": "unknown",
-            "tv_kicker_allowed": False
-        }
-
-# === Main ===
+# === Main runner ===
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--tv-mode", action="store_true", help="Use TV-kicker trades")
-    args = parser.parse_args()
+    logging.info("🚀 Fork Trade Runner starting...")
+    tv_mode = is_tv_enabled()
 
-    logging.info("\U0001F680 Fork Trade Runner starting...")
+    if not tv_mode:
+        clear_if_disabled()
 
-    # Evaluate TV Screener status
-    tv_status = check_tv_kicker_status()
-    status_str = f"\U0001F4CA TV Enabled: {'✅' if tv_status['tv_enabled'] else '❌'} | " \
-                 f"BTC Override Enabled: {'✅' if tv_status['btc_filter_enabled'] else '❌'} | " \
-                 f"BTC Status: {tv_status['btc_status'].upper()}"
-    logging.info(status_str)
-
-    TV_KICKER_STATUS_PATH.write_text(json.dumps(tv_status, indent=2))
-    logging.info(f"\U0001F4C1 Written to: {TV_KICKER_STATUS_PATH}")
-
-    if args.tv_mode and not tv_status["tv_kicker_allowed"]:
-        logging.warning("❌ TV mode requested but TV Screener is disabled (or BTC is unhealthy). Aborting.")
-        return
-
-    fork_trades = load_fork_trades(args.tv_mode)
-    if not fork_trades:
-        logging.info("⚠️ No fork trades found.")
+    trades = load_trades(tv_mode)
+    if not trades:
+        logging.info("⚠️ No trades to process.")
         return
 
     trade_buffer = []
-    for trade in fork_trades:
-        symbol = trade.get("symbol")
+    for t in trades:
+        symbol = t["symbol"] if isinstance(t, dict) else t
         if not symbol:
-            logging.warning(f"⚠️ Missing symbol in trade: {trade}")
+            logging.warning(f"⚠️ Skipping malformed trade: {t}")
             continue
-
-        indicator_data = trade.get("indicators", trade.get("meta", {})) or {}
-        if not trade.get("score_hash"):
-            trade["score_hash"] = compute_score_hash(indicator_data)
 
         success_main = send_to_3c(symbol, BOT_ID)
         success_alt = send_to_3c(symbol, BOT_ID2) if BOT_ID2 else False
@@ -199,33 +131,28 @@ def main():
             trade_buffer.append({
                 "symbol": symbol,
                 "entry_ts": int(time.time()),
-                "indicators": indicator_data,
-                "score_hash": trade["score_hash"],
-                "source": "tv_kicker" if args.tv_mode else "fork_runner"
+                "indicators": t.get("indicators", {}),
+                "score_hash": t.get("score_hash", compute_score_hash(t.get("indicators", {}))),
+                "source": "tv_kicker" if tv_mode else "fork_runner"
             })
 
         time.sleep(1)
 
-    logging.info("⏱️ Waiting 5 seconds for 3Commas to create trades...")
+    logging.info("⏱️ Waiting 5 seconds for 3Commas...")
     time.sleep(5)
 
-    active_symbols = get_active_3c_trades()
-    logging.info(f"📦 Active trades pulled from 3Commas: {len(active_symbols)}")
-
+    active = get_active_trades()
     confirmed = 0
     for t in trade_buffer:
-        base_symbol = t["symbol"].replace("USDT", "")
-        if base_symbol + "USDT" in active_symbols:
-            entry_price = get_entry_price(t["symbol"], t["entry_ts"])
-            entry_ts_iso = datetime.utcfromtimestamp(t["entry_ts"]).isoformat()
+        if t["symbol"] in active:
             log_fork_entry({
                 "symbol": t["symbol"],
-                "entry_price": entry_price,
+                "entry_price": get_entry_price(t["symbol"], t["entry_ts"]),
                 "entry_time": t["entry_ts"],
-                "entry_ts_iso": entry_ts_iso,
+                "entry_ts_iso": datetime.utcfromtimestamp(t["entry_ts"]).isoformat(),
                 "score_hash": t["score_hash"],
-                "source": t.get("source", "fork_runner"),
-                "indicators": t.get("indicators", {})
+                "source": t["source"],
+                "indicators": t["indicators"]
             })
             confirmed += 1
         else:
