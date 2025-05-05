@@ -7,7 +7,7 @@ from pathlib import Path
 # === Updated Dynamic Paths ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
 FORK_HISTORY_BASE = PROJECT_ROOT / "output/fork_history"
-SCRUBBED_BASE = FORK_HISTORY_BASE / "scrubbed"
+SCRUBBED_BASE = PROJECT_ROOT / "ml/datasets/fork_pulls"
 
 # === Paths ===
 def get_paths(date_str):

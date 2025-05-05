@@ -7,8 +7,8 @@ from pathlib import Path
 
 # === Updated Dynamic Paths ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
-RAW_DIR = PROJECT_ROOT / "live/paper_trades/raw"
-SCRUBBED_DIR = PROJECT_ROOT / "live/paper_trades/scrubbed"
+RAW_DIR = PROJECT_ROOT / "ml/datasets/raw_paper"
+SCRUBBED_DIR = PROJECT_ROOT / "ml/datasets/scrubbed_paper"
 
 def normalize_symbol(pair: str) -> str:
     if "_" in pair:

@@ -10,7 +10,7 @@ from pathlib import Path
 # === Updated Dynamic Paths ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
 CRED_PATH = PROJECT_ROOT / "config/paper_cred.json"
-SAVE_BASE = PROJECT_ROOT / "live/paper_trades/raw"
+SAVE_BASE = PROJECT_ROOT / "ml/datasets/raw_paper"
 BASE_URL = "https://api.3commas.io"
 LIMIT = 1000
 

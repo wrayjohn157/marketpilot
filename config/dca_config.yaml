@@ -19,11 +19,11 @@ trajectory_thresholds:
   macd_lift_min: 5.0e-05
   rsi_slope_min: 1
 require_tp1_feasibility: true
-max_tp1_shift_pct: 7
+max_tp1_shift_pct: 30
 require_recovery_odds: true
 min_recovery_probability: 0.5
 min_confidence_odds: 0.65
-use_confidence_override: true
+use_confidence_override: false
 confidence_dca_guard:
   safu_score_min: 0.5
   macd_lift_min: 5.0e-05
@@ -31,6 +31,7 @@ confidence_dca_guard:
   confidence_score_min: 0.7
   min_confidence_delta: 0.05
   min_tp1_shift_gain_pct: 1.1
+use_soft_confidence_override: false
 soft_confidence_override:
   min_confidence: 0.75
   min_recovery_odds: 0.8

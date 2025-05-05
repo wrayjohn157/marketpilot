@@ -1,21 +1,21 @@
 // src/components/ConfigPanels/DcaConfigPanel.jsx
+import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { Button } from "../ui/Button";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
 } from "../ui/Card";
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "../ui/Collapsible";
 import { FormField } from "../ui/FormField";
 import { Input } from "../ui/Input";
 import { Switch } from "../ui/Switch";
-import { Button } from "../ui/Button";
-import axios from "axios";
-import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-} from "../ui/Collapsible";
 
 const prettyLabel = (key) =>
   key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
@@ -138,8 +138,18 @@ export default function DcaConfigPanel() {
 
             <Section title="🧪 Soft Confidence Rescue">
               <FieldGrid>
-                {Object.entries(config.soft_confidence_override).map(([k, v]) => (
-                  <NumericField key={k} label={prettyLabel(k)} value={v} onChange={(val) => updateField("soft_confidence_override", k, val)} />
+               <SwitchField
+                 label="Use Soft Confidence Override"
+                 checked={config.use_soft_confidence_override}
+                 onChange={(v) => updateRoot("use_soft_confidence_override", v)}
+               />
+               {Object.entries(config.soft_confidence_override).map(([k, v]) => (
+                 <NumericField
+                    key={k}
+                    label={prettyLabel(k)}
+                    value={v}
+                    onChange={(val) => updateField("soft_confidence_override", k, val)}
+                 />
                 ))}
               </FieldGrid>
             </Section>
