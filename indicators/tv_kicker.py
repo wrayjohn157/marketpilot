@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+from pathlib import Path
+import sys
+
+CURRENT_FILE = Path(__file__).resolve()
+PROJECT_ROOT = CURRENT_FILE.parent.parent
+sys.path.append(str(PROJECT_ROOT))
 import json
 import logging
 from pathlib import Path
