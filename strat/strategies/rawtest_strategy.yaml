@@ -1,0 +1,5 @@
+weights:
+  MACD_Histogram: 0.5
+  RSI14: 0.3
+  StochRSI_K: 0.2
+min_score: 0.7
