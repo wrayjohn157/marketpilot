@@ -16,13 +16,14 @@ btc_indicators:
   adx_max: 15
 use_trajectory_check: true
 trajectory_thresholds:
-  macd_lift_min: 5.0e-05
-  rsi_slope_min: 1
+  macd_lift_min: 0.0001
+  rsi_slope_min: 1.5
 require_tp1_feasibility: true
-max_tp1_shift_pct: 30
+max_tp1_shift_pct: 25
 require_recovery_odds: true
-min_recovery_probability: 0.5
-min_confidence_odds: 0.65
+min_recovery_probability: 0.6
+min_confidence_odds: 0.7
+min_be_improvement_pct: 0.8
 use_confidence_override: false
 confidence_dca_guard:
   safu_score_min: 0.5
@@ -40,7 +41,6 @@ soft_confidence_override:
   min_drawdown_pct: 2
   min_confidence_delta: 0.05
   min_tp1_shift_pct: 2
-min_be_improvement_pct: 0.8
 so_volume_table:
 - 20
 - 10
