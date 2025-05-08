@@ -135,6 +135,25 @@ export default function DcaConfigPanel() {
                 ))}
               </FieldGrid>
             </Section>
+            <Section title="🔁 Step Repeat Guard">
+              <FieldGrid>
+                <SwitchField
+                  label="Enabled"
+                  checked={config.step_repeat_guard?.enabled}
+                  onChange={(v) => updateField("step_repeat_guard", "enabled", v)}
+                />
+                <NumericField
+                  label="Min Confidence Delta"
+                  value={config.step_repeat_guard?.min_conf_delta}
+                  onChange={(val) => updateField("step_repeat_guard", "min_conf_delta", val)}
+                />
+                <NumericField
+                  label="Min TP1 Delta"
+                  value={config.step_repeat_guard?.min_tp1_delta}
+                  onChange={(val) => updateField("step_repeat_guard", "min_tp1_delta", val)}
+                />
+              </FieldGrid>
+            </Section>
 
             <Section title="🧪 Soft Confidence Rescue">
               <FieldGrid>

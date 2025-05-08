@@ -1,5 +1,3 @@
-# /market7/dca/modules/dca_decision_engine.py
-
 def should_dca(
     trade,
     config,
@@ -14,6 +12,14 @@ def should_dca(
     # === BTC Filter ===
     if config.get("use_btc_filter", True) and btc_status != "SAFE":
         return False, "btc_unsafe", recovery_odds
+
+    # === Zombie / Hard Abandon ===
+    if current_score is not None and current_score < 0.2:
+        return False, "abandon_low_score", recovery_odds
+    if safu_score is not None and safu_score < 0.4:
+        return False, "abandon_safu", recovery_odds
+    if recovery_odds is not None and recovery_odds < 0.4:
+        return False, "abandon_recovery", recovery_odds
 
     # === Max Allocation ===
     total_spent = float(trade.get("bought_volume") or 0)
@@ -34,10 +40,6 @@ def should_dca(
             return False, "macd_bearish", recovery_odds
         if indicators.get("adx", 0) < thresholds.get("adx", 20):
             return False, "adx_weak", recovery_odds
-
-    # === SAFU ===
-    if safu_score is None or safu_score < config.get("safu_score_threshold", 0.4):
-        return False, "safu_low", recovery_odds
 
     # === Score Decay ===
     if current_score is not None and current_score < config.get("score_decay_min", 0.3):
@@ -63,17 +65,9 @@ def should_dca(
         if tp1_sim_pct < 0:
             return False, "tp1_shift_negative", recovery_odds
 
-    # === Recovery Odds (passed from caller) ===
+    # === Recovery Odds ===
     if config.get("require_recovery_odds", True):
-        if recovery_odds < config.get("min_recovery_probability", 0.5):
+        if recovery_odds < config.get("min_recovery_probability", 0.6):
             return False, "recovery_odds_low", recovery_odds
 
     return True, None, recovery_odds
-
-
-def how_much_to_dca(trade, config):
-    num_so = trade.get("completed_safety_orders_count", 0)
-    so_volume_table = config.get("so_volume_table", [])
-    if num_so >= len(so_volume_table):
-        return 0
-    return so_volume_table[num_so]

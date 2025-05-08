@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import TradeCard    from "../components/ui/TradeCardEnhanced";
+import React, { useState, useEffect, useMemo } from "react";
+import TradeCard from "../components/ui/TradeCardEnhanced";
 import SelectFilter from "../components/ui/SelectFilter";
 
 export default function ActiveTradesPanel() {
   const [trades, setTrades] = useState([]);
-  const [sortBy, setSortBy] = useState("confidence");
+  const [sortBy, setSortBy] = useState("pnl");
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -15,7 +15,7 @@ export default function ActiveTradesPanel() {
     fetchTrades();
   }, []);
 
-  const sortTrades = (trades) => {
+  const sortedTrades = useMemo(() => {
     switch (sortBy) {
       case "pnl":
         return [...trades].sort((a, b) => (b.open_pnl || 0) - (a.open_pnl || 0));
@@ -27,15 +27,13 @@ export default function ActiveTradesPanel() {
       default:
         return [...trades].sort((a, b) => (b.confidence_score || 0) - (a.confidence_score || 0));
     }
-  };
-
-  const sortedTrades = sortTrades(trades);
+  }, [trades, sortBy]);
 
   const sortOptions = [
-    { label: "Confidence", value: "confidence" },
     { label: "PnL", value: "pnl" },
+    { label: "Confidence", value: "confidence" },
     { label: "Drawdown", value: "drawdown" },
-    { label: "DCA Step", value: "dca" }
+    { label: "DCA Step", value: "dca" },
   ];
 
   return (
@@ -45,13 +43,16 @@ export default function ActiveTradesPanel() {
           label="Sort By"
           options={sortOptions}
           value={sortBy}
-          onChange={setSortBy}
+          onChange={(val) => {
+            console.log("Sort mode changed to:", val);
+            setSortBy(val);
+          }}
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4">
         {sortedTrades.map((trade) => (
-          <TradeCard key={trade.deal_id} trade={trade} />
+          <TradeCard key={`${sortBy}-${trade.deal_id}`} trade={trade} />
         ))}
       </div>
     </div>

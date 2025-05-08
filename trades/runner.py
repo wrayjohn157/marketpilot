@@ -20,7 +20,7 @@ def run_step(description, script_path):
 def main():
     print("🚀 Starting Market7 pipeline...")
 
-    run_step("BTC Market Condition", os.path.join(BASE_DIR, "indicators", "btc_market_condition.py"))
+    run_step("BTC Snapshot Logger", os.path.join(BASE_DIR, "dashboard_backend", "btc_logger.py")) #run_step("BTC Market Condition", os.path.join(BASE_DIR, "indicators", "btc_market_condition.py"))
     run_step("Volume Filter", os.path.join(BASE_DIR, "data", "volume_filter.py"))
     run_step("Technical Filter", os.path.join(BASE_DIR, "indicators", "tech_filter.py"))
 

@@ -1,9 +1,9 @@
 max_trade_usdt: 2000
 base_order_usdt: 200
 drawdown_trigger_pct: 0.9
+buffer_zone_pct: 0
 safu_score_threshold: 0.5
 score_decay_min: 0.2
-buffer_zone_pct: 0
 require_indicator_health: true
 indicator_thresholds:
   rsi: 45
@@ -24,6 +24,10 @@ require_recovery_odds: true
 min_recovery_probability: 0.6
 min_confidence_odds: 0.7
 min_be_improvement_pct: 0.8
+abandon_thresholds:
+  min_score: 0.2
+  min_safu_score: 0.4
+  min_recovery_odds: 0.4
 use_confidence_override: false
 confidence_dca_guard:
   safu_score_min: 0.5
@@ -91,4 +95,8 @@ health_scoring:
   health_thresholds:
     healthy: 0.7
     weak: 0.4
+step_repeat_guard:
+  enabled: true
+  min_conf_delta: 0.02
+  min_tp1_delta: 0.5
 log_verbose: true

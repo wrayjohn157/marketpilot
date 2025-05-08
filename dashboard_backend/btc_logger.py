@@ -159,6 +159,7 @@ def log_btc_snapshot():
     r.set("BTC_1h_EMA50", round(ema50_1h, 2))
     r.set("BTC_1h_ADX14", round(adx_1h, 2))
     r.set("BTC_15m_RSI14", round(rsi_15m, 2))
+    r.set("btc_condition", market_condition)
     
     print(f"✅ Logged BTC snapshot @ {ts_iso}")
     print(f"📁 Snapshot saved to: {file_path}")

@@ -38,7 +38,9 @@ from dca.utils.spend_predictor import predict_spend_volume, adjust_volume
 from dca.utils.trade_health_evaluator import evaluate_trade_health
 from config.config_loader import PATHS
 
-CONFIG_PATH = PATHS["dca_config"] #CONFIG_PATH = PATHS["base"] / "dca" / "config" / "dca_config.yaml"
+CONFIG_PATH = PATHS[
+    "dca_config"
+]  # CONFIG_PATH = PATHS["dca_config"] #CONFIG_PATH = PATHS["base"] / "dca" / "config" / "dca_config.yaml"
 LOG_DIR = PATHS["base"] / "dca" / "logs"
 SNAPSHOT_DIR = SNAPSHOT_PATH
 DCA_TRACKING_PATH = LOG_DIR / "dca_tracking" / "dca_fired.jsonl"
@@ -68,6 +70,21 @@ def get_last_snapshot_values(symbol, deal_id):
             return last.get("confidence_score", 0.0), last.get("tp1_shift", 0.0)
     except:
         return 0.0, 0.0
+
+
+def get_last_logged_snapshot(deal_id):
+    if not DCA_TRACKING_PATH.exists():
+        return None
+    try:
+        with open(DCA_TRACKING_PATH, "r") as f:
+            entries = [
+                json.loads(line) for line in f if f'"deal_id": {deal_id}' in line
+            ]
+        if not entries:
+            return None
+        return entries[-1]
+    except:
+        return None
 
 
 def get_last_fired_step(deal_id):
@@ -308,6 +325,59 @@ def run():
         )
         conf_delta = confidence_score - last_conf_score
         tp1_gain = tp1_shift - last_tp1_shift
+
+        # === Check step memory with YAML-configurable guard ===
+        last_logged = get_last_logged_snapshot(deal_id)
+        step_guard = config.get("step_repeat_guard", {})
+        if step_guard.get("enabled", True) and last_logged:
+            prev_step = last_logged.get("step", 0)
+            prev_conf = last_logged.get("confidence_score", 0)
+            prev_tp1 = last_logged.get("tp1_shift", 0)
+            same_step = prev_step == get_last_fired_step(deal_id)
+            conf_improved = (confidence_score - prev_conf) > step_guard.get(
+                "min_conf_delta", 0.02
+            )
+            tp1_improved = (tp1_shift - prev_tp1) > step_guard.get(
+                "min_tp1_delta", 0.25
+            )
+
+            if same_step and not (conf_improved or tp1_improved):
+                print(f"🔁 Step {prev_step} already fired, no significant improvement.")
+                reason = "no_step_improvement"
+                log_entry = {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "deal_id": deal_id,
+                    "symbol": symbol,
+                    "step": prev_step,
+                    "current_price": current_price,
+                    "avg_entry_price": avg_entry_price,
+                    "entry_score": entry_score,
+                    "current_score": current_score,
+                    "open_pnl": (
+                        (
+                            (current_price - avg_entry_price)
+                            * (total_spent / avg_entry_price)
+                        )
+                        if avg_entry_price
+                        else 0.0
+                    ),
+                    "tp1_shift": tp1_shift,
+                    "be_improvement": be_improvement,
+                    "recovery_odds": recovery_odds,
+                    "confidence_score": confidence_score,
+                    "safu_score": safu_score,
+                    "btc_status": btc_status,
+                    "tv_tag": tv_tag,
+                    "tv_kicker": tv_kicker,
+                    "health_score": health_score,
+                    "health_status": health_status,
+                    "zombie_tagged": zombie_tagged,
+                    "decision": "skipped",
+                    "rejection_reason": reason,
+                    "spent": total_spent,
+                }
+                write_log(log_entry)
+                continue
 
         override_conf = config.get("confidence_dca_guard", {})
         if (

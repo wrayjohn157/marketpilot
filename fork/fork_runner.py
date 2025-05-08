@@ -23,6 +23,7 @@ FORK_TV_PATH = PATHS["fork_tv_adjusted"]
 FORK_BACKTEST_PATH = PATHS["fork_backtest_candidates"]
 TV_CONFIG_PATH = PATHS["tv_screener_config"]
 CRED_PATH = PATHS["paper_cred"]
+BTC_LOGS_DIR = PATHS["btc_logs"]
 
 # === Redis / 3Commas ===
 REDIS_HOST = "localhost"
@@ -83,15 +84,31 @@ def get_active_trades():
         logging.error(f"❌ Could not fetch active trades: {e}")
         return set()
 
+# === BTC Status from file ===
+def get_latest_btc_status():
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    btc_log_path = BTC_LOGS_DIR / today / "btc_snapshots.jsonl"
+    if not btc_log_path.exists():
+        return "neutral"
+    try:
+        lines = btc_log_path.read_text().strip().splitlines()
+        if not lines:
+            return "neutral"
+        last = json.loads(lines[-1])
+        return last.get("market_condition", "neutral").lower()
+    except Exception as e:
+        logging.warning(f"⚠️ Failed to read BTC status from log: {e}")
+        return "neutral"
+
 # === TV Status ===
 def check_tv_status():
     try:
         cfg = yaml.safe_load(TV_CONFIG_PATH.read_text()).get("tv_screener", {})
         enabled = cfg.get("enabled", False)
         guard = cfg.get("disable_if_btc_unhealthy", False)
-        btc_status = r.get("btc_condition") or "neutral"
-        healthy = (btc_status.lower() == "bullish")
-        return enabled, guard, btc_status.lower(), (not guard or healthy)
+        btc_status = get_latest_btc_status()
+        healthy = (btc_status == "bullish")
+        return enabled, guard, btc_status, (not guard or healthy)
     except Exception as e:
         logging.error(f"❌ Failed to parse TV Screener config: {e}")
         return False, False, "unknown", False
