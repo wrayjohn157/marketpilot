@@ -5,6 +5,7 @@ import argparse
 import joblib
 import pandas as pd
 import numpy as np
+from datetime import datetime
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -14,7 +15,7 @@ import shap
 import matplotlib.pyplot as plt
 
 # === CONFIG ===
-PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "ml/datasets"
 MODEL_DIR = PROJECT_ROOT / "ml/models"
 
@@ -25,42 +26,38 @@ def load_data(path):
 
 def prepare_features(df):
     indicator_cols = [
-        "fork_score.indicators.EMA50",
-        "fork_score.indicators.EMA200",
-        "fork_score.indicators.RSI14",
-        "fork_score.indicators.ADX14",
-        "fork_score.indicators.QQE",
-        "fork_score.indicators.PSAR",
-        "fork_score.indicators.ATR",
-        "fork_score.indicators.StochRSI_K",
-        "fork_score.indicators.StochRSI_D",
-        "fork_score.indicators.MACD",
-        "fork_score.indicators.MACD_signal",
-        "fork_score.indicators.MACD_diff",
-        "fork_score.indicators.MACD_Histogram",
-        "fork_score.indicators.MACD_Histogram_Prev",
-        "fork_score.indicators.MACD_lift",
-        "btc_entry.rsi",
-        "btc_entry.adx",
-        "btc_entry.macd_histogram",
-        "btc_entry.ema_50",
-        "btc_entry.ema_200"
+        "ind_ema50", "ind_rsi", "ind_adx", "ind_atr",
+        "ind_stoch_rsi_k", "ind_stoch_rsi_d", "ind_macd",
+        "ind_macd_signal", "ind_macd_hist", "ind_macd_hist_prev",
+        "ind_macd_lift",
+        "btc_rsi", "btc_adx", "btc_macd_histogram",
+        "btc_ema_50", "btc_ema_200"
     ]
 
-    if "btc_entry.market_condition" in df.columns:
-        df["btc_entry.market_condition_num"] = df["btc_entry.market_condition"].map({
+    if "btc_market_condition" in df.columns:
+        df["btc_market_condition_num"] = df["btc_market_condition"].map({
             "bullish": 2, "neutral": 1, "bearish": 0
         })
-        indicator_cols.append("btc_entry.market_condition_num")
+        indicator_cols.append("btc_market_condition_num")
 
-    for col in indicator_cols:
+    # Detect available columns
+    available_cols = [col for col in indicator_cols if col in df.columns]
+    missing = [col for col in indicator_cols if col not in df.columns]
+    if missing:
+        print(f"⚠️ Missing columns skipped: {missing}")
+
+    for col in available_cols:
         df[col] = pd.to_numeric(df[col], errors='coerce')
 
-    df_clean = df.dropna(subset=indicator_cols + ["label"])
+    # Fallback label if not present
+    if "label" not in df.columns and "pnl_pct" in df.columns:
+        df["label"] = (df["pnl_pct"] > 0.5).astype(int)
 
-    X = df_clean[indicator_cols]
+    df_clean = df.dropna(subset=available_cols + ["label"])
+
+    X = df_clean[available_cols]
     y = df_clean["label"].astype(int)
-    return X, y, indicator_cols
+    return X, y, available_cols
 
 def train_model(X, y, feature_names, shap_out_path):
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, stratify=y, random_state=42)
@@ -94,7 +91,7 @@ def train_model(X, y, feature_names, shap_out_path):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", required=True, help="Path to ml_training_set.jsonl")
+    parser.add_argument("--dataset", required=True, help="Path to master_data.jsonl")
     args = parser.parse_args()
 
     dataset_path = Path(args.dataset)
@@ -102,8 +99,8 @@ def main():
         print(f"[ERROR] Dataset not found: {dataset_path}")
         return
 
-    date_folder = dataset_path.parent.name
-    shap_out_path = MODEL_DIR / f"shap_summary_{date_folder}.png"
+    date_tag = datetime.utcnow().strftime("%Y-%m-%d")
+    shap_out_path = MODEL_DIR / f"shap_summary_{date_tag}.png"
     model_out_path = MODEL_DIR / "xgb_model.pkl"
     scaler_out_path = MODEL_DIR / "scaler.pkl"
     features_out_path = MODEL_DIR / "features_used.json"

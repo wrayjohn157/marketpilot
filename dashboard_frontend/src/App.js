@@ -14,6 +14,9 @@ import BTCRiskPanel from "./pages/BTCRiskPanel";
 import ForkScore from "./pages/ForkScore";
 import DcaConfig from "./pages/DcaConfig";
 import TvScreenerConfig from "./pages/TvScreenerConfig";
+import SafuConfig from "./pages/SafuConfig";
+import AskGpt from "./pages/AskGpt";
+import CodeEditor from "./pages/GptCodeEditor";
 
 function App() {
   return (
@@ -28,11 +31,14 @@ function App() {
               <Route path="/scan-review" element={<ScanReview />} />
               <Route path="/dca-tracker" element={<DCATracker />} />
               <Route path="/backtest-summary" element={<BacktestSummary />} />
+              <Route path="/ask-gpt" element={<AskGpt />} />
+              <Route path="/code-editor" element={<CodeEditor />} />
               <Route path="/ml-monitor" element={<MLMonitor />} />
               <Route path="/btc-panel" element={<BTCRiskPanel />} />
               <Route path="/fork-score" element={<ForkScore />} />
               <Route path="/dca-config" element={<DcaConfig />} />
               <Route path="/tv-config" element={<TvScreenerConfig />} />
+              <Route path="/safu-config" element={<SafuConfig />} />
               <Route path="*" element={<Navigate to="/trade-dashboard" replace />} />
             </Routes>
           </main>

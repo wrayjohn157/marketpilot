@@ -100,3 +100,14 @@ Thumbs.db
 *.swp
 *.bak
 *.tmp
+
+# Ignore generated or temporary datasets
+ml/datasets/enriched/
+ml/datasets/fork_pulls/
+ml/datasets/raw_paper/
+ml/datasets/scrubbed_paper/
+ml/datasets/recovery_training/
+ml/datasets/dca_spend/
+ml/datasets/unified/
+ml/datasets/flattened/
+ml/models/*.pkl

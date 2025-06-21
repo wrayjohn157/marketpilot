@@ -29,7 +29,7 @@ r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 # === Excluded base tokens ===
 EXCLUDED_BASES = [
-    "USDT", "USDC", "FDUSD", "TUSD", "BUSD", "DAI",
+    "USDT", "PAXG", "USDC", "FDUSD", "TUSD", "BUSD", "DAI",
     "EUR", "TRY", "BRL", "GBP", "UAH", "USD",
     "WBTC", "WETH"
 ]

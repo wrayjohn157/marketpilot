@@ -8,12 +8,14 @@ const links = [
   { label: "Active Trades", icon: "📈", path: "/active-trades" },
   { label: "Scan Review", icon: "🔍", path: "/scan-review" },
   { label: "DCA Tracker", icon: "📊", path: "/dca-tracker" },
-  { label: "Backtest", icon: "📚", path: "/backtest-summary" },
+  // { label: "Ask ChatGPT", icon: "🧠", path: "/ask-gpt" },
+  // { label: "Code Assistant", icon: "🧑‍💻", path: "/code-editor" },
   { label: "ML Monitor", icon: "🤖", path: "/ml-monitor" },
   { label: "BTC Panel", icon: "⚠️", path: "/btc-panel" },
   { label: "Fork Config", icon: "🛠️", path: "/fork-score" },
   { label: "DCA Config", icon: "🛠️", path: "/dca-config" },
   { label: "TV Config", icon: "📺", path: "/tv-config" },
+  { label: "SAFU Config", icon: "🧯", path: "/safu-config" },
 ];
 
 export default function Sidebar() {

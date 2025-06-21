@@ -24,11 +24,19 @@ except Exception as e:
     logger.error(f"Failed to load spend model: {e}")
     MODEL = None
 
-# === Required Features ===
-FEATURES = [
+# === Required Feature Set for Base Inputs (excluding one-hot btc_status)
+BASE_FEATURES = [
     "entry_score", "current_score", "drawdown_pct", "safu_score", "macd_lift",
     "rsi", "rsi_slope", "adx", "tp1_shift", "recovery_odds", "confidence_score",
-    "zombie_tagged", "btc_rsi", "btc_macd_histogram", "btc_adx", "btc_status"
+    "zombie_tagged", "btc_rsi", "btc_macd_histogram", "btc_adx"
+]
+
+# === One-hot Encoded btc_status Feature Keys
+BTC_STATUS_KEYS = [
+    "btc_status_bullish",
+    "btc_status_bearish",
+    "btc_status_neutral",
+    "btc_status_nan"
 ]
 
 
@@ -39,9 +47,25 @@ def predict_spend_volume(input_features: dict) -> float:
         return 0.0
 
     try:
-        df = pd.DataFrame([{feat: input_features.get(feat, 0.0) for feat in FEATURES}])
+        # Extract base features
+        base_data = {key: input_features.get(key, 0.0) for key in BASE_FEATURES}
+
+        # Map btc_status to one-hot fields
+        btc_status = str(input_features.get("btc_status", "nan")).lower()
+        btc_data = {
+            "btc_status_bullish": int(btc_status == "bullish"),
+            "btc_status_bearish": int(btc_status == "bearish"),
+            "btc_status_neutral": int(btc_status == "neutral"),
+            "btc_status_nan": int(btc_status not in {"bullish", "bearish", "neutral"}),
+        }
+
+        # Combine all features
+        row = {**base_data, **btc_data}
+        df = pd.DataFrame([row])
+
         pred = MODEL.predict(df)[0]
         return float(pred)
+
     except Exception as e:
         logger.error(f"Spend prediction failed: {e}")
         return 0.0
@@ -56,8 +80,8 @@ def adjust_volume(
 ) -> float:
     """Adjust predicted DCA volume based on sanity checks and budget limits."""
     min_effective_dd_pct = 1.0     # Minimum drawdown %
-    min_tp1_shift_pct = 1.0         # Minimum TP1 shift %
-    max_ratio = 10.0                # Max times already spent
+    min_tp1_shift_pct = 1.0        # Minimum TP1 shift %
+    max_ratio = 10.0               # Max times already spent
 
     remaining_budget = max(0.0, max_budget - already_spent)
 

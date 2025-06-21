@@ -30,7 +30,9 @@ REDIS_SET = "FORK_RRR_PASSED"
 REDIS_FINAL_TRADES = "FORK_FINAL_TRADES"
 
 r = redis.Redis(host="localhost", port=6379, decode_responses=True)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 # === Load config ===
 with open(CONFIG_PATH) as f:
@@ -38,6 +40,7 @@ with open(CONFIG_PATH) as f:
 MIN_SCORE = config.get("min_score", 0.73)
 WEIGHTS = config.get("weights", {})
 OPTIONS = config.get("options", {})
+
 
 def extract_float(val):
     if val is None:
@@ -51,6 +54,7 @@ def extract_float(val):
     except:
         match = re.search(r"[-+]?\d*\.\d+|\d+", s)
         return float(match.group()) if match else 0.0
+
 
 def btc_sentiment_multiplier():
     price = extract_float(r.get("BTC_1h_latest_close"))
@@ -67,6 +71,7 @@ def btc_sentiment_multiplier():
     if rsi < 35:
         mult -= 0.05
     return max(0.8, min(mult, 1.2))
+
 
 def compute_stoch_slope(symbol):
     today = datetime.utcnow().strftime("%Y-%m-%d")
@@ -90,6 +95,7 @@ def compute_stoch_slope(symbol):
         logging.warning(f"[WARN] Failed to compute stoch slope for {symbol}: {e}")
     return 0.0, None
 
+
 def load_kline_volumes(symbol):
     today = datetime.utcnow().strftime("%Y-%m-%d")
     filepath = SNAPSHOT_BASE / today / f"{symbol.upper()}_15m_klines.json"
@@ -104,6 +110,7 @@ def load_kline_volumes(symbol):
         return volumes[-1], sum(volumes[:-1]) / (len(volumes) - 1)
     except:
         return None, None
+
 
 def compute_subscores(symbol):
     data = r.get(f"{symbol.upper()}_1h")
@@ -132,18 +139,25 @@ def compute_subscores(symbol):
     mean_reversion_score = 1.0
     if price > ema50 and atr > 0:
         dist = (price - ema50) / atr
-        if dist > 3: mean_reversion_score = 0.0
-        elif dist > 2: mean_reversion_score = 0.25
-        elif dist > 1.5: mean_reversion_score = 0.5
+        if dist > 3:
+            mean_reversion_score = 0.0
+        elif dist > 2:
+            mean_reversion_score = 0.25
+        elif dist > 1.5:
+            mean_reversion_score = 0.5
 
-    macd_histogram_score = 1.0 if (macd > macd_signal and macd_hist > macd_hist_prev) else 0.0
+    macd_histogram_score = (
+        1.0 if (macd > macd_signal and macd_hist > macd_hist_prev) else 0.0
+    )
     if not OPTIONS.get("use_macd_bearish_check", True):
         macd_histogram_score = 0.0
     macd_bearish_cross = 1.0 if macd < macd_signal else 0.0
     stoch_ob_penalty = 0.0 if (k > 90 and d > 90) else 1.0
     if not OPTIONS.get("use_stoch_ob_penalty", True):
         stoch_ob_penalty = 0.0
-    volume_penalty = 0.0 if (sma9_vol and current_vol and current_vol > sma9_vol * 2) else 1.0
+    volume_penalty = (
+        0.0 if (sma9_vol and current_vol and current_vol > sma9_vol * 2) else 1.0
+    )
     if not OPTIONS.get("use_volume_penalty", True):
         volume_penalty = 0.0
 
@@ -162,7 +176,7 @@ def compute_subscores(symbol):
         "ema_price_reclaim": ema_price_reclaim,
         "mean_reversion_score": mean_reversion_score,
         "volume_penalty": volume_penalty,
-        "stoch_rsi_slope": stoch_slope_score
+        "stoch_rsi_slope": stoch_slope_score,
     }
 
     base_score = sum(subscores[k] * WEIGHTS.get(k, 0) for k in subscores)
@@ -170,21 +184,31 @@ def compute_subscores(symbol):
     adjusted = round(base_score * mult, 4)
 
     raw_indicators = {
-        "price": price, "ema50": ema50, "adx": adx, "atr": atr,
-        "macd": macd, "macd_signal": macd_signal,
-        "macd_hist": macd_hist, "macd_hist_prev": macd_hist_prev,
-        "rsi": rsi, "stoch_rsi_k": k, "stoch_rsi_d": d,
-        "volume": current_vol, "volume_sma9": sma9_vol,
-        "stoch_slope": stoch_raw_slope
+        "price": price,
+        "ema50": ema50,
+        "adx": adx,
+        "atr": atr,
+        "macd": macd,
+        "macd_signal": macd_signal,
+        "macd_hist": macd_hist,
+        "macd_hist_prev": macd_hist_prev,
+        "rsi": rsi,
+        "stoch_rsi_k": k,
+        "stoch_rsi_d": d,
+        "volume": current_vol,
+        "volume_sma9": sma9_vol,
+        "stoch_slope": stoch_raw_slope,
     }
 
     return adjusted, subscores, mult, raw_indicators
+
 
 def write_to_history_log(entry, date_str):
     path = FORK_HISTORY_BASE / date_str / "fork_scores.jsonl"
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "a") as f:
         f.write(json.dumps(entry) + "\n")
+
 
 def main():
     if not FORK_INPUT_FILE.exists():
@@ -197,29 +221,43 @@ def main():
     r.delete(REDIS_SET)
     r.delete(REDIS_FINAL_TRADES)
 
-    now_ts = int(datetime.utcnow().timestamp() * 1000)
-    today = datetime.utcnow().strftime("%Y-%m-%d")
+    now = datetime.utcnow()
+    now_ts = int(now.timestamp() * 1000)
+    ts_iso = now.isoformat() + "Z"
+    today = now.strftime("%Y-%m-%d")
     results, candidates = [], []
 
     for sym in symbols:
         score, subs, mult, raw_indicators = compute_subscores(sym)
-        passed = score >= MIN_SCORE and (subs.get("rsi_recovery", 0) > 0 or subs.get("stoch_rsi_cross", 0) > 0)
+        price = raw_indicators.get("price", 0.0)
+        passed = score >= MIN_SCORE and (
+            subs.get("rsi_recovery", 0) > 0 or subs.get("stoch_rsi_cross", 0) > 0
+        )
 
         log = {
             "symbol": sym.upper(),
             "score": score,
             "timestamp": now_ts,
+            "ts_iso": ts_iso,
             "score_hash": "_".join([f"{k}:{subs[k]}" for k in subs]),
             "score_components": subs,
             "btc_multiplier": mult,
-            "entry_price": extract_float(r.get(f"{sym.upper()}_1h_latest_close")),
+            "entry_price": price, #"entry_price": extract_float(r.get(f"{sym.upper()}_1h_latest_close")),
             "raw_indicators": raw_indicators,
             "passed": passed,
-            "source": "fork_score_filter"
+            "source": "fork_score_filter",
         }
 
         write_to_history_log(log, today)
-        candidates.append({k: log[k] for k in ("symbol", "score", "timestamp", "raw_indicators")})
+        candidates.append(
+            {
+                "symbol": log["symbol"],
+                "score": log["score"],
+                "timestamp": log["timestamp"],
+                "ts_iso": log["ts_iso"],
+                "raw_indicators": log["raw_indicators"],
+            }
+        )
 
         if passed:
             trade = {
@@ -228,14 +266,17 @@ def main():
                 "score": score,
                 "meta": subs,
                 "score_hash": log["score_hash"],
-                "timestamp": now_ts
+                "timestamp": now_ts,
+                "ts_iso": ts_iso,
             }
             r.sadd(REDIS_SET, sym)
             r.rpush(REDIS_FINAL_TRADES, json.dumps(trade))
             results.append(trade)
 
         verdict = "✅" if passed else "❌"
-        log_lines = [f"{verdict} {sym.upper()} | Score: {score:.3f} | Mult: {mult:.2f}"] + [
+        log_lines = [
+            f"{verdict} {sym.upper()} | Score: {score:.3f} | Mult: {mult:.2f}"
+        ] + [
             f"    • {k.replace('_',' ').title():25}: {'✅' if subs[k] >= 1 else '❌' if subs[k] == 0 else f'{subs[k]:.3f}'}"
             for k in subs
         ]
@@ -248,6 +289,7 @@ def main():
 
     logging.info(f"📂 Saved {len(results)} trades to {OUTPUT_FILE}")
     logging.info(f"📊 Backtest candidates saved to {BACKTEST_CANDIDATES_FILE}")
+
 
 if __name__ == "__main__":
     main()

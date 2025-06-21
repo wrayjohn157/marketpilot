@@ -26,4 +26,8 @@ fork_trade_candidates_path: /home/signal/market7/output/fork_trade_candidates.js
 final_forked_trades: /home/signal/market7/output/final_forked_trades.json
 binance_symbols: /home/signal/market7/data/binance_symbols.json
 dca_config: /home/signal/market7/config/dca_config.yaml
-
+fork_safu_config: /home/signal/market7/config/fork_safu_config.yaml
+enriched_path: /home/signal/market7/ml/datasets/enriched
+dca_tracking_path: /home/signal/market7/dca/logs/dca_tracking/dca_fired.jsonl
+recovery_snapshots_path: /home/signal/market7/ml/datasets/recovery_snapshots
+dca_spend_path: /home/signal/market7/ml/datasets/dca_spend

@@ -1,82 +1,70 @@
-#!/usr/bin/env python3
 import json
-import logging
-from pathlib import Path
 import argparse
+import logging
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split
 import joblib
 
-# === Logging Setup ===
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
-# === Default Paths ===
-BASE_DIR = Path(__file__).resolve().parents[2]  # ~/market7/
-DEFAULT_MODEL_PATH = BASE_DIR / "ml/models/xgb_recovery_model.pkl"
-
-# === Helper: Load and flatten JSONL ===
-def load_jsonl_flat(path: Path) -> pd.DataFrame:
-    data = []
-    with open(path, "r") as f:
-        for line in f:
-            row = json.loads(line.strip())
-            # Flatten snapshot_meta into top-level fields
-            snapshot_meta = row.pop("snapshot_meta", {})
-            for k, v in snapshot_meta.items():
-                row[f"snapshot_{k}"] = v
-            row.pop("symbol", None)
-            row.pop("deal_id", None)
-            row.pop("zombie_reason", None)
-            data.append(row)
-    return pd.DataFrame(data)
-
-# === Trainer Function ===
-def train_model(input_path: Path, output_model_path: Path):
+def train_model(input_path, output_path):
     logging.info(f"📂 Loading dataset: {input_path}")
-    df = load_jsonl_flat(input_path)
+    with open(input_path, 'r') as f:
+        data = [json.loads(line) for line in f if line.strip()]
 
-    if "recovery_label" not in df.columns:
-        logging.error("❌ 'recovery_label' column not found. Exiting.")
-        return
+    df = pd.DataFrame(data)
 
-    df = df[df["recovery_label"].notna()]
+    # Drop non-numeric or irrelevant fields
+    drop_cols = ["symbol", "deal_id", "status", "exit_time", "pnl_pct"]
+    df = df.drop(columns=[col for col in drop_cols if col in df.columns])
+
+    # Split features and label
+    X = df.drop(columns=["recovery_label"])
     y = df["recovery_label"]
-    X = df.drop(columns=["recovery_label"]).fillna(0)
 
-    logging.info(f"✅ Dataset loaded: {X.shape[0]} samples, {X.shape[1]} features.")
+    logging.info(f"✅ Dataset loaded: {len(df)} samples, {X.shape[1]} features.")
 
-    # Split data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Label distribution
+    pos_count = sum(y == 1)
+    neg_count = sum(y == 0)
+    logging.info(f"📊 Label distribution → Recovered: {pos_count}, Not recovered: {neg_count}")
 
+    # Rebalance class weights
+    scale_pos_weight = (neg_count / pos_count) if pos_count > 0 else 1.0
+    logging.info(f"⚖️  Using scale_pos_weight: {scale_pos_weight:.2f}")
+
+    # Split for validation
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
+
+    # Train XGBoost
     logging.info("🧠 Training XGBoost classifier...")
     model = XGBClassifier(
-        n_estimators=250,
-        max_depth=5,
-        learning_rate=0.05,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        random_state=42,
+        n_estimators=100,
+        max_depth=4,
+        learning_rate=0.1,
+        objective="binary:logistic",
+        scale_pos_weight=scale_pos_weight,
         use_label_encoder=False,
         eval_metric="logloss"
     )
     model.fit(X_train, y_train)
 
+    # Evaluate
     logging.info("🧪 Evaluating model...")
     y_pred = model.predict(X_test)
-    report = classification_report(y_test, y_pred, digits=3)
-    print("\n📊 Classification Report:\n", report)
+    print("\n📊 Classification Report:\n", classification_report(y_test, y_pred, digits=3))
+    print("📉 Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
 
-    output_model_path.parent.mkdir(parents=True, exist_ok=True)
-    joblib.dump(model, output_model_path)
-    logging.info(f"✅ Model saved to: {output_model_path}")
+    # Save model
+    joblib.dump(model, output_path)
+    logging.info(f"✅ Model saved to: {output_path}")
 
-# === Main ===
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Train recovery ML model.")
-    parser.add_argument("--input", type=Path, required=True, help="Merged recovery_training JSONL path")
-    parser.add_argument("--output", type=Path, default=DEFAULT_MODEL_PATH, help="Where to save model (pkl)")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input", required=True, help="Path to merged recovery dataset (JSONL)")
+    parser.add_argument("--output", default="/home/signal/market7/ml/models/xgb_recovery_model.pkl", help="Output path")
     args = parser.parse_args()
 
     train_model(args.input, args.output)

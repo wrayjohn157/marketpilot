@@ -1,6 +1,6 @@
 // src/components/ConfigPanels/DcaConfigPanel.jsx
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/Button";
 import {
     Card,
@@ -153,6 +153,31 @@ export default function DcaConfigPanel() {
                   onChange={(val) => updateField("step_repeat_guard", "min_tp1_delta", val)}
                 />
               </FieldGrid>
+            </Section>
+
+            <Section title="🚦 Step Progress Guard">
+            <FieldGrid>
+                <SwitchField
+                label="Enabled"
+                checked={config.step_progress_guard?.enabled}
+                onChange={(v) => updateField("step_progress_guard", "enabled", v)}
+                />
+                <NumericField
+                label="Min Price Change %"
+                value={config.step_progress_guard?.min_price_change_pct}
+                onChange={(val) => updateField("step_progress_guard", "min_price_change_pct", val)}
+                />
+                <NumericField
+                label="Min Seconds Elapsed"
+                value={config.step_progress_guard?.min_seconds_elapsed}
+                onChange={(val) => updateField("step_progress_guard", "min_seconds_elapsed", val)}
+                />
+                <NumericField
+                label="Min BE Improvement %"
+                value={config.step_progress_guard?.min_be_improvement_pct}
+                onChange={(val) => updateField("step_progress_guard", "min_be_improvement_pct", val)}
+                />
+            </FieldGrid>
             </Section>
 
             <Section title="🧪 Soft Confidence Rescue">

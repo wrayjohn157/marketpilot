@@ -263,7 +263,7 @@ def run():
             avg_entry_price, so_table[0], current_price
         )
         tp1_shift = (
-            ((1.015 * new_avg_price - current_price) / current_price) * 100
+            ((1.006 * new_avg_price - current_price) / current_price) * 100
             if current_price
             else 0.0
         )
@@ -376,6 +376,30 @@ def run():
                     "rejection_reason": reason,
                     "spent": total_spent,
                 }
+                write_log(log_entry)
+                continue
+
+        # === Step Progression Guard (Prevents runaway steps at similar prices) ===
+        progress_guard = config.get("step_progress_guard", {})
+        if progress_guard.get("enabled", True) and last_logged:
+            prev_price = last_logged.get("current_price", 0)
+            prev_time = datetime.fromisoformat(last_logged["timestamp"])
+            prev_be = last_logged.get("be_improvement", 0)
+
+            price_change_pct = (
+                abs(current_price - prev_price) / prev_price * 100 if prev_price else 0
+            )
+            time_elapsed = (datetime.utcnow() - prev_time).total_seconds()
+            be_gain = be_improvement - prev_be
+
+            if (
+                price_change_pct < progress_guard.get("min_price_change_pct", 0.3)
+                and time_elapsed < progress_guard.get("min_seconds_elapsed", 600)
+                and be_gain < progress_guard.get("min_be_improvement_pct", 0.5)
+            ):
+                print(f"🛑 Step {step} blocked: no significant change from last DCA")
+                log_entry["rejection_reason"] = "step_progress_insufficient"
+                log_entry["decision"] = "skipped"
                 write_log(log_entry)
                 continue
 

@@ -5,11 +5,10 @@ import sys
 CURRENT_FILE = Path(__file__).resolve()
 PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
+
 import json
 import logging
-from pathlib import Path
 from datetime import datetime
-import time
 import yaml
 
 from config.config_loader import PATHS
@@ -96,7 +95,9 @@ def main():
             tv_tag = tv_tags.get(symbol, "neutral")
             tv_kicker = TV_SCORE_WEIGHTS.get(tv_tag, 0.0)
             adjusted_score = round(base_score + tv_kicker, 4)
-            ts = int(time.time() * 1000)
+            now = datetime.utcnow()
+            ts = int(now.timestamp() * 1000)
+            ts_iso = now.isoformat() + "Z"
             passed = adjusted_score >= MIN_PASS_SCORE
 
             entry = {
@@ -106,6 +107,7 @@ def main():
                 "tv_kicker": tv_kicker,
                 "adjusted_score": adjusted_score,
                 "timestamp": ts,
+                "ts_iso": ts_iso,
                 "pass": passed
             }
 

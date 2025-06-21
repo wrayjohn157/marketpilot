@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+from pathlib import Path
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
@@ -22,11 +23,8 @@ def load_dataset(path):
 
 def preprocess(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    df["btc_status"] = df["btc_status"].map({
-        "SAFE": 1,
-        "UNSAFE": 0,
-        None: -1
-    }).fillna(-1)
+    df["btc_status"] = df["btc_status"].fillna("nan").str.lower()
+    df = pd.get_dummies(df, columns=["btc_status"], prefix="btc_status")
     return df
 
 def main(input_path: str, output_path: str):
@@ -34,10 +32,16 @@ def main(input_path: str, output_path: str):
     df = load_dataset(input_path)
     df = preprocess(df)
 
+    # Ensure all possible btc_status columns exist
+    for col in ["btc_status_bullish", "btc_status_bearish", "btc_status_neutral", "btc_status_nan"]:
+        if col not in df.columns:
+            df[col] = 0
+
     features = [
         "entry_score", "current_score", "drawdown_pct", "safu_score", "macd_lift",
         "rsi", "rsi_slope", "adx", "tp1_shift", "recovery_odds", "confidence_score",
-        "zombie_tagged", "btc_rsi", "btc_macd_histogram", "btc_adx", "btc_status"
+        "zombie_tagged", "btc_rsi", "btc_macd_histogram", "btc_adx",
+        "btc_status_bullish", "btc_status_bearish", "btc_status_neutral", "btc_status_nan"
     ]
 
     df = df.dropna(subset=["volume_sent"])

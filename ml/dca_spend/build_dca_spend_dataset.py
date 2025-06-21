@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
 import os
+import sys
 import json
 import argparse
 from datetime import datetime
 from pathlib import Path
 from dateutil import parser as dtparser
 
-# === New base path ===
-BASE_PATH = Path("/home/signal/market7/ml")
-DCA_LOG_PATH = BASE_PATH / "datasets/dca_logs"
-ENRICHED_PATH = BASE_PATH / "datasets/enriched"
-BTC_SNAPSHOT_DIR = BASE_PATH / "datasets/btc_logs"
-SNAPSHOT_DIR = BASE_PATH / "datasets/recovery_snapshots"
-TRACKING_PATH = BASE_PATH / "datasets/dca_tracking/dca_fired.jsonl"
-OUTPUT_PATH = BASE_PATH / "datasets/dca_spend"
+# === Use dynamic path loader ===
+sys.path.append("/home/signal/market7")
+from config.config_loader import PATHS
 
 # === Helpers ===
 def load_jsonl(path):
@@ -24,7 +20,7 @@ def index_by_deal_id(rows):
     return {r["deal_id"]: r for r in rows if "deal_id" in r}
 
 def load_btc_context(date_str):
-    path = BTC_SNAPSHOT_DIR / date_str / "btc_snapshots.jsonl"
+    path = PATHS["btc_logs"] / date_str / "btc_snapshots.jsonl"
     if not path.exists():
         return [], []
     snapshots = load_jsonl(path)
@@ -48,11 +44,11 @@ def find_closest_btc_snapshot(ts, btc_snapshots):
         "btc_rsi": closest.get("rsi"),
         "btc_macd_histogram": closest.get("macd_histogram"),
         "btc_adx": closest.get("adx"),
-        "btc_status": closest.get("status"),
+        "btc_status": closest.get("market_condition"), #"btc_status": closest.get("status"),
     }
 
 def load_latest_snapshot(symbol, deal_id):
-    path = SNAPSHOT_DIR / f"{symbol}_{deal_id}.jsonl"
+    path = PATHS["recovery_snapshots"] / f"{symbol}_{deal_id}.jsonl"
     if not path.exists():
         return {}
     try:
@@ -66,9 +62,9 @@ def load_latest_snapshot(symbol, deal_id):
 
 # === Main logic ===
 def main(date_str):
-    dca_path = DCA_LOG_PATH / date_str / "dca_log.jsonl"
-    enriched_path = ENRICHED_PATH / date_str / "enriched_data.jsonl"
-    out_path = OUTPUT_PATH / f"{date_str}.jsonl"
+    dca_path = PATHS["dca_log"] / date_str / "dca_log.jsonl"
+    enriched_path = PATHS["enriched"] / date_str / "enriched_data.jsonl"
+    out_path = PATHS["dca_spend"] / f"{date_str}.jsonl" #out_path = PATHS["ml_dataset"] / "dca_spend" / f"{date_str}.jsonl"
 
     if not dca_path.exists() or not enriched_path.exists():
         print("Missing required input file(s)")
@@ -76,7 +72,7 @@ def main(date_str):
 
     dca_logs = load_jsonl(dca_path)
     enriched_logs = index_by_deal_id(load_jsonl(enriched_path))
-    fired_steps = load_jsonl(TRACKING_PATH)
+    fired_steps = load_jsonl(PATHS["dca_tracking"])
     fired_lookup = {(x["deal_id"], x["step"]): x for x in fired_steps}
     btc_snapshots, _ = load_btc_context(date_str)
 

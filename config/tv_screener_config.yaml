@@ -1,6 +1,6 @@
 tv_screener:
   enabled: true
-  disable_if_btc_unhealthy: false
+  disable_if_btc_unhealthy: true
   weights:
     strong_buy: 0.5
     buy: 0.25

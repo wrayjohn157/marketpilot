@@ -34,9 +34,9 @@ def is_btc_unsafe(cfg):
         logging.warning("[BTC] No snapshot available, skipping BTC filter")
         return False
 
-    rsi = snapshot.get("RSI14")
-    macd = snapshot.get("MACD_Histogram")
-    adx = snapshot.get("ADX14")
+    rsi = snapshot.get("rsi") #rsi = snapshot.get("RSI14")
+    macd = snapshot.get("macd_histogram") #macd = snapshot.get("MACD_Histogram")
+    adx = snapshot.get("adx") #adx = snapshot.get("ADX14")
 
     rsi_th = cfg.get("rsi", 35)
     macd_th = cfg.get("macd_histogram", -0.01)
