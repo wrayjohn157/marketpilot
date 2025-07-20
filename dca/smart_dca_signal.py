@@ -5,6 +5,9 @@ from pathlib import Path
 from datetime import datetime
 import yaml
 import sys
+from modules.fork_safu_evaluator import get_safu_exit_decision, load_safu_exit_model
+
+safu_exit_model = load_safu_exit_model()
 
 # === Paths ===
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -55,6 +58,8 @@ with open(CONFIG_PATH, "r") as f:
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def get_last_snapshot_values(symbol, deal_id):
@@ -208,6 +213,10 @@ def run():
         except:
             entry_ts = None
 
+        if avg_entry_price == 0:
+            print(f"⚠️ {symbol} missing avg_entry_price, skipping")
+            continue
+
         deviation_pct = (
             ((avg_entry_price - current_price) / avg_entry_price) * 100
             if avg_entry_price
@@ -257,6 +266,9 @@ def run():
             entry_score = load_fork_entry_score(short_symbol, entry_ts)
             if entry_score is not None:
                 save_entry_score_to_redis(deal_id, entry_score)
+        if entry_score is None:
+            print(f"⚠️ {symbol} missing entry_score — setting to 0.0")
+            entry_score = 0.0
 
         current_score = compute_fork_score(short_symbol)
         new_avg_price = simulate_new_avg_price(
@@ -292,6 +304,61 @@ def run():
             print(f"💀 Skipping {symbol} due to zombie tag")
             continue
 
+        # === ML-powered SAFU Exit Check ===
+        should_exit, exit_reason, ml_exit_prob = get_safu_exit_decision(
+            trade,
+            config.get("safu_reentry", {}),
+            model=safu_exit_model,
+        )
+
+        if should_exit:
+            logger.info(
+                f"🛑 [SAFU Decision] Exit triggered for {symbol}: {exit_reason} | ML={ml_exit_prob:.2f}"
+                if ml_exit_prob is not None
+                else f"🛑 [SAFU Decision] Exit triggered for {symbol}: {exit_reason}"
+            )
+            log_entry = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "deal_id": deal_id,
+                "symbol": symbol,
+                "step": get_last_fired_step(deal_id) + 1,
+                "current_price": current_price,
+                "avg_entry_price": avg_entry_price,
+                "entry_score": entry_score,
+                "current_score": current_score,
+                "open_pnl": (
+                    (
+                        (current_price - avg_entry_price)
+                        * (total_spent / avg_entry_price)
+                    )
+                    if avg_entry_price
+                    else 0.0
+                ),
+                "tp1_shift": tp1_shift,
+                "be_improvement": be_improvement,
+                "recovery_odds": recovery_odds,
+                "confidence_score": confidence_score,
+                "safu_score": safu_score,
+                "btc_status": btc_status,
+                "tv_tag": tv_tag,
+                "tv_kicker": tv_kicker,
+                "health_score": health_score,
+                "health_status": health_status,
+                "zombie_tagged": zombie_tagged,
+                "decision": "exit",
+                "rejection_reason": exit_reason,
+                "ml_exit_prob": ml_exit_prob,
+                "spent": total_spent,
+            }
+            write_log(log_entry)
+            continue
+        else:
+            logger.info(
+                f"✅ [SAFU Decision] Holding {symbol} | Reason: {exit_reason or 'healthy'} | ML={ml_exit_prob:.2f}"
+                if ml_exit_prob is not None
+                else f"✅ [SAFU Decision] Holding {symbol} | Reason: {exit_reason or 'healthy'}"
+            )
+
         trade_features = {
             "recovery_odds": recovery_odds,
             "confidence_score": confidence_score,
@@ -308,6 +375,25 @@ def run():
         health_status = health["health_status"]
 
         tv_tag, tv_kicker = load_tv_kicker(short_symbol)
+
+        # === SAFU + ML-based exit decision logging ===
+        should_exit, exit_reason, ml_exit_prob = get_safu_exit_decision(
+            trade, config.get("safu_reentry", {}), model=safu_exit_model
+        )
+
+        if should_exit:
+            logger.warning(
+                f"🛑 [SAFU Decision] Exit triggered for {symbol}: {exit_reason} | ML={ml_exit_prob:.2f}"
+                if ml_exit_prob is not None
+                else f"🛑 [SAFU Decision] Exit triggered for {symbol}: {exit_reason}"
+            )
+            # Optional: apply trimming, abandon, or tagging logic here
+        else:
+            logger.info(
+                f"✅ [SAFU Decision] Holding {symbol} | Reason: {exit_reason or 'healthy'} | ML={ml_exit_prob:.2f}"
+                if ml_exit_prob is not None
+                else f"✅ [SAFU Decision] Holding {symbol} | Reason: {exit_reason or 'healthy'}"
+            )
         should_fire, reason, _ = should_dca(
             trade=trade,
             config=config,

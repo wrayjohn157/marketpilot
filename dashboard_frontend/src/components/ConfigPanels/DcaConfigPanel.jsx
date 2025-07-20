@@ -16,6 +16,8 @@ import {
 import { FormField } from "../ui/FormField";
 import { Input } from "../ui/Input";
 import { Switch } from "../ui/Switch";
+import DcaVisualizer from "../Visualizers/DcaVisualizer";
+import DcaDecisionDebugger from "../Visualizers/DcaDecisionDebugger";
 
 const prettyLabel = (key) =>
   key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
@@ -96,6 +98,24 @@ export default function DcaConfigPanel() {
               <NumericField key={k} label={prettyLabel(k)} value={v} onChange={(val) => updateField("btc_indicators", k, val)} />
             ))}
           </FieldGrid>
+        </Section>
+
+       <Section title="🎨 Visual Preview">
+          <Collapsible>
+            <CollapsibleTrigger className="text-blue-400 cursor-pointer text-sm hover:underline">
+              ▶ Show DCA Visual Tools
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 space-y-8">
+              <div>
+                <h4 className="text-sm text-muted-foreground mb-1">📊 Raw Parameter Visualizer</h4>
+                <DcaVisualizer config={config} />
+              </div>
+              <div>
+                <h4 className="text-sm text-muted-foreground mb-1">📍 DCA Trigger Decision Debugger</h4>
+                <DcaDecisionDebugger config={config} />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </Section>
 
         <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>

@@ -1,0 +1,34 @@
+from .sandbox_kline_utils import load_klines_around_time
+
+
+def load_price_at_entry(symbol: str, entry_time: int, tf: str = "1h") -> float:
+    print(f"🔍 Loading klines for {symbol} at {entry_time} ({tf})")
+    klines = load_klines_around_time(symbol, tf, entry_time)
+    if klines is None:
+        print("❌ Klines returned None.")
+        return None
+    if len(klines) == 0:
+        print("❌ Klines list is empty.")
+        return None
+    print(f"✅ Loaded {len(klines)} klines")
+
+    valid = [k for k in klines if isinstance(k, dict) and k.get("timestamp", 0) <= entry_time]
+    if not valid:
+        print("❌ No valid klines before or at entry_time")
+        return None
+    print(f"🟢 Found valid kline at or before entry_time: {valid[-1]}")
+    return valid[-1]["close"]
+
+
+def build_mock_trade(symbol: str, entry_time: int, tf: str = "1h") -> dict:
+    price = load_price_at_entry(symbol, entry_time, tf)
+    if price is None:
+        return {}
+    return {
+        "symbol": symbol,
+        "entry_time": entry_time,
+        "timestamp": entry_time,
+        "deal_id": f"sim-{symbol}-{entry_time}",
+        "drawdown_pct": 4.5,  # Optional
+        "avg_entry_price": price,
+    }

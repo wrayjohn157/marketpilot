@@ -1,0 +1,66 @@
+import os, json
+from pathlib import Path
+from datetime import datetime
+from tqdm import tqdm
+
+BASE_ENRICHED = "/home/signal/market7/ml/datasets/enriched"
+BASE_SAFU = "/home/signal/market7/dca/logs"
+OUT_DIR = "/home/signal/market7/ml/datasets/safu_merged"
+
+def load_jsonl(path):
+    with open(path) as f:
+        return [json.loads(line) for line in f if line.strip()]
+
+def load_safu_lookup(date_str):
+    safu_path = f"{BASE_SAFU}/{date_str}/dca_log.jsonl"
+    safu_lookup = {}
+    if os.path.exists(safu_path):
+        for entry in load_jsonl(safu_path):
+            deal_id = entry.get("deal_id")
+            if deal_id:
+                safu_lookup[deal_id] = entry
+    return safu_lookup
+
+def merge_safu_fields(obj, safu_data):
+    fields = [
+        "safu_score", "confidence_score", "recovery_odds",
+        "tp1_shift", "be_improvement", "drawdown_pct",
+        "health_score", "zombie_tagged", "decision", "rejection_reason"
+    ]
+    for field in fields:
+        if field in safu_data:
+            obj[field] = safu_data[field]
+    return obj
+
+def main(date_str):
+    enriched_path = f"{BASE_ENRICHED}/{date_str}/enriched_data.jsonl"
+    if not os.path.exists(enriched_path):
+        print(f"❌ No enriched file found for {date_str}")
+        return
+
+    trades = load_jsonl(enriched_path)
+    safu_lookup = load_safu_lookup(date_str)
+
+    enriched_out = []
+    for obj in tqdm(trades, desc=f"Merging {date_str}"):
+        deal_id = obj.get("trade", {}).get("trade_id") or obj.get("deal_id")
+        if deal_id in safu_lookup:
+            obj = merge_safu_fields(obj, safu_lookup[deal_id])
+        enriched_out.append(obj)
+
+    out_dir = Path(f"{OUT_DIR}/{date_str}")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / "enriched_with_safu.jsonl"
+
+    with open(out_path, "w") as f:
+        for row in enriched_out:
+            f.write(json.dumps(row) + "\n")
+
+    print(f"✅ Merged file saved to: {out_path}")
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--date", required=True, help="Format: YYYY-MM-DD")
+    args = parser.parse_args()
+    main(args.date)

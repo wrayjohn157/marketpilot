@@ -1,0 +1,17 @@
+# /dashboard_backend/eval_routes/dca_eval_api.py
+
+from fastapi import APIRouter
+from utils.log_reader import load_latest_dca_logs
+from datetime import datetime
+
+router = APIRouter()
+
+@router.get("/dca-evals")
+def get_dca_evaluations():
+    """
+    Returns the latest DCA evaluation per deal_id from dca_log.jsonl.
+    Default path: /home/signal/market7/dca/logs/YYYY-MM-DD/dca_log.jsonl
+    """
+    today = datetime.now().strftime("%Y-%m-%d")
+    evaluations = load_latest_dca_logs(today)
+    return {"evaluations": evaluations}

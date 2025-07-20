@@ -1,0 +1,23 @@
+import sys
+import os
+import json
+
+# Add the utils dir to sys.path manually
+sys.path.append(os.path.join(os.path.dirname(__file__)))
+
+from sim_snapshot_loader import sim_generate_snapshot_series
+
+if len(sys.argv) != 4:
+    print("Usage: python3 test_snapshot_series.py SYMBOL ENTRY_TIMESTAMP_MS TIMEFRAME")
+    sys.exit(1)
+
+symbol = sys.argv[1]
+entry_ts = int(sys.argv[2])
+tf = sys.argv[3]
+
+try:
+    snapshots = sim_generate_snapshot_series(symbol, entry_ts, tf)
+    print(f"✅ Generated {len(snapshots)} snapshots")
+    print(json.dumps(snapshots[:3], indent=2))  # show preview
+except Exception as e:
+    print(f"❌ Error: {e}")

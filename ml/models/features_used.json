@@ -1,0 +1,19 @@
+[
+  "ind_ema50",
+  "ind_rsi",
+  "ind_adx",
+  "ind_atr",
+  "ind_stoch_rsi_k",
+  "ind_stoch_rsi_d",
+  "ind_macd",
+  "ind_macd_signal",
+  "ind_macd_hist",
+  "ind_macd_hist_prev",
+  "ind_macd_lift",
+  "btc_rsi",
+  "btc_adx",
+  "btc_macd_histogram",
+  "btc_ema_50",
+  "btc_ema_200",
+  "btc_market_condition_num"
+]

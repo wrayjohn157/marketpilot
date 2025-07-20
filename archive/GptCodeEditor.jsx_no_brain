@@ -1,0 +1,87 @@
+// src/pages/GptCodeEditor.jsx
+import React, { useState } from "react";
+
+export default function GptCodeEditor() {
+  const [filePath, setFilePath] = useState("");
+  const [instruction, setInstruction] = useState("");
+  const [writeBack, setWriteBack] = useState(false);
+  const [response, setResponse] = useState("");
+  const [modifiedCode, setModifiedCode] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    setResponse("");
+    setModifiedCode("");
+
+    try {
+      const res = await fetch("/config/gpt/code-edit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          file_path: filePath,
+          instruction,
+          write_back: writeBack,
+        }),
+      });
+      const data = await res.json();
+      setResponse(data.result || "No result");
+      setModifiedCode(data.modified_code || "");
+    } catch (err) {
+      setResponse("Error: " + err.message);
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <div className="p-6 max-w-3xl">
+      <h1 className="text-2xl font-bold mb-4">🛠️ GPT Code Editor</h1>
+
+      <label className="block text-sm font-semibold mb-1">File Path</label>
+      <input
+        type="text"
+        className="w-full p-2 mb-3 rounded bg-gray-800 text-white border border-gray-600"
+        value={filePath}
+        onChange={(e) => setFilePath(e.target.value)}
+        placeholder="/home/signal/market7/some_file.py"
+      />
+
+      <label className="block text-sm font-semibold mb-1">Instruction</label>
+      <textarea
+        className="w-full p-3 mb-3 rounded bg-gray-800 text-white border border-gray-600"
+        rows={4}
+        value={instruction}
+        onChange={(e) => setInstruction(e.target.value)}
+        placeholder="e.g. Add logging to every function or convert to use pathlib"
+      />
+
+      <label className="inline-flex items-center mb-4">
+        <input
+          type="checkbox"
+          className="mr-2"
+          checked={writeBack}
+          onChange={(e) => setWriteBack(e.target.checked)}
+        />
+        Write changes to file (⚠️ Overwrites original)
+      </label>
+
+      <button
+        onClick={handleSubmit}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+        disabled={loading || !filePath || !instruction}
+      >
+        {loading ? "Thinking..." : "Submit"}
+      </button>
+
+      {response && (
+        <div className="mt-4 p-4 rounded bg-gray-900 text-gray-200 border border-gray-700">
+          <p className="mb-2 font-bold">Response: {response}</p>
+          {modifiedCode && (
+            <pre className="whitespace-pre-wrap text-sm">{modifiedCode}</pre>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

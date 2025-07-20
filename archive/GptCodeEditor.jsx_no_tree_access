@@ -1,0 +1,98 @@
+// pages/GptCodeEditor.jsx
+import React, { useState } from "react";
+
+export default function GptCodeEditor() {
+  const [filePath, setFilePath] = useState("");
+  const [instruction, setInstruction] = useState("");
+  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [writeBack, setWriteBack] = useState(false);
+  const [mode, setMode] = useState("edit"); // "edit" or "review"
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    setResponse("");
+
+    const payload = {
+      file_path: filePath,
+      instruction: instruction,
+      write_back: writeBack,
+      mode: mode,
+    };
+
+    try {
+      const res = await fetch("/config/gpt/code-edit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResponse(data.modified_code || data.review_comments || "✅ Done.");
+      } else {
+        setResponse("❌ Error: " + (data.detail || "Unknown issue"));
+      }
+    } catch (err) {
+      setResponse("❌ Error: " + err.message);
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <div className="p-6 max-w-3xl">
+      <h1 className="text-2xl font-bold mb-4">💻 GPT Code Editor</h1>
+
+      <label className="block mb-1 font-semibold">📁 File Path</label>
+      <input
+        type="text"
+        className="w-full p-2 mb-4 bg-gray-800 text-white border border-gray-600 rounded"
+        placeholder="/home/signal/market7/example.py"
+        value={filePath}
+        onChange={(e) => setFilePath(e.target.value)}
+      />
+
+      <label className="block mb-1 font-semibold">📝 Instruction</label>
+      <textarea
+        className="w-full p-2 mb-4 bg-gray-800 text-white border border-gray-600 rounded"
+        rows={4}
+        placeholder="e.g., Replace the content with a hello world script"
+        value={instruction}
+        onChange={(e) => setInstruction(e.target.value)}
+      />
+
+      <div className="flex items-center mb-4 space-x-6">
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={writeBack}
+            onChange={() => setWriteBack(!writeBack)}
+          />
+          <span>💾 Write to File</span>
+        </label>
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={mode === "review"}
+            onChange={() => setMode(mode === "edit" ? "review" : "edit")}
+          />
+          <span>🔍 Review Only</span>
+        </label>
+      </div>
+
+      <button
+        onClick={handleSubmit}
+        disabled={loading || !filePath || !instruction}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
+      >
+        {loading ? "Working..." : "Submit"}
+      </button>
+
+      {response && (
+        <div className="mt-6 bg-gray-900 text-gray-200 border border-gray-700 p-4 rounded whitespace-pre-wrap max-h-[500px] overflow-y-auto">
+          {response}
+        </div>
+      )}
+    </div>
+  );
+}

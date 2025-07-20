@@ -1,0 +1,117 @@
+import { useEffect, useRef, useState } from "react";
+import { createChart } from "lightweight-charts";
+
+const CandleChart = ({ data, width: propWidth, height: propHeight, onCandleClick }) => {
+  const containerRef = useRef(null);
+  const chartRef = useRef(null);
+  const seriesRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 600, height: 400 });
+  const [selectedIndex, setSelectedIndex] = useState(null);
+
+  useEffect(() => {
+    if (propWidth && propHeight) {
+      setDimensions({ width: propWidth, height: propHeight });
+    } else if (containerRef.current) {
+      setDimensions({
+        width: containerRef.current.offsetWidth || 600,
+        height: containerRef.current.offsetHeight || 400,
+      });
+    }
+  }, [propWidth, propHeight]);
+
+  useEffect(() => {
+    if (!containerRef.current || !data?.length) return;
+
+    if (chartRef.current) {
+      chartRef.current.remove();
+    }
+
+    const chart = createChart(containerRef.current, {
+      width: dimensions.width,
+      height: dimensions.height,
+      layout: {
+        background: { color: "#ffffff" },
+        textColor: "#000000",
+      },
+      grid: {
+        vertLines: { color: "#eee" },
+        horzLines: { color: "#eee" },
+      },
+      crosshair: {
+        mode: 0,
+      },
+      rightPriceScale: {
+        borderColor: "#ccc",
+      },
+      timeScale: {
+        borderColor: "#ccc",
+        timeVisible: true,
+        secondsVisible: false,
+      },
+    });
+
+    const candlestickSeries = chart.addCandlestickSeries();
+    chartRef.current = chart;
+    seriesRef.current = candlestickSeries;
+
+    const formatted = data.map((d) => ({
+      time: d.timestamp ? d.timestamp / 1000 : d.time,
+      open: d.open,
+      high: d.high,
+      low: d.low,
+      close: d.close,
+    }));
+
+    candlestickSeries.setData(formatted);
+
+    chartRef.current.subscribeClick((param) => {
+      if (!param || !param.time || !data) return;
+
+      const clickedTimestamp = param.time * 1000;
+      const index = data.findIndex(
+        (d) => d.timestamp === clickedTimestamp || d.time * 1000 === clickedTimestamp
+      );
+      if (index !== -1) {
+        setSelectedIndex(index);
+      }
+    });
+
+    return () => chartRef.current?.remove();
+  }, [data, dimensions]);
+
+  useEffect(() => {
+    if (selectedIndex !== null && data[selectedIndex] && seriesRef.current) {
+      const point = data[selectedIndex];
+      const time = point.timestamp ? point.timestamp / 1000 : point.time;
+      seriesRef.current.setMarkers([
+        {
+          time,
+          position: "aboveBar",
+          color: "red",
+          shape: "arrowDown",
+          text: "Selected",
+        },
+      ]);
+
+      onCandleClick?.(point.timestamp || point.time * 1000);
+    }
+  }, [selectedIndex, data, onCandleClick]);
+
+  return (
+    <div>
+      <div ref={containerRef} style={{ width: "100%", height: "400px" }} />
+      {data && (
+        <input
+          type="range"
+          min={0}
+          max={data.length - 1}
+          value={selectedIndex ?? 0}
+          onChange={(e) => setSelectedIndex(parseInt(e.target.value))}
+          style={{ width: "100%", marginTop: "1rem" }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default CandleChart;

@@ -1,0 +1,41 @@
+# gpt_eval_api.py
+from fastapi import APIRouter, Request, HTTPException
+import openai, json
+from pathlib import Path
+
+router = APIRouter(prefix="/gpt")
+
+# === Load OpenAI key from paper_cred.json ===
+CRED_PATH = Path("/home/signal/market7/config/paper_cred.json")
+try:
+    with open(CRED_PATH) as f:
+        creds = json.load(f)
+        openai.api_key = creds.get("OPENAI_API_KEY")
+except Exception as e:
+    openai.api_key = None
+    print(f"[ERROR] Failed to load OPENAI_API_KEY: {e}")
+
+@router.post("/ask")
+async def ask_gpt(req: Request):
+    data = await req.json()
+    prompt = data.get("prompt")
+
+    if not prompt:
+        raise HTTPException(status_code=400, detail="Missing prompt")
+    if not openai.api_key:
+        raise HTTPException(status_code=500, detail="OpenAI API key missing")
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4-turbo",
+            messages=[
+                {"role": "system", "content": "You are an expert crypto trade assistant focused on DCA recovery, fork trades, and trade scoring logic."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=400,
+            temperature=0.4,
+        )
+        reply = response.choices[0].message.content.strip()
+        return {"reply": reply}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"OpenAI Error: {str(e)}")

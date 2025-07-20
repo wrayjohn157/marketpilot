@@ -1,0 +1,149 @@
+import { RefreshCw, ShieldCheck, TrendingUp, Activity, Percent, Zap } from "lucide-react";
+import { useState } from "react";
+import { Button } from "./Button";
+import { Card } from "./Card";
+import { PriceProgressBar } from "./PriceProgressBar";
+import { Sparkline } from "./Sparkline";
+
+export default function TradeCard({ trade }) {
+  const [liveTrade, setLiveTrade] = useState(trade);
+  const [loading, setLoading] = useState(false);
+
+  const {
+    deal_id,
+    symbol,
+    avg_entry_price,
+    current_price,
+    tp1_shift,
+    entry_score,
+    current_score,
+    confidence_score,
+    recovery_odds,
+    safu_score,
+    step,
+    open_pnl,
+    sparkline_data = [],
+    rejection_reason,
+    be_price,
+  } = liveTrade;
+
+  const entry = parseFloat(avg_entry_price) || 1;
+  const current = parseFloat(current_price) || entry;
+  const breakEven = parseFloat(be_price) || entry;
+  const tp1 = breakEven * (1 + (parseFloat(tp1_shift) || 0) / 100);
+
+  const refreshPrice = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/refresh-price/${deal_id}`);
+      const data = await res.json();
+
+      if (data?.current_price) {
+        setLiveTrade(prev => ({
+          ...prev,
+          current_price: data.current_price,
+          open_pnl: data.open_pnl ?? prev.open_pnl,
+          pnl_pct: data.pnl_pct ?? prev.pnl_pct,
+        }));
+      } else {
+        console.error("⚠️ Invalid refresh payload:", data);
+      }
+    } catch (e) {
+      console.error("❌ Refresh error:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card className="relative flex flex-col md:flex-row overflow-hidden rounded-2xl shadow-md bg-gray-900 dark:bg-gray-900">
+      {/* ── RIGHT: Content ───────────────────────────── */}
+      <div className="flex-1 p-4 flex flex-col justify-between space-y-4">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold tracking-wide">{symbol}</h2>
+          <Button size="sm" onClick={refreshPrice} disabled={loading}>
+            {loading
+              ? <RefreshCw className="w-4 h-4 animate-spin" />
+              : "Refresh"}
+          </Button>
+        </div>
+
+        {/* Entry/TP1 & Reason */}
+        <div className="text-sm text-muted-foreground">
+          Entry: {entry.toFixed(4)} › TP1: {tp1.toFixed(4)}
+        </div>
+        {rejection_reason && (
+          <div className="italic text-yellow-400 text-sm">
+            Reason: {rejection_reason.toUpperCase()}
+          </div>
+        )}
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center space-x-2">
+            <Zap className="w-4 h-4 text-blue-400" />
+            <div>
+              <div className="font-medium">Score</div>
+              <div>{entry_score?.toFixed(2)} → {current_score?.toFixed(2)}</div>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <TrendingUp className="w-4 h-4 text-purple-400" />
+            <div>
+              <div className="font-medium">Confidence</div>
+              <div>{confidence_score?.toFixed(2)}</div>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Activity className="w-4 h-4 text-yellow-400" />
+            <div>
+              <div className="font-medium">Odds</div>
+              <div>{recovery_odds?.toFixed(2)}</div>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <ShieldCheck className="w-4 h-4 text-green-400" />
+            <div>
+              <div className="font-medium">SAFU</div>
+              <div>{safu_score?.toFixed(2)}</div>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Zap className="w-4 h-4 text-orange-300" />
+            <div>
+              <div className="font-medium">Step</div>
+              <div>{step ?? 0}</div>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Percent className="w-4 h-4 text-pink-400" />
+            <div>
+              <div className="font-medium">PnL</div>
+              <div className={open_pnl < 0 ? "text-red-400" : "text-green-400"}>
+                {(open_pnl ?? 0).toFixed(2)} USDT
+                <span className="ml-2 text-xs text-muted-foreground">
+                  ({liveTrade.pnl_pct?.toFixed(2)}%)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* PnL Progress Bar */}
+        <PriceProgressBar
+          current={current}
+          breakEven={breakEven}
+          tp1={tp1}
+        />
+
+        {/* ── BOTTOM: Sparkline ───────────────────────────── */}
+        {sparkline_data.length > 1 && (
+          <div className="w-full md:w-1/3 h-36 p-2 mt-4 md:mt-0">
+            <Sparkline data={sparkline_data} />
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}

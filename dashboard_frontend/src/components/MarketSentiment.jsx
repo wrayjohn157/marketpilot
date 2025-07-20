@@ -43,7 +43,7 @@ export default function MarketSentiment() {
 
   return (
     <div
-      className="relative bg-gray-800 rounded-2xl p-4 shadow-md overflow-hidden border border-white/20"
+      className="relative bg-gray-900 rounded-2xl p-4 shadow-md overflow-hidden border border-white/20"
       style={{ minHeight: "160px" }}
     >
       {/* Background globe */}

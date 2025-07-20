@@ -1,0 +1,59 @@
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "./ui/Card";
+
+export default function ConfidencePanel() {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetch("/ml/confidence")
+      .then((res) => res.json())
+      .then(setData)
+      .catch(() => setData([]));
+  }, []);
+
+  const getBadgeClass = (decision) => {
+    if (decision === "RUN") return "text-green-400 bg-green-900";
+    if (decision === "DCA") return "text-emerald-400 bg-emerald-900";
+    if (decision === "SKIPPED") return "text-red-400 bg-red-900";
+    return "text-gray-400 bg-gray-800";
+  };
+
+  // Limit to Top 3, and only include trades with a real decision
+  const filtered = data.slice(0, 3);
+
+  return (
+    <Card className="bg-gray-900 border border-gray-200 p-4">
+      <h2 className="text-white text-base font-semibold mb-3">AI/ML Confidence</h2>
+      <CardContent className="space-y-1">
+        {filtered.length === 0 ? (
+          <p className="text-gray-500 text-sm">No confident trades found.</p>
+        ) : (
+          filtered.map((entry, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between text-sm border-b border-gray-800 pb-1"
+            >
+              <div className="flex flex-col">
+                <span className="text-white font-mono text-xs">{entry.symbol}</span>
+                <span className="text-xs text-gray-400 uppercase">
+                  {entry.rejection_reason || "—"}
+                </span>
+              </div>
+
+              <div className="flex flex-col items-end text-right">
+                <span className="text-base font-bold text-white">
+                  {entry.confidence_score.toFixed(2)}
+                </span>
+                <div
+                  className={`text-xs rounded px-2 py-0.5 mt-1 ${getBadgeClass(entry.decision)}`}
+                >
+                  {entry.decision}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </CardContent>
+    </Card>
+  );
+}

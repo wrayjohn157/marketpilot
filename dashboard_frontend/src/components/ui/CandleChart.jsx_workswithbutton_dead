@@ -1,0 +1,121 @@
+// src/components/ui/CandleChart.jsx
+
+import { timeFormat } from "d3-time-format";
+import { useEffect, useRef, useState } from "react";
+import {
+    CandlestickSeries,
+    Chart,
+    ChartCanvas,
+    CrossHairCursor,
+    discontinuousTimeScaleProvider,
+    EdgeIndicator,
+    MouseCoordinateX,
+    MouseCoordinateY,
+    OHLCTooltip,
+    XAxis,
+    YAxis,
+} from "react-financial-charts";
+
+const CandleChart = ({ series, data, width: propWidth, height: propHeight }) => {
+  const chartSeries = Array.isArray(series) ? series : data;
+  const containerRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 100, height: 400 });
+  const [selectedCandle, setSelectedCandle] = useState(null);
+
+  useEffect(() => {
+    if (propWidth && propHeight) {
+      setDimensions({ width: propWidth, height: propHeight });
+    } else if (containerRef.current) {
+      setDimensions({
+        width: Math.max(100, containerRef.current.offsetWidth),
+        height:
+          containerRef.current.offsetHeight > 0
+            ? containerRef.current.offsetHeight
+            : 400,
+      });
+    }
+  }, [propWidth, propHeight]);
+
+  useEffect(() => {
+    if (selectedCandle) {
+      console.log("Selected candle for DCA sim:", selectedCandle);
+    }
+  }, [selectedCandle]);
+
+  if (
+    !chartSeries ||
+    !Array.isArray(chartSeries) ||
+    chartSeries.length === 0 ||
+    (!chartSeries[0].timestamp && !chartSeries[0].time)
+  ) {
+    return <div style={{ color: "#888", fontSize: "0.9rem" }}>No candle data loaded.</div>;
+  }
+
+  if (dimensions.width <= 0) {
+    return <div style={{ color: "#888", fontSize: "0.9rem" }}>Chart is loading...</div>;
+  }
+
+  const formattedData = chartSeries.map((d, i) => ({
+    ...d,
+    id: i,
+    date: new Date(d.timestamp || d.time * 1000),
+  }));
+
+  const xScaleProvider = discontinuousTimeScaleProvider.inputDateAccessor((d) => d.date);
+  const { data: chartData, xScale, xAccessor, displayXAccessor } = xScaleProvider(formattedData);
+
+  const start = xAccessor(chartData[Math.max(0, chartData.length - 50)]);
+  const end = xAccessor(chartData[chartData.length - 1]);
+  const xExtents = [start, end];
+
+  return (
+    <div ref={containerRef} style={{ width: "100%", minWidth: "100%", flexGrow: 1 }}>
+      {dimensions.width > 0 && (
+      <ChartCanvas
+        height={dimensions.height}
+        width={dimensions.width}
+        ratio={1}
+        margin={{ left: 50, right: 50, top: 10, bottom: 30 }}
+        seriesName="BTC"
+        data={chartData}
+        xScale={xScale}
+        xAccessor={xAccessor}
+        displayXAccessor={displayXAccessor}
+        xExtents={xExtents}
+      >
+        <Chart id={1} yExtents={(d) => [d.high, d.low]}>
+          <XAxis ticks={6} />
+          <YAxis ticks={6} />
+          <MouseCoordinateX
+            displayFormat={timeFormat("%b %d %H:%M")}
+            at="bottom"
+            orient="bottom"
+          />
+          <MouseCoordinateY displayFormat={(d) => d.toFixed(2)} />
+          <CandlestickSeries
+            onClick={(event, moreProps) => {
+              const { currentItem } = moreProps;
+              if (currentItem) {
+                setSelectedCandle(currentItem);
+              }
+            }}
+          />
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right" yAccessor={(d) => d.close} />
+          {selectedCandle && (
+            <circle
+              cx={xScale(xAccessor(selectedCandle))}
+              cy={dimensions.height / 2}
+              r={6}
+              fill="red"
+            />
+          )}
+          <OHLCTooltip origin={[dimensions.width - 160, 10]} />
+        </Chart>
+        <CrossHairCursor />
+      </ChartCanvas>
+      )}
+    </div>
+  );
+};
+
+export default CandleChart;

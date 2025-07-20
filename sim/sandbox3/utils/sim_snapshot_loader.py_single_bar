@@ -1,0 +1,37 @@
+import os
+import json
+from datetime import datetime
+from pathlib import Path
+
+SNAPSHOT_BASE = Path("/home/signal/market7/data/snapshots")
+
+def sim_load_snapshot(symbol: str, entry_time_ms: int, tf: str = "1h") -> dict:
+    entry_date = datetime.utcfromtimestamp(entry_time_ms / 1000).strftime("%Y-%m-%d")
+    snapshot_file = SNAPSHOT_BASE / entry_date / f"{symbol}_{tf}_snapshots.json"
+
+    if not snapshot_file.exists():
+        raise FileNotFoundError(f"Snapshot file not found: {snapshot_file}")
+
+    with open(snapshot_file, "r") as f:
+        snapshots = json.load(f)
+
+    closest_entry = None
+    min_diff = float("inf")
+
+    for snap in snapshots:
+        snap_ts = snap.get("entry_time")
+        if snap_ts is None:
+            continue
+        diff = abs(entry_time_ms - snap_ts)
+        if diff < min_diff:
+            closest_entry = snap
+            min_diff = diff
+
+    if not closest_entry or min_diff > 5 * 60 * 1000:  # 5-minute grace
+        raise ValueError(f"No close-enough snapshot for {symbol} at {entry_time_ms}")
+
+    return {
+        "entry": closest_entry.get("entry"),
+        "mid": closest_entry.get("mid"),
+        "exit": closest_entry.get("exit"),
+    }

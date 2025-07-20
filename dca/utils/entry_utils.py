@@ -20,6 +20,7 @@ BTC_LOG_PATH = Path("/home/signal/market7/live/btc_logs")
 # === Redis Setup ===
 REDIS = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
 
+
 # === 3Commas Trade Fetch (Paginated) ===
 def get_live_3c_trades():
     try:
@@ -36,11 +37,10 @@ def get_live_3c_trades():
             query = f"limit=1000&scope=active&bot_id={BOT_ID}&page={page}"
             path = f"/public/api/ver1/deals?{query}"
             url = f"https://api.3commas.io{path}"
-            signature = hmac.new(API_SECRET.encode(), path.encode(), hashlib.sha256).hexdigest()
-            headers = {
-                "Apikey": API_KEY,
-                "Signature": signature
-            }
+            signature = hmac.new(
+                API_SECRET.encode(), path.encode(), hashlib.sha256
+            ).hexdigest()
+            headers = {"Apikey": API_KEY, "Signature": signature}
 
             resp = requests.get(url, headers=headers, timeout=10)
             if resp.status_code != 200:
@@ -60,9 +60,15 @@ def get_live_3c_trades():
             deal["deal_id"] = deal.get("id")
 
             avg_price = deal.get("bought_average_price")
-            if not avg_price and deal.get("bought_amount") and deal.get("bought_volume"):
+            if (
+                not avg_price
+                and deal.get("bought_amount")
+                and deal.get("bought_volume")
+            ):
                 try:
-                    avg_price = float(deal["bought_amount"]) / float(deal["bought_volume"])
+                    avg_price = float(deal["bought_amount"]) / float(
+                        deal["bought_volume"]
+                    )
                 except Exception:
                     avg_price = None
 
@@ -74,6 +80,7 @@ def get_live_3c_trades():
         print(f"[ERROR] Failed to fetch 3Commas live trades: {e}")
         return []
         print("[DEBUG] 3C Trade Normalization Active")
+
 
 def send_dca_signal(pair, volume=15):
     try:
@@ -87,7 +94,7 @@ def send_dca_signal(pair, volume=15):
             "email_token": creds["3commas_email_token"],
             "delay_seconds": 0,
             "pair": pair,
-            "volume": volume
+            "volume": volume,
         }
 
         url = "https://app.3commas.io/trade_signal/trading_view"
@@ -98,8 +105,13 @@ def send_dca_signal(pair, volume=15):
     except Exception as e:
         print(f"[ERROR] Failed to send DCA signal for {pair}: {e}")
 
+
 def get_latest_indicators(symbol, tf="15m"):
-    path = SNAPSHOT_BASE / datetime.utcnow().strftime("%Y-%m-%d") / f"{symbol}_{tf}_klines.json"
+    path = (
+        SNAPSHOT_BASE
+        / datetime.utcnow().strftime("%Y-%m-%d")
+        / f"{symbol}_{tf}_klines.json"
+    )
     if not path.exists():
         print(f"[WARN] Missing snapshot for {symbol}")
         return {}
@@ -111,12 +123,32 @@ def get_latest_indicators(symbol, tf="15m"):
             print(f"[WARN] Not enough candles to compute indicators for {symbol}")
             return {}
 
-        df = pd.DataFrame(raw, columns=[
-            "timestamp", "open", "high", "low", "close", "volume",
-            "close_time", "quote_asset_volume", "num_trades",
-            "taker_base_volume", "taker_quote_volume", "ignore"
-        ])
-        df = df.astype({"open": float, "high": float, "low": float, "close": float, "volume": float})
+        df = pd.DataFrame(
+            raw,
+            columns=[
+                "timestamp",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",
+                "close_time",
+                "quote_asset_volume",
+                "num_trades",
+                "taker_base_volume",
+                "taker_quote_volume",
+                "ignore",
+            ],
+        )
+        df = df.astype(
+            {
+                "open": float,
+                "high": float,
+                "low": float,
+                "close": float,
+                "volume": float,
+            }
+        )
 
         rsi_val = RSIIndicator(df["close"]).rsi().iloc[-1]
         macd_val = MACD(df["close"]).macd_diff().iloc[-1]
@@ -125,16 +157,21 @@ def get_latest_indicators(symbol, tf="15m"):
         return {
             "rsi": round(float(rsi_val), 2),
             "macd_histogram": round(float(macd_val), 5),
-            "adx": round(float(adx_val), 2)
+            "adx": round(float(adx_val), 2),
         }
 
     except Exception as e:
         print(f"[ERROR] Could not compute indicators for {symbol}: {e}")
         return {}
 
+
 def get_rsi_slope(symbol, tf="15m", window=3):
     try:
-        path = SNAPSHOT_BASE / datetime.utcnow().strftime("%Y-%m-%d") / f"{symbol}_{tf}_klines.json"
+        path = (
+            SNAPSHOT_BASE
+            / datetime.utcnow().strftime("%Y-%m-%d")
+            / f"{symbol}_{tf}_klines.json"
+        )
         if not path.exists():
             return 0.0
         df = pd.read_json(path)
@@ -148,9 +185,14 @@ def get_rsi_slope(symbol, tf="15m", window=3):
         print(f"[ERROR] RSI slope error for {symbol}: {e}")
         return 0.0
 
+
 def get_macd_lift(symbol, tf="15m", window=3):
     try:
-        path = SNAPSHOT_BASE / datetime.utcnow().strftime("%Y-%m-%d") / f"{symbol}_{tf}_klines.json"
+        path = (
+            SNAPSHOT_BASE
+            / datetime.utcnow().strftime("%Y-%m-%d")
+            / f"{symbol}_{tf}_klines.json"
+        )
         if not path.exists():
             return 0.0
         df = pd.read_json(path)
@@ -164,19 +206,30 @@ def get_macd_lift(symbol, tf="15m", window=3):
         print(f"[ERROR] MACD lift error for {symbol}: {e}")
         return 0.0
 
+
 def load_fork_entry_score(symbol, entry_ts):
+    from datetime import timedelta
+
     best_match = None
     smallest_delta = float("inf")
 
-    for folder in sorted(FORK_HISTORY.glob("*")):
+    entry_date = datetime.utcfromtimestamp(entry_ts / 1000)
+    search_dates = [entry_date + timedelta(days=offset) for offset in range(-2, 3)]
+
+    for date in search_dates:
+        folder = FORK_HISTORY / date.strftime("%Y-%m-%d")
         path = folder / "fork_scores.jsonl"
         if not path.exists():
             continue
         with open(path) as f:
-            for line in f:
+            for i, line in enumerate(f):
+                if i > 5000:
+                    print(f"[WARN] Aborting fork score scan for {symbol} — too many lines in {path}")
+                    break
                 try:
                     obj = json.loads(line)
-                except Exception:
+                except Exception as e:
+                    print(f"[WARN] Skipping bad line in {path}: {e}")
                     continue
                 if obj.get("symbol") != symbol:
                     continue
@@ -197,6 +250,7 @@ def load_fork_entry_score(symbol, entry_ts):
     print(f"[WARN] No matching entry score found for {symbol} at ts={entry_ts}")
     return None
 
+
 def simulate_new_avg_price(current_avg, added_usdt, current_price):
     try:
         tokens = added_usdt / current_price
@@ -206,6 +260,7 @@ def simulate_new_avg_price(current_avg, added_usdt, current_price):
     except Exception as e:
         print(f"[ERROR] Failed to simulate BE price: {e}")
         return current_avg
+
 
 def load_btc_market_condition():
     try:
@@ -221,6 +276,7 @@ def load_btc_market_condition():
         print(f"[WARN] Failed to load BTC condition: {e}")
         return None
 
+
 # === Redis Entry Score Utilities ===
 def save_entry_score_to_redis(deal_id, score):
     try:
@@ -228,6 +284,7 @@ def save_entry_score_to_redis(deal_id, score):
         REDIS.set(key, score)
     except Exception as e:
         print(f"[WARN] Failed to save entry score to Redis: {e}")
+
 
 def load_entry_score_from_redis(deal_id):
     try:

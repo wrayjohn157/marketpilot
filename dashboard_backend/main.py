@@ -34,9 +34,10 @@ from config_routes.dca_config_api import router as dca_config_router
 from config_routes.tv_screener_config_api import router as tv_screener_config_router
 from eval_routes import dca_eval_api
 from config_routes import safu_config_api
-from eval_routes import gpt_eval_api
-from config_routes.gpt_code_editor_api import router as gpt_code_editor_router #from config_routes import gpt_code_editor_api
-from config_routes.gpt_file_list_api import router as gpt_file_list_router #from config_routes import gpt_file_list_api
+from sim_routes.sim_dca_strategies import router as sim_dca_strategy_router
+from eval_routes.price_series_api import router as price_series_router
+from sim_routes.dca_simulate_route import router as dca_simulate_router
+from dashboard_backend.sim_routes.sim_dca_config_api import router as sim_dca_router
 
 app.include_router(dca_router)
 app.include_router(ml_confidence_router)
@@ -47,12 +48,11 @@ app.include_router(dca_config_router, prefix="/config")
 app.include_router(tv_screener_config_router, prefix="/config")
 app.include_router(dca_eval_api.router)
 app.include_router(safu_config_api.router, prefix="/config")
-app.include_router(gpt_eval_api.router)
-#app.include_router(gpt_code_editor_api.router, prefix="/config/gpt")
-#app.include_router(gpt_file_list_api.router, prefix="/config/gpt")
-app.include_router(gpt_code_editor_router, prefix="/config")
-#app.include_router(gpt_code_editor_router)  # no prefix
-app.include_router(gpt_file_list_router, prefix="/config/gpt")
+app.include_router(price_series_router)
+app.include_router(dca_simulate_router)
+app.include_router(sim_dca_strategy_router)
+app.include_router(sim_dca_router)
+
 
 @app.get("/", response_class=HTMLResponse)
 def root():
@@ -63,14 +63,8 @@ def root():
             <h2>🚀 Market7 Dashboard Backend</h2>
             <p>Available Endpoints:</p>
             <ul>
-                <li><a href="/metrics">/metrics</a></li>
                 <li><a href="/active-trades">/active-trades</a></li>
-                <li><a href="/all-trade-health">/all-trade-health</a></li>
-                <li><a href="/active-trades-detailed">/active-trades-detailed</a></li>
-                <li><a href="/backtest/summary">/backtest/summary</a></li>
-                <li><a href="/backtest/summary/&lt;YYYY-MM-DD&gt;">/backtest/summary/&lt;YYYY-MM-DD&gt;</a></li>
                 <li><a href="/3commas/metrics">/3commas/metrics</a></li>
-                <li><a href="/fork/metrics" target="_blank">/fork/metrics</a></li>
                 <li><a href="/dca-trades-active" target="_blank">/dca-trades-active</a></li>
                 <li><a href="/btc/context" target="_blank">/btc/context</a></li>
                 <li><a href="/ml/confidence" target="_blank">/ml/confidence</a></li>
@@ -80,24 +74,6 @@ def root():
     </html>
     """
 
-@app.get("/metrics")
-def metrics():
-    return {
-        "btc_market_condition": r.get("btc_condition"),
-        "last_scan_full": r.get("last_scan_full"),
-        "last_scan_vol": r.get("last_scan_vol"),
-        "last_scan_tech": r.get("last_scan_tech"),
-        "last_scan_rrr": r.get("last_scan_rrr"),
-        "volume_filter_count": r.get("volume_filter_count"),
-        "tech_filter_count_in": r.get("tech_filter_count_in"),
-        "tech_filter_count_out": r.get("tech_filter_count_out"),
-        "rrr_filter_count_in": r.get("rrr_filter_count_in"),
-        "rrr_filter_count_out": r.get("rrr_filter_count_out"),
-        "last_sent_trades": r.get("last_sent_trades"),
-        "active_trades": r.get("active_trades_count"),
-        "final_trade_queue": r.get("final_trade_queue_count"),
-        "timestamp": datetime.utcnow().isoformat()
-    }
 
 @app.get("/btc/context")
 def get_btc_context():
@@ -114,8 +90,9 @@ def get_btc_context():
         "rsi": parse_float(r.get("BTC_15m_RSI14")),
         "adx": parse_float(r.get("BTC_1h_ADX14")),
         "ema": parse_float(r.get("BTC_1h_EMA50")),
-        "close": parse_float(r.get("BTC_1h_latest_close"))
+        "close": parse_float(r.get("BTC_1h_latest_close")),
     }
+
 
 @app.get("/fork/metrics")
 def serve_cached_metrics():
@@ -125,6 +102,7 @@ def serve_cached_metrics():
             return json.load(f)
     except Exception as e:
         return {"error": str(e)}
+
 
 @app.get("/active-trades")
 def active_trades():
@@ -151,12 +129,10 @@ def active_trades():
         except:
             score = None
 
-        trades.append({
-            "symbol": symbol,
-            "score": score
-        })
+        trades.append({"symbol": symbol, "score": score})
 
     return trades
+
 
 @app.get("/trade-health/{symbol}")
 def trade_health(symbol: str):
@@ -171,110 +147,9 @@ def trade_health(symbol: str):
     except:
         return {"error": "Invalid format"}
 
-@app.get("/all-trade-health")
-def all_trade_health():
-    keys = r.keys("trade_health:*")
-    data = []
-
-    for key in keys:
-        try:
-            score = int(r.get(key))
-            symbol = key.replace("trade_health:", "")
-            data.append({
-                "symbol": symbol,
-                "score": score
-            })
-        except:
-            continue
-
-    return data
-
-@app.get("/active-trades-detailed")
-def active_trades_detailed():
-    def flag_to_emoji(*flags):
-        total = sum([f for f in flags if isinstance(f, int)])
-        if total == 0:
-            return "✅"
-        elif total == 1:
-            return "⚠️"
-        else:
-            return "❌"
-
-    def get_flag(key):
-        val = r.get(key)
-        try:
-            return int(val) if val else 0
-        except:
-            return 0
-
-    trade_keys = r.keys("trade_health:*")
-    trades = []
-
-    for key in trade_keys:
-        symbol = key.replace("trade_health:", "")
-        score_raw = r.get(key)
-        if not score_raw:
-            continue
-
-        try:
-            score = int(score_raw)
-        except:
-            score = 0
-
-        indicators = {
-            "macd": flag_to_emoji(get_flag(f"macd_weakness:{symbol}:15m"), get_flag(f"macd_weakness:{symbol}:1h")),
-            "rsi": flag_to_emoji(get_flag(f"rsi_weakness:{symbol}:15m"), get_flag(f"rsi_weakness:{symbol}:1h")),
-            "ema": flag_to_emoji(get_flag(f"ema_breakdown:{symbol}"), get_flag(f"ema_death_cross:{symbol}")),
-            "adx": flag_to_emoji(get_flag(f"adx_bearish:{symbol}:1h")),
-            "vwap": flag_to_emoji(get_flag(f"vwap_breakdown:{symbol}")),
-            "momentum": flag_to_emoji(get_flag(f"momentum_loss:{symbol}")),
-            "atr": flag_to_emoji(get_flag(f"atr_drop:{symbol}:1h"))
-        }
-
-        if score >= 8:
-            status = "healthy"
-        elif score >= 4:
-            status = "weakening"
-        else:
-            status = "critically_weak"
-
-        trades.append({
-            "symbol": symbol,
-            "score": score,
-            "status": status,
-            "indicators": indicators
-        })
-
-    return {
-        "count": len(trades),
-        "trades": trades
-    }
 
 @app.get("/3commas/metrics")
 def threecommas_metrics():
     from threecommas_metrics import get_3commas_metrics
+
     return get_3commas_metrics()
-
-@app.get("/backtest/summary")
-def get_backtest_summary():
-    today = datetime.utcnow().strftime("%Y-%m-%d")
-    summary_path = PATHS["backtest_summary_path"] / f"{today}_summary.json"
-    if not summary_path.exists():
-        return {"error": f"Summary for {today} not found."}
-    try:
-        with open(summary_path, "r") as f:
-            return json.load(f)
-    except Exception as e:
-        return {"error": str(e)}
-
-@app.get("/backtest/summary/{date}")
-def get_summary_by_date(date: str):
-    summary_path = PATHS["backtest_summary_path"] / f"{date}_summary.json"
-    if not summary_path.exists():
-        return {"error": f"Summary for {date} not found."}
-    try:
-        with open(summary_path, "r") as f:
-            return json.load(f)
-    except Exception as e:
-        return {"error": str(e)}
-

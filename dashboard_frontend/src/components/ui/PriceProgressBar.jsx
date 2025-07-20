@@ -68,7 +68,7 @@ export function PriceProgressBar({ current, breakEven, tp1 }) {
 
       {/* 🏷️ Price tag */}
       <div
-        className="absolute -top-5 text-[10px] text-white bg-black/80 px-1 rounded transition-all duration-500"
+        className="absolute top-3 text-[10px] text-white bg-black/80 px-1 rounded transition-all duration-500"
         style={{ left: `${currentPct}%`, transform: "translateX(-50%)" }}
       >
         {current.toFixed(4)}

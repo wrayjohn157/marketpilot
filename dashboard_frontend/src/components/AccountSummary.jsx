@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AccountSummary() {
   const [summary, setSummary] = useState(null);
@@ -32,7 +32,7 @@ export default function AccountSummary() {
   };
 
   return (
-    <div className="bg-gray-800 rounded-2xl p-6 shadow-md">
+    <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
       <h3 className="text-lg font-semibold mb-2 text-white">Account Summary</h3>
 
       <div className="text-3xl md:text-4xl font-bold text-white">

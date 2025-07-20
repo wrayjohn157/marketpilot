@@ -50,7 +50,7 @@ export default function ActiveTradesPanel() {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
         {sortedTrades.map((trade) => (
           <TradeCard key={`${sortBy}-${trade.deal_id}`} trade={trade} />
         ))}

@@ -111,3 +111,15 @@ ml/datasets/dca_spend/
 ml/datasets/unified/
 ml/datasets/flattened/
 ml/models/*.pkl
+
+# Trash/debug
+*_orig
+*_pre_*
+*_old
+*_fallback
+*.txt
+
+# ML outputs
+ml/models/*.pkl*
+ml/models/*.png
+ml/datasets/**/*.jsonl

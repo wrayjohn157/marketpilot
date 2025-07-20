@@ -1,0 +1,55 @@
+# sim_dca_runner.py
+
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parent / "core"))
+
+import json
+import yaml
+from sim_dca_engine import simulate_dca_engine
+
+CONFIG_PATH = Path(__file__).resolve().parent / "config" / "sim_dca_config.yaml"
+
+from sim_utils.sim_kline_loader import load_klines_across_days
+from sim_utils.sim_entry_utils import sim_get_entry_price
+from sim_utils.sim_btc_context import get_btc_context_for_sim
+from sim_utils.sim_fork_score_utils import sim_score_fork_entry
+from sim_utils.sim_trade_health_utils import evaluate_trade_health
+from sim_utils.sim_recovery_confidence_utils import predict_confidence_and_recovery
+from sim_utils.sim_spend_predictor import predict_dca_spend
+from sim_utils.sim_safu_reentry_utils import should_reenable_dca
+
+def run_sim_dca(symbol, entry_time_ms, tf='1h'):
+    # Load klines and entry price
+    klines = load_klines_across_days(symbol, tf, entry_time_ms)
+    if klines:
+        print(f"[DEBUG] Requested entry_time_ms: {entry_time_ms}")
+        print(f"[DEBUG] First kline ts: {klines[0][0]}, Last kline ts: {klines[-1][0]}")
+    else:
+        print("[DEBUG] No klines loaded.")
+    entry_price = sim_get_entry_price(symbol, entry_time_ms, tf)
+    # Load simulation config
+    config = yaml.safe_load(open(CONFIG_PATH))
+    # Delegate to core engine
+    result = simulate_dca_engine(klines, entry_price, entry_time_ms, symbol, tf, config)
+    # Print step-by-step results
+    for step in result.get("steps", []):
+        print(json.dumps(step, indent=2))
+    print("Final exit:", result.get("exit_reason"))
+    return result
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--symbol", required=True)
+    parser.add_argument("--entry_time", type=int, required=True)
+    parser.add_argument("--tf", default="1h")
+    args = parser.parse_args()
+
+    result = run_sim_dca(
+        symbol=args.symbol,
+        entry_time_ms=args.entry_time,
+        tf=args.tf,
+    )
+    print(json.dumps(result, indent=2))

@@ -1,0 +1,119 @@
+import { useEffect, useState } from "react";
+import { Input } from "../ui/Input";
+import { Label } from "../ui/Label";
+import { Card } from "../ui/Card";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "../ui/Collapsible";
+import CandleChart from '../ui/CandleChart';
+
+const defaultParams = {
+  entryScore: 0.75,
+  currentScore: 0.62,
+  safuScore: 0.85,
+  drawdown: -11.0,
+  tp1Shift: 5.2,
+};
+
+export default function DcaDecisionDebugger() {
+  const [params, setParams] = useState(defaultParams);
+  const [series, setSeries] = useState([]);
+  const [symbol, setSymbol] = useState("ARB");
+  const [interval, setInterval] = useState("15m");
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (!show) return;
+
+    fetch(`/price-series?symbol=${symbol}&interval=${interval}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Fetched price-series response:", data);
+        if (data && Array.isArray(data.series)) {
+          setSeries(data.series);
+        } else {
+          console.warn("No valid 'series' array found in response:", data);
+          setSeries([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Fetch failed:", err);
+        setSeries([]);
+      });
+  }, [show, symbol, interval]);
+
+  const updateParam = (key, value) => {
+    setParams((prev) => ({ ...prev, [key]: parseFloat(value) }));
+  };
+
+  return (
+    <Card className="p-4 mt-4">
+      <Collapsible open={show} onOpenChange={setShow}>
+        <CollapsibleTrigger className="text-blue-400 cursor-pointer text-sm hover:underline">
+          ▶ DCA Trigger Visualizer
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <div>
+              <Label>Symbol</Label>
+              <Input value={symbol} onChange={(e) => setSymbol(e.target.value.toUpperCase())} />
+              <Label className="mt-2">Interval</Label>
+              <Input value={interval} onChange={(e) => setInterval(e.target.value)} />
+
+              <Label className="mt-4">Entry Score</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={params.entryScore}
+                onChange={(e) => updateParam("entryScore", e.target.value)}
+              />
+
+              <Label className="mt-2">Current Score</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={params.currentScore}
+                onChange={(e) => updateParam("currentScore", e.target.value)}
+              />
+
+              <Label className="mt-2">SAFU Score</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={params.safuScore}
+                onChange={(e) => updateParam("safuScore", e.target.value)}
+              />
+
+              <Label className="mt-2">Drawdown %</Label>
+              <Input
+                type="number"
+                step="0.1"
+                value={params.drawdown}
+                onChange={(e) => updateParam("drawdown", e.target.value)}
+              />
+
+              <Label className="mt-2">TP1 Shift %</Label>
+              <Input
+                type="number"
+                step="0.1"
+                value={params.tp1Shift}
+                onChange={(e) => updateParam("tp1Shift", e.target.value)}
+              />
+            </div>
+
+            <div>
+              <Label className="mb-2">Price Series</Label>
+              {series.length > 0 ? (
+                <CandleChart
+                  data={series}
+                  width={400}
+                  height={200}
+                />
+              ) : (
+                <div className="text-sm text-gray-500">No candle data loaded.</div>
+              )}
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    </Card>
+  );
+}

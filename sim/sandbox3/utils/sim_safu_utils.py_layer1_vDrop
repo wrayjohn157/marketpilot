@@ -1,0 +1,119 @@
+# utils/sim_safu_utils.py
+import os
+import json
+import yaml
+from pathlib import Path
+from datetime import datetime
+
+# === Paths & Config ===
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+SAFU_CONFIG_PATH = BASE_DIR / "config" / "fork_safu_config.yaml"
+SNAPSHOT_BASE = Path("/home/signal/market7/data/snapshots")
+
+with open(SAFU_CONFIG_PATH) as f:
+    safu_cfg = yaml.safe_load(f)
+WEIGHTS = safu_cfg.get("weights", {})
+MIN_SCORE = safu_cfg.get("min_score", 0.4)
+
+def calculate_vwap(klines: list) -> float:
+    total_pv = 0
+    total_vol = 0
+    for k in klines:
+        high = float(k[2])
+        low = float(k[3])
+        close = float(k[4])
+        volume = float(k[5])
+        typical_price = (high + low + close) / 3
+        total_pv += typical_price * volume
+        total_vol += volume
+    return round(total_pv / total_vol, 8) if total_vol > 0 else None
+
+def calculate_volume_drop_pct(klines: list) -> float:
+    if len(klines) < 21:
+        return None
+    volumes = [float(k[5]) for k in klines[-21:-1]]  # 20 bars before most recent
+    ma20 = sum(volumes) / len(volumes)
+    last_volume = float(klines[-1][5])
+    drop_pct = (last_volume - ma20) / ma20 * 100
+    return round(max(0.0, -drop_pct), 2)
+
+def load_sim_safu_indicators(symbol: str, ts_ms: int, tf: str = "1h", grace_ms: int = 5*60*1000) -> dict:
+    date_str = datetime.utcfromtimestamp(ts_ms / 1000).strftime("%Y-%m-%d")
+    indicator_file = SNAPSHOT_BASE / date_str / f"{symbol}_{tf}.jsonl"
+    kline_file = SNAPSHOT_BASE / date_str / f"{symbol}_{tf}_klines.json"
+
+    best = None
+    min_diff = grace_ms + 1
+    if indicator_file.exists():
+        with open(indicator_file) as f:
+            for line in f:
+                try:
+                    row = json.loads(line)
+                    row_ts = row.get("timestamp")
+                    row_ts_ms = row_ts if row_ts > 1e12 else int(row_ts * 1000)
+                    diff = abs(row_ts_ms - ts_ms)
+                    if diff <= grace_ms and diff < min_diff:
+                        best = row
+                        min_diff = diff
+                except json.JSONDecodeError:
+                    continue
+
+    vwap = None
+    volume_drop_pct = None
+    if kline_file.exists():
+        with open(kline_file) as f:
+            try:
+                klines = json.load(f)
+                recent_klines = [k for k in klines if k[0] <= ts_ms]
+                recent_klines = recent_klines[-21:]  # For VWAP and volume MA20
+                if recent_klines:
+                    vwap = calculate_vwap(recent_klines[-10:])
+                    volume_drop_pct = calculate_volume_drop_pct(recent_klines)
+            except Exception:
+                pass
+
+    if not best:
+        return {}
+
+    return {
+        "RSI14": best.get("RSI14"),
+        "MACD_diff": best.get("MACD_diff"),
+        "VWAP": vwap,
+        "volume_drop_pct": volume_drop_pct
+    }
+
+def sim_get_safu_score(symbol: str, entry_price: float, current_price: float, ts_ms: int, tf: str = "1h") -> float:
+    """
+    Simulated SAFU scoring using indicator snapshots and config weights.
+    """
+    if entry_price == 0 or current_price == 0:
+        return 0.0
+
+    price_pct = (current_price - entry_price) / entry_price * 100
+    indicators = load_sim_safu_indicators(symbol, ts_ms, tf)
+    if not indicators:
+        return 0.0
+
+    score = 1.0
+    # RSI penalty
+    if indicators.get("RSI14") is not None and indicators["RSI14"] < 35:
+        score -= WEIGHTS.get("token_rsi_below_35", 0)
+    # MACD bearish
+    if indicators.get("MACD_diff") is not None and indicators["MACD_diff"] < 0:
+        score -= WEIGHTS.get("token_macd_bearish", 0)
+    # Price below VWAP
+    if indicators.get("VWAP") is not None and current_price < indicators["VWAP"]:
+        score -= WEIGHTS.get("token_price_below_vwap", 0)
+    # Volume drop
+    if indicators.get("volume_drop_pct") is not None and indicators["volume_drop_pct"] > 20:
+        score -= WEIGHTS.get("token_volume_drop", 0)
+    # Drawdown thresholds
+    if price_pct < -6:
+        score -= WEIGHTS.get("drawdown_gt_6", 0)
+    if price_pct < -7:
+        score -= WEIGHTS.get("drawdown_gt_7", 0)
+
+    return round(max(0.0, score), 3)
+
+# utils/__init__.py
+from .sim_safu_utils import sim_get_safu_score, load_sim_safu_indicators

@@ -24,7 +24,9 @@ sys.path.append(str(PROJECT_ROOT))
 from config.config_loader import PATHS
 
 # === Logging ===
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 # === Configuration ===
 REDIS_HOST = "localhost"
@@ -37,45 +39,79 @@ TIMEFRAMES = ["15m", "1h", "4h"]
 # === Paths ===
 FILTERED_FILE = PATHS["filtered_pairs"]
 SNAPSHOTS_BASE = PATHS["snapshots"]
-FORK_METRICS_FILE = Path("/home/signal/market7/dashboard_backend/cache/fork_metrics.json")
+FORK_METRICS_FILE = Path(
+    "/home/signal/market7/dashboard_backend/cache/fork_metrics.json"
+)
 
 # === Redis ===
 r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+
 
 def get_snapshot_dir():
     path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
     path.mkdir(parents=True, exist_ok=True)
     return path
 
+
 def fetch_klines(symbol, interval, limit=150):
     url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
     try:
         resp = requests.get(url, timeout=10)
         resp.raise_for_status()
-        df = pd.DataFrame(resp.json(), columns=[
-            "time", "open", "high", "low", "close", "volume",
-            "close_time", "qav", "num_trades", "tb_base_vol", "tbqav", "ignore"
-        ])
-        df = df.astype({"open": float, "high": float, "low": float, "close": float, "volume": float})
+        df = pd.DataFrame(
+            resp.json(),
+            columns=[
+                "time",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",
+                "close_time",
+                "qav",
+                "num_trades",
+                "tb_base_vol",
+                "tbqav",
+                "ignore",
+            ],
+        )
+        df = df.astype(
+            {
+                "open": float,
+                "high": float,
+                "low": float,
+                "close": float,
+                "volume": float,
+            }
+        )
         return df
     except Exception as e:
         logging.warning(f"Failed to fetch klines for {symbol} {interval}: {e}")
         return None
+
 
 def compute_indicators(df):
     indicators = {}
     indicators["EMA50"] = EMAIndicator(df["close"], 50).ema_indicator().iloc[-1]
     indicators["EMA200"] = EMAIndicator(df["close"], 200).ema_indicator().iloc[-1]
     indicators["RSI14"] = RSIIndicator(df["close"]).rsi().iloc[-1]
-    indicators["ADX14"] = ADXIndicator(df["high"], df["low"], df["close"]).adx().iloc[-1]
+    indicators["ADX14"] = (
+        ADXIndicator(df["high"], df["low"], df["close"]).adx().iloc[-1]
+    )
 
     rsi_series = RSIIndicator(df["close"]).rsi()
-    smoothed_rsi = rsi_series.ewm(alpha=1/14, adjust=False).mean()
-    atr_rsi = abs(rsi_series - smoothed_rsi).ewm(alpha=1/14, adjust=False).mean()
+    smoothed_rsi = rsi_series.ewm(alpha=1 / 14, adjust=False).mean()
+    atr_rsi = abs(rsi_series - smoothed_rsi).ewm(alpha=1 / 14, adjust=False).mean()
     indicators["QQE"] = smoothed_rsi.iloc[-1] + 4.236 * atr_rsi.iloc[-1]
 
-    indicators["PSAR"] = PSARIndicator(df["high"], df["low"], df["close"]).psar().iloc[-1]
-    indicators["ATR"] = AverageTrueRange(df["high"], df["low"], df["close"]).average_true_range().iloc[-1]
+    indicators["PSAR"] = (
+        PSARIndicator(df["high"], df["low"], df["close"]).psar().iloc[-1]
+    )
+    indicators["ATR"] = (
+        AverageTrueRange(df["high"], df["low"], df["close"])
+        .average_true_range()
+        .iloc[-1]
+    )
 
     stoch_rsi = StochRSIIndicator(df["close"], window=14, smooth1=3, smooth2=3)
     indicators["StochRSI_K"] = stoch_rsi.stochrsi_k().iloc[-1]
@@ -94,6 +130,7 @@ def compute_indicators(df):
 
     return indicators
 
+
 def load_symbols():
     filtered = set()
     active = set()
@@ -106,16 +143,26 @@ def load_symbols():
         try:
             with open(FORK_METRICS_FILE, "r") as f:
                 fork_metrics = json.load(f)
-                active = set([d["pair"].replace("USDT_", "") for d in fork_metrics.get("metrics", {}).get("active_deals", [])])
+                active = set(
+                    [
+                        d["pair"].replace("USDT_", "")
+                        for d in fork_metrics.get("metrics", {}).get("active_deals", [])
+                    ]
+                )
         except Exception as e:
-            logging.warning(f"⚠️ Failed to load active forks from fork_metrics.json: {e}")
+            logging.warning(
+                f"⚠️ Failed to load active forks from fork_metrics.json: {e}"
+            )
 
     symbols = sorted(filtered.union(active))
 
     if not symbols:
-        logging.warning("⚠️ No symbols found from filtered_pairs.json or fork_metrics.json.")
+        logging.warning(
+            "⚠️ No symbols found from filtered_pairs.json or fork_metrics.json."
+        )
 
     return symbols
+
 
 def save_to_disk(symbol, tf, indicators):
     snapshot_dir = get_snapshot_dir()
@@ -126,6 +173,16 @@ def save_to_disk(symbol, tf, indicators):
         logging.info(f"📂 {symbol.upper()}_{tf} indicators saved to disk")
     except Exception as e:
         logging.error(f"❌ Failed to save {symbol.upper()}_{tf} to disk: {e}")
+
+    # Also append to JSONL version for rolling snapshot
+    jsonl_filename = snapshot_dir / f"{symbol.upper()}_{tf}.jsonl"
+    try:
+        with open(jsonl_filename, "a") as f_jsonl:
+            f_jsonl.write(json.dumps(indicators) + "\n")
+        logging.info(f"📄 Appended to {symbol.upper()}_{tf}.jsonl")
+    except Exception as e:
+        logging.warning(f"⚠️ Failed to append to JSONL for {symbol.upper()}_{tf}: {e}")
+
 
 def main():
     logging.info("📊 Starting indicator updater...")
@@ -146,11 +203,14 @@ def main():
                     r.set(f"{symbol.upper()}_{tf}_StochRSI_K", indicators["StochRSI_K"])
                     r.set(f"{symbol.upper()}_{tf}_StochRSI_D", indicators["StochRSI_D"])
                 except Exception as e:
-                    logging.warning(f"⚠️ Failed to write individual indicators for {symbol}: {e}")
+                    logging.warning(
+                        f"⚠️ Failed to write individual indicators for {symbol}: {e}"
+                    )
 
                 save_to_disk(symbol, tf, indicators)
                 logging.info(f"✅ {key} indicators written to Redis")
         time.sleep(REFRESH_INTERVAL)
+
 
 if __name__ == "__main__":
     main()

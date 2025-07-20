@@ -1,0 +1,481 @@
+#!/usr/bin/env python3
+import argparse
+import json
+from pathlib import Path
+from datetime import datetime
+
+import pandas as pd
+from ta.trend import MACD
+from ta.momentum import RSIIndicator
+import yaml
+import joblib
+
+
+# === load_klines replacement ===
+def load_klines(symbol: str, tf: str, entry_ts: int) -> pd.DataFrame:
+    snapshots_dir = BASE_DIR / "data" / "snapshots"
+    entry_ms = entry_ts  # already in milliseconds
+    dfs = []
+    for date_dir in sorted(snapshots_dir.iterdir()):
+        if not date_dir.is_dir():
+            continue
+        file_path = date_dir / f"{symbol.upper()}_{tf}_klines.json"
+        if not file_path.exists():
+            continue
+        df_day = pd.read_json(file_path, orient="values")
+        df_day.columns = [
+            "timestamp",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            "close_time",
+            "quote_asset_volume",
+            "number_of_trades",
+            "taker_buy_base",
+            "taker_buy_quote",
+            "ignore",
+        ]
+        dfs.append(df_day)
+    if not dfs:
+        raise FileNotFoundError(f"No kline data for {symbol}_{tf} in snapshots")
+    df = pd.concat(dfs, ignore_index=True)
+    df = df.sort_values("timestamp").reset_index(drop=True)
+    # filter from entry timestamp onward
+    return df[df["timestamp"] >= entry_ms].copy()
+
+
+# === CONFIG ===
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+KLINE_PATH = BASE_DIR / "data" / "klines"
+CONFIG_PATH = BASE_DIR / "sim" / "config" / "dca_config.yaml"
+
+
+def add_indicators(df: pd.DataFrame) -> pd.DataFrame:
+    df["RSI"] = RSIIndicator(close=df["close"], window=14).rsi()
+    macd = MACD(close=df["close"])
+    df["MACD"] = macd.macd()
+    df["MACD_signal"] = macd.macd_signal()
+    df["MACD_hist"] = macd.macd_diff()
+    return df
+
+
+def simulate_dca(
+    df: pd.DataFrame,
+    entry_price: float,
+    config: dict,
+    confidence_model=None,
+    recovery_model=None,
+) -> list:
+    steps = []
+    drawdown_trigger = config.get("drawdown_trigger_pct", 0.9)
+    indicator_thresholds = config.get("indicator_thresholds", {})
+    use_trajectory = config.get("use_trajectory_check", False)
+    trajectory_thresholds = config.get("trajectory_thresholds", {})
+
+    # --- DCA gating config sections ---
+    use_soft_confidence_override = config.get("use_soft_confidence_override", False)
+    soft_confidence_override = config.get("soft_confidence_override", 0)
+    use_confidence_override = config.get("use_confidence_override", False)
+    confidence_dca_guard = config.get("confidence_dca_guard", 0)
+    require_tp1_feasibility = config.get("require_tp1_feasibility", False)
+    max_tp1_shift_pct = config.get("max_tp1_shift_pct", 10)
+    require_recovery_odds = config.get("require_recovery_odds", False)
+    min_recovery_probability = config.get("min_recovery_probability", 0.0)
+    min_confidence_odds = config.get("min_confidence_odds", 0.0)
+    min_be_improvement_pct = config.get("min_be_improvement_pct", 0.0)
+    use_safu_exit_model = config.get("use_safu_exit_model", False)
+    ml_exit_threshold = config.get("ml_exit_threshold", 0.0)
+    step_progress_guard = config.get("step_progress_guard", None)
+
+    fired_prices = [entry_price]
+    avg_entry_price = entry_price
+
+    last_fire = None
+    last_fire_ts = None
+    last_price = None
+    last_drawdown_pct = None
+
+    prev_row = None
+
+    for i, row in df.iterrows():
+        drawdown_pct = round(
+            (row["close"] - avg_entry_price) / avg_entry_price * 100, 2
+        )
+        if prev_row is None:
+            prev_row = row
+            continue
+
+        log = {
+            "timestamp": int(row["timestamp"]),
+            "price": row["close"],
+            "decision": "HOLD",
+        }
+
+        # Recalculate average entry price and drawdown
+        log["drawdown_pct"] = drawdown_pct
+        log["avg_entry_price"] = round(avg_entry_price, 4)
+        log["dca_count"] = len(fired_prices) - 1
+
+        # === Always compute confidence and recovery odds ONCE per candle ===
+        features = pd.DataFrame(
+            [
+                {
+                    "step": len(fired_prices),
+                    "entry_score": row.get("MACD_hist", 0),
+                    "current_score": row.get("MACD_hist", 0),
+                    "tp1_shift": abs(drawdown_pct),
+                    "safu_score": 0.5,
+                    "rsi": row.get("RSI", 0),
+                    "macd_histogram": row.get("MACD_hist", 0),
+                    "adx": row.get("ADX", 20),
+                    "macd_lift": row.get("MACD_hist", 0) - row.get("MACD_signal", 0),
+                    "rsi_slope": row.get("RSI", 0) - prev_row.get("RSI", 0),
+                    "drawdown_pct": drawdown_pct,
+                    "snapshot_score_trend": row.get("MACD_hist", 0)
+                    - prev_row.get("MACD_hist", 0),
+                    "snapshot_rsi_trend": row.get("RSI", 0) - prev_row.get("RSI", 0),
+                    "snapshot_max_drawdown": abs(drawdown_pct),
+                    "snapshot_min_score": min(
+                        row.get("MACD_hist", 0), prev_row.get("MACD_hist", 0)
+                    ),
+                    "snapshot_min_rsi": min(row.get("RSI", 0), prev_row.get("RSI", 0)),
+                    "snapshot_time_to_max_drawdown_min": 0,
+                }
+            ]
+        )
+        if confidence_model:
+            conf_score = float(confidence_model.predict(features)[0])
+        else:
+            conf_score = round(row["RSI"] / 100, 2)
+
+        if recovery_model:
+            recovery = float(recovery_model.predict_proba(features)[0][1])
+        else:
+            recovery = min(1.0, max(0.0, (row["RSI"] - 30) / 70))
+
+        log["confidence_score"] = round(conf_score, 4)
+        log["recovery_odds"] = round(recovery, 4)
+        # Dummy tp1 proxy
+        current_tp1_shift = abs(drawdown_pct)
+        log["tp1_shift_sim"] = current_tp1_shift
+
+        # --- Debug print block for features and model outputs ---
+        if config.get("log_verbose", True):
+            print(f"[DEBUG] Features: {features.to_dict(orient='records')[0]}")
+            print(f"[DEBUG] Conf: {conf_score:.4f} | Recovery: {recovery:.4f}")
+
+        # Check drawdown
+        if drawdown_pct > -drawdown_trigger:
+            log["rejection_reason"] = "Drawdown not deep enough"
+            print(
+                f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                f"Reason: {log.get('rejection_reason', '-')}"
+            )
+            steps.append(log)
+            prev_row = row
+            continue
+
+        # Check indicators
+        rsi_ok = row["RSI"] >= indicator_thresholds.get("rsi", 0)
+        macd_ok = row["MACD_hist"] >= indicator_thresholds.get("macd_histogram", 0)
+        adx_ok = row.get("ADX", 20) >= indicator_thresholds.get("adx", 0)
+
+        if not (rsi_ok and macd_ok and adx_ok):
+            log["rejection_reason"] = "Indicator thresholds not met"
+            print(
+                f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                f"Reason: {log.get('rejection_reason', '-')}"
+            )
+            steps.append(log)
+            prev_row = row
+            continue
+
+        # Trajectory check
+        if use_trajectory:
+            macd_lift = row["MACD_hist"] - row["MACD_signal"]
+            rsi_slope = row["RSI"] - df.iloc[i - 1]["RSI"] if i > 0 else 0
+            if macd_lift < trajectory_thresholds.get(
+                "macd_lift_min", 0
+            ) or rsi_slope < trajectory_thresholds.get("rsi_slope_min", 0):
+                log["rejection_reason"] = "Trajectory thresholds not met"
+                print(
+                    f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                    f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                    f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                    f"Reason: {log.get('rejection_reason', '-')}"
+                )
+                steps.append(log)
+                prev_row = row
+                continue
+
+        # TP1 feasibility guard
+        if require_tp1_feasibility:
+            if current_tp1_shift > max_tp1_shift_pct:
+                log["rejection_reason"] = (
+                    f"TP1 shift {current_tp1_shift:.2f}% exceeds max {max_tp1_shift_pct}%"
+                )
+                print(
+                    f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                    f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                    f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                    f"Reason: {log.get('rejection_reason', '-')}"
+                )
+                steps.append(log)
+                prev_row = row
+                continue
+
+        # Recovery odds guard
+        if require_recovery_odds:
+            if recovery < min_recovery_probability:
+                log["rejection_reason"] = (
+                    f"Recovery odds {recovery:.2f} below min {min_recovery_probability}"
+                )
+                print(
+                    f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                    f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                    f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                    f"Reason: {log.get('rejection_reason', '-')}"
+                )
+                steps.append(log)
+                prev_row = row
+                continue
+
+        # Confidence odds guard
+        if min_confidence_odds > 0:
+            if conf_score < min_confidence_odds:
+                log["rejection_reason"] = (
+                    f"Confidence score {conf_score:.2f} below min {min_confidence_odds}"
+                )
+                print(
+                    f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                    f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                    f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                    f"Reason: {log.get('rejection_reason', '-')}"
+                )
+                steps.append(log)
+                prev_row = row
+                continue
+
+        # Confidence override (hard)
+        if use_confidence_override:
+            if conf_score < confidence_dca_guard:
+                log["rejection_reason"] = (
+                    f"Confidence override: {conf_score:.2f} < {confidence_dca_guard}"
+                )
+                print(
+                    f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                    f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                    f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                    f"Reason: {log.get('rejection_reason', '-')}"
+                )
+                steps.append(log)
+                prev_row = row
+                continue
+
+        # Confidence override (soft)
+        if use_soft_confidence_override:
+            if conf_score < soft_confidence_override:
+                log["rejection_reason"] = (
+                    f"Soft confidence override: {conf_score:.2f} < {soft_confidence_override}"
+                )
+                print(
+                    f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                    f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                    f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                    f"Reason: {log.get('rejection_reason', '-')}"
+                )
+                steps.append(log)
+                prev_row = row
+                continue
+
+        # Step progress guard (simulate time/price/drawdown spacing)
+        if step_progress_guard and last_fire_ts is not None:
+            min_seconds_elapsed = step_progress_guard.get("min_seconds_elapsed", 0)
+            min_price_change_pct = step_progress_guard.get("min_price_change_pct", 0)
+            min_be_improvement_pct = step_progress_guard.get(
+                "min_be_improvement_pct", 0
+            )
+            seconds_elapsed = int(row["timestamp"]) - int(last_fire_ts)
+            price_change_pct = (
+                abs((row["close"] - last_price) / last_price * 100) if last_price else 0
+            )
+            be_improvement_pct = (
+                abs(drawdown_pct) - abs(last_drawdown_pct)
+                if last_drawdown_pct is not None
+                else 0
+            )
+            if seconds_elapsed < min_seconds_elapsed:
+                log["rejection_reason"] = (
+                    f"Step progress: {seconds_elapsed}s < {min_seconds_elapsed}s"
+                )
+                print(
+                    f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                    f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                    f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                    f"Reason: {log.get('rejection_reason', '-')}"
+                )
+                steps.append(log)
+                prev_row = row
+                continue
+            if price_change_pct < min_price_change_pct:
+                log["rejection_reason"] = (
+                    f"Step progress: price change {price_change_pct:.2f}% < {min_price_change_pct}%"
+                )
+                print(
+                    f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                    f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                    f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                    f"Reason: {log.get('rejection_reason', '-')}"
+                )
+                steps.append(log)
+                prev_row = row
+                continue
+            if be_improvement_pct < min_be_improvement_pct:
+                log["rejection_reason"] = (
+                    f"Step progress: BE improvement {be_improvement_pct:.2f}% < {min_be_improvement_pct}%"
+                )
+                print(
+                    f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                    f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                    f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                    f"Reason: {log.get('rejection_reason', '-')}"
+                )
+                steps.append(log)
+                prev_row = row
+                continue
+
+        # Step repeat guard (legacy, for compatibility)
+        if "step_repeat_guard" in config and last_fire:
+            delta_conf = conf_score - last_fire.get("confidence_score", 0)
+            delta_tp1 = current_tp1_shift - last_fire.get("tp1_shift_sim", 0)
+            min_conf = config["step_repeat_guard"].get("min_conf_delta", 0)
+            min_tp1 = config["step_repeat_guard"].get("min_tp1_delta", 0)
+            if delta_conf < min_conf and delta_tp1 < min_tp1:
+                log["rejection_reason"] = "Step repeat thresholds not met"
+                print(
+                    f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                    f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                    f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                    f"Reason: {log.get('rejection_reason', '-')}"
+                )
+                steps.append(log)
+                prev_row = row
+                continue
+
+        # --- Simulate SAFU/ML exit model (dummy) ---
+        if use_safu_exit_model:
+            # Simulate ML model as: if RSI < (100*ml_exit_threshold), block
+            if row["RSI"] < ml_exit_threshold * 100:
+                log["rejection_reason"] = (
+                    f"SAFU/ML exit: RSI {row['RSI']:.2f} < {ml_exit_threshold*100:.2f}"
+                )
+                print(
+                    f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+                    f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+                    f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+                    f"Reason: {log.get('rejection_reason', '-')}"
+                )
+                steps.append(log)
+                prev_row = row
+                continue
+
+        # --- All gates passed ---
+        log["decision"] = "FIRE"
+        fired_prices.append(row["close"])
+        avg_entry_price = sum(fired_prices) / len(fired_prices)
+        log["avg_entry_price"] = round(avg_entry_price, 4)
+        log["dca_count"] = len(fired_prices) - 1
+        log["drawdown_pct"] = round(
+            (row["close"] - avg_entry_price) / avg_entry_price * 100, 2
+        )
+        # Store for guards
+        last_fire = log.copy()
+        last_fire_ts = int(row["timestamp"])
+        last_price = row["close"]
+        last_drawdown_pct = drawdown_pct
+        print(
+            f"{datetime.utcfromtimestamp(log['timestamp']//1000)} | {log['decision']} | "
+            f"Price: {log['price']:.2f} | Drawdown: {log['drawdown_pct']:.2f}% | "
+            f"Conf: {conf_score:.4f} | Rec: {recovery:.4f} | "
+            f"Reason: {log.get('rejection_reason', '-')}"
+        )
+        steps.append(log)
+        prev_row = row
+
+    return steps
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--symbol", required=True)
+    parser.add_argument("--tf", default="15m")
+    parser.add_argument("--entry_time", type=int, required=True)
+    parser.add_argument("--config", default="dca_config.yaml")
+    args = parser.parse_args()
+
+    df = load_klines(args.symbol, args.tf, args.entry_time)
+    df = add_indicators(df)
+    entry_price = df.iloc[0]["close"]
+
+    with open(CONFIG_PATH, "r") as f:
+        full_config = yaml.safe_load(f)
+    print(f"✅ Loaded config keys: {list(full_config.keys())}")
+    config = full_config.get("dca_config", full_config)
+
+    CONFIDENCE_MODEL_PATH = BASE_DIR / "ml" / "models" / "xgb_confidence_model.pkl"
+    RECOVERY_MODEL_PATH = BASE_DIR / "ml" / "models" / "xgb_model.pkl"
+
+    try:
+        confidence_model = joblib.load(CONFIDENCE_MODEL_PATH)
+        recovery_model = joblib.load(RECOVERY_MODEL_PATH)
+        print("✅ ML models loaded")
+    except Exception as e:
+        print(f"⚠️ Failed to load ML models: {e}")
+        confidence_model = None
+        recovery_model = None
+
+    results = simulate_dca(df, entry_price, config, confidence_model, recovery_model)
+    print(f"Total entries: {len(results)}")
+    print(json.dumps(results, indent=2))
+
+
+def simulate_overlay(symbol: str, entry_time: int, tf: str = "1h"):
+    """
+    Helper function to simulate DCA overlay for FastAPI or other programmatic use.
+    """
+    df = load_klines(symbol, tf, entry_time)
+    df = add_indicators(df)
+    entry_price = df.iloc[0]["close"]
+
+    with open(CONFIG_PATH, "r") as f:
+        full_config = yaml.safe_load(f)
+    config = full_config.get("dca_config", full_config)
+
+    CONFIDENCE_MODEL_PATH = BASE_DIR / "ml" / "models" / "xgb_confidence_model.pkl"
+    RECOVERY_MODEL_PATH = BASE_DIR / "ml" / "models" / "xgb_model.pkl"
+
+    try:
+        confidence_model = joblib.load(CONFIDENCE_MODEL_PATH)
+        recovery_model = joblib.load(RECOVERY_MODEL_PATH)
+    except Exception:
+        confidence_model = None
+        recovery_model = None
+
+    df_ohlc = df[["timestamp", "open", "high", "low", "close"]].copy()
+    return {
+        "klines": df_ohlc.to_dict(orient="records"),
+        "simulation": simulate_dca(
+            df, entry_price, config, confidence_model, recovery_model
+        ),
+    }
+
+
+# For FastAPI route compatibility
+def run_dca_simulation(symbol: str, entry_time: int, tf: str = "1h"):
+    return simulate_overlay(symbol, entry_time, tf)

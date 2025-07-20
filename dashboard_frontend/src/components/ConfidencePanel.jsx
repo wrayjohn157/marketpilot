@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "./ui/Card";
 
 export default function ConfidencePanel() {
@@ -12,9 +12,11 @@ export default function ConfidencePanel() {
   }, []);
 
   const getBadgeClass = (decision) => {
-    if (decision === "RUN") return "text-green-400 bg-green-900";
-    if (decision === "DCA") return "text-emerald-400 bg-emerald-900";
-    if (decision === "SKIPPED") return "text-red-400 bg-red-900";
+    const key = decision?.toUpperCase();
+    if (key === "RUN") return "text-green-300 bg-green-700";
+    if (key === "DCA") return "text-green-300 bg-green-700";
+    if (key === "SKIPPED") return "text-white-300 bg-red-700";
+    if (key === "FIRED") return "text-white bg-lime-700";
     return "text-gray-400 bg-gray-800";
   };
 
@@ -22,7 +24,7 @@ export default function ConfidencePanel() {
   const filtered = data.slice(0, 3);
 
   return (
-    <Card className="bg-gray-900 p-4">
+    <Card className="bg-gray-900 border border-gray-200 p-4">
       <h2 className="text-white text-base font-semibold mb-3">AI/ML Confidence</h2>
       <CardContent className="space-y-1">
         {filtered.length === 0 ? (

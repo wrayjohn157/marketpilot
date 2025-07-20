@@ -66,7 +66,7 @@ tp1_targets:
 - 7.1
 - 10
 zombie_tag:
-  enabled: true
+  enabled: false
   min_drawdown_pct: 0.5
   max_drawdown_pct: 5
   max_score: 0.3
@@ -104,4 +104,7 @@ step_progress_guard:
   min_price_change_pct: 0.5
   min_seconds_elapsed: 900
   min_be_improvement_pct: 1
+use_safu_exit_model: true
+ml_exit_threshold: 0.6
+enforce_if: both  # Options: "ml_only", "score_only", "both"
 log_verbose: true

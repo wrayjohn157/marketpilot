@@ -21,7 +21,7 @@ export function Sparkline({ data }) {
   const gradientId = up ? "sparkGreen" : "sparkRed";
 
   return (
-    <div className="absolute inset-0 z-0 h-full min-h-[100px] overflow-visible">
+      <div className="relative w-full h-[100px] overflow-visible">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={normalized} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
           <defs>

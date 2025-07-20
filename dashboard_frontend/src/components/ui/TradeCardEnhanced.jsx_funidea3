@@ -1,0 +1,156 @@
+import { RefreshCw, ShieldCheck, TrendingUp, Activity, Percent, Zap } from "lucide-react";
+import { useState } from "react";
+import { Button } from "./Button";
+import { Card } from "./Card";
+import { PriceProgressBar } from "./PriceProgressBar";
+import { Sparkline } from "./Sparkline";
+
+export default function TradeCard({ trade }) {
+  const [liveTrade, setLiveTrade] = useState(trade);
+  const [loading, setLoading] = useState(false);
+
+  const {
+    deal_id,
+    symbol,
+    avg_entry_price,
+    current_price,
+    tp1_shift,
+    entry_score,
+    current_score,
+    confidence_score,
+    recovery_odds,
+    safu_score,
+    step,
+    open_pnl,
+    pnl_pct,
+    sparkline_data = [],
+    rejection_reason,
+    be_price,
+  } = liveTrade;
+
+  const entry = parseFloat(avg_entry_price) || 1;
+  const current = parseFloat(current_price) || entry;
+  const breakEven = parseFloat(be_price) || entry;
+  const tp1 = breakEven * (1 + (parseFloat(tp1_shift) || 0) / 100);
+
+  const refreshPrice = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/refresh-price/${deal_id}`);
+      const data = await res.json();
+
+      if (data?.current_price) {
+        setLiveTrade(prev => ({
+          ...prev,
+          current_price: data.current_price,
+          open_pnl: data.open_pnl ?? prev.open_pnl,
+          pnl_pct: data.pnl_pct ?? prev.pnl_pct,
+        }));
+      } else {
+        console.error("⚠️ Invalid refresh payload:", data);
+      }
+    } catch (e) {
+      console.error("❌ Refresh error:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="relative bg-gray-900 rounded-2xl overflow-hidden p-3">
+      {/* Sparkline ghost background */}
+      {sparkline_data.length > 1 && (
+        <div className="absolute inset-0 opacity-5 blur-[3px] pointer-events-none">
+          <Sparkline data={sparkline_data} />
+        </div>
+      )}
+
+      {/* Main Card content */}
+      <Card className="p-2 border bg-background/90 backdrop-blur-sm rounded-md space-y-2 shadow-sm relative z-10 flex flex-col md:flex-row overflow-hidden bg-transparent">
+        {/* ── RIGHT: Content ───────────────────────────── */}
+        <div className="flex-1 flex flex-col justify-between space-y-2">
+          {/* Header */}
+          <div className="flex justify-start items-center gap-2 mb-1">
+            <h2 className="text-base font-medium">{symbol}</h2>
+            <Button size="xs" variant="ghost" onClick={refreshPrice} disabled={loading}>
+              {loading
+                ? <RefreshCw className="w-4 h-4 animate-spin" />
+                : "Refresh"}
+            </Button>
+          </div>
+
+          {/* Entry/TP1 & Reason */}
+          <div className="text-sm text-muted-foreground">
+            Entry: {entry.toFixed(4)} › TP1: {tp1.toFixed(4)}
+          </div>
+          {rejection_reason && (
+            <div className="italic text-yellow-400 text-sm">
+              Reason: {rejection_reason.toUpperCase()}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+            <div>
+              <div className="text-[11px]">Score</div>
+              <div className="font-semibold text-white">{entry_score?.toFixed(2)} → {current_score?.toFixed(2)}</div>
+            </div>
+            <div>
+              <div className="text-[11px]">SAFU</div>
+              <div className="font-semibold text-white">{safu_score?.toFixed(2)}</div>
+            </div>
+            <div>
+              <div className="text-[11px]">Confidence</div>
+              <div className="font-semibold text-white">{confidence_score?.toFixed(2)}</div>
+            </div>
+            <div>
+              <div className="text-[11px]">Odds</div>
+              <div className="font-semibold text-white">{recovery_odds?.toFixed(2)}</div>
+            </div>
+            <div>
+              <div className="text-[11px]">Step</div>
+              <div className="font-semibold text-white">{step ?? 0}</div>
+            </div>
+            <div>
+              <div className="text-[11px]">PnL</div>
+              <div className={open_pnl >= 0 ? "text-green-400 font-semibold" : "text-red-400 font-semibold"}>
+                {(open_pnl ?? 0).toFixed(2)} USDT <span className="text-muted">({pnl_pct?.toFixed(2)}%)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* PnL Progress Bar */}
+          <PriceProgressBar
+            current={current}
+            breakEven={breakEven}
+            tp1={tp1}
+          />
+
+          <div className="flex justify-between text-xs text-muted-foreground px-1 mt-0.5">
+            <div className="text-left w-full">Entry {entry.toFixed(4)}</div>
+            <div className="text-center w-full opacity-40">BE</div>
+            <div className="text-right w-full">TP1 {tp1.toFixed(4)}</div>
+          </div>
+
+          {/* ── BOTTOM: Sparkline ───────────────────────────── */}
+          {/* Removed the inline Sparkline here since it's rendered as background */}
+
+          <div className="flex justify-end mt-4 text-xs text-muted-foreground">
+            <div className="relative inline-block text-left">
+              <button type="button" className="inline-flex justify-center w-full rounded-md border border-gray-700 shadow-sm px-2 py-1 bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none" aria-expanded="true" aria-haspopup="true">
+                ...
+              </button>
+              {/* Dropdown menu - placeholder, can be enhanced with state */}
+              <div className="origin-top-right absolute right-0 mt-2 w-28 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                  <button className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 w-full text-left" role="menuitem">Cancel</button>
+                  <button className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 w-full text-left" role="menuitem">Add Funds</button>
+                  <button className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 w-full text-left" role="menuitem">Edit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}

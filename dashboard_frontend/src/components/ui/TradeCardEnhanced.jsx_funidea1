@@ -1,0 +1,124 @@
+import { RefreshCw, ShieldCheck, TrendingUp, Activity, Percent, Zap } from "lucide-react";
+import { useState } from "react";
+import { Button } from "./Button";
+import { Card } from "./Card";
+import { PriceProgressBar } from "./PriceProgressBar";
+import { Sparkline } from "./Sparkline";
+
+export default function TradeCard({ trade }) {
+  const [liveTrade, setLiveTrade] = useState(trade);
+  const [loading, setLoading] = useState(false);
+
+  const {
+    deal_id,
+    symbol,
+    avg_entry_price,
+    current_price,
+    tp1_shift,
+    entry_score,
+    current_score,
+    confidence_score,
+    recovery_odds,
+    safu_score,
+    step,
+    open_pnl,
+    pnl_pct,
+    sparkline_data = [],
+    rejection_reason,
+    be_price,
+  } = liveTrade;
+
+  const entry = parseFloat(avg_entry_price) || 1;
+  const current = parseFloat(current_price) || entry;
+  const breakEven = parseFloat(be_price) || entry;
+  const tp1 = breakEven * (1 + (parseFloat(tp1_shift) || 0) / 100);
+
+  const refreshPrice = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/refresh-price/${deal_id}`);
+      const data = await res.json();
+
+      if (data?.current_price) {
+        setLiveTrade(prev => ({
+          ...prev,
+          current_price: data.current_price,
+          open_pnl: data.open_pnl ?? prev.open_pnl,
+          pnl_pct: data.pnl_pct ?? prev.pnl_pct,
+        }));
+      } else {
+        console.error("⚠️ Invalid refresh payload:", data);
+      }
+    } catch (e) {
+      console.error("❌ Refresh error:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card className="relative flex flex-col md:flex-row overflow-hidden rounded-2xl shadow-md bg-gray-900 dark:bg-gray-900">
+      {/* ── RIGHT: Content ───────────────────────────── */}
+      <div className="flex-1 p-4 flex flex-col justify-between space-y-4">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold tracking-wide">{symbol}</h2>
+          <Button size="sm" onClick={refreshPrice} disabled={loading}>
+            {loading
+              ? <RefreshCw className="w-4 h-4 animate-spin" />
+              : "Refresh"}
+          </Button>
+        </div>
+
+        {/* Entry/TP1 & Reason */}
+        <div className="text-sm text-muted-foreground">
+          Entry: {entry.toFixed(4)} › TP1: {tp1.toFixed(4)}
+        </div>
+        {rejection_reason && (
+          <div className="italic text-yellow-400 text-sm">
+            Reason: {rejection_reason.toUpperCase()}
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-y-2 gap-x-6 text-sm mt-2">
+          <div><span className="font-medium text-gray-300">Entry:</span> {entry.toFixed(4)}</div>
+          <div><span className="font-medium text-gray-300">TP1:</span> {tp1.toFixed(4)}</div>
+          <div><span className="font-medium text-gray-300">Score:</span> {entry_score?.toFixed(2)} → {current_score?.toFixed(2)}</div>
+          <div><span className="font-medium text-gray-300">SAFU:</span> {safu_score?.toFixed(2)}</div>
+          <div><span className="font-medium text-gray-300">Confidence:</span> {confidence_score?.toFixed(2)}</div>
+          <div><span className="font-medium text-gray-300">Odds:</span> {recovery_odds?.toFixed(2)}</div>
+          <div><span className="font-medium text-gray-300">Step:</span> {step ?? 0}</div>
+          <div>
+            <span className="font-medium text-gray-300">PnL:</span> {(open_pnl ?? 0).toFixed(2)} USDT ({pnl_pct?.toFixed(2)}%)
+          </div>
+        </div>
+
+        {/* PnL Progress Bar */}
+        <PriceProgressBar
+          current={current}
+          breakEven={breakEven}
+          tp1={tp1}
+        />
+
+        <div className="flex justify-between text-xs text-muted-foreground px-1 mt-1">
+          <div>Entry {entry.toFixed(4)}</div>
+          <div>BE</div>
+          <div>TP1 {tp1.toFixed(4)}</div>
+        </div>
+
+        {/* ── BOTTOM: Sparkline ───────────────────────────── */}
+        {sparkline_data.length > 1 && (
+          <div className="w-full md:w-1/3 h-36 p-2 mt-4 md:mt-0">
+            <Sparkline data={sparkline_data} />
+          </div>
+        )}
+
+        <div className="flex justify-end space-x-2 mt-4 text-xs text-muted-foreground">
+          <button className="text-red-500 hover:underline">Cancel</button>
+          <button className="hover:underline">Add Funds</button>
+          <button className="hover:underline">Edit</button>
+        </div>
+      </div>
+    </Card>
+  );
+}

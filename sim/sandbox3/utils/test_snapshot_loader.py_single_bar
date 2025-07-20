@@ -1,0 +1,17 @@
+import sys
+from sim_snapshot_loader import sim_load_snapshot
+
+if len(sys.argv) != 4:
+    print("Usage: python3 test_snapshot_loader.py SYMBOL ENTRY_TIME_MS TF")
+    sys.exit(1)
+
+symbol = sys.argv[1]
+entry_ts = int(sys.argv[2])
+tf = sys.argv[3]
+
+try:
+    snapshot = sim_load_snapshot(symbol, entry_ts, tf)
+    print("✅ Snapshot loaded:")
+    print(snapshot)
+except Exception as e:
+    print(f"❌ Error: {e}")

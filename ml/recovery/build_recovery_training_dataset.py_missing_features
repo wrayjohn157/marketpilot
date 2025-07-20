@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+import os, json, argparse
+from pathlib import Path
+from datetime import datetime, timedelta
+from dateutil import parser as dtparser
+
+# === Paths ===
+MASTER_PATH = Path("/home/signal/market7/ml/datasets/unified/master_data.jsonl")
+SNAPSHOT_DIR = Path("/home/signal/market7/ml/datasets/recovery_snapshots")
+OUTPUT_DIR = Path("/home/signal/market7/ml/datasets/recovery_training")
+FINAL_OUTPUT = OUTPUT_DIR / "recovery_data.jsonl"
+ARCHIVE_DIR = OUTPUT_DIR / "archive"
+
+def load_master_data():
+    with open(MASTER_PATH, "r") as f:
+        return [json.loads(line) for line in f if line.strip()]
+
+def load_snapshots(symbol, trade_id):
+    file_path = SNAPSHOT_DIR / f"{symbol}_{trade_id}.jsonl"
+    if not file_path.exists():
+        return []
+    with open(file_path, "r") as f:
+        return [json.loads(line) for line in f if line.strip()]
+
+def extract_snapshot_meta(snapshots):
+    if not snapshots:
+        return {}
+
+    times, dd_vals, score_vals, rsi_vals = [], [], [], []
+    for snap in snapshots:
+        ts = snap.get("timestamp")
+        try:
+            dt = dtparser.parse(str(ts)) if isinstance(ts, str) else datetime.utcfromtimestamp(ts)
+        except:
+            continue
+        dd = snap.get("drawdown_pct")
+        sc = snap.get("current_score")
+        rsi = snap.get("rsi")
+        if dd is None or sc is None or rsi is None:
+            continue
+        times.append(dt)
+        dd_vals.append(dd)
+        score_vals.append(sc)
+        rsi_vals.append(rsi)
+
+    if not times:
+        return {}
+
+    try:
+        score_trend = score_vals[-1] - score_vals[0]
+        rsi_trend = rsi_vals[-1] - rsi_vals[0]
+        max_dd = max(dd_vals)
+        min_score = min(score_vals)
+        min_rsi = min(rsi_vals)
+        idx_max = dd_vals.index(max_dd)
+        time_to_max = (times[idx_max] - times[0]).total_seconds() / 60.0
+    except:
+        return {}
+
+    return {
+        "snapshot_score_trend": score_trend,
+        "snapshot_rsi_trend": rsi_trend,
+        "snapshot_max_drawdown": max_dd,
+        "snapshot_min_score": min_score,
+        "snapshot_min_rsi": min_rsi,
+        "snapshot_time_to_max_drawdown_min": time_to_max
+    }
+
+def archive_previous(date_str):
+    if FINAL_OUTPUT.exists():
+        ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+        archive_path = ARCHIVE_DIR / f"{date_str}.jsonl"
+        FINAL_OUTPUT.rename(archive_path)
+        print(f"📦 Archived previous → {archive_path}")
+
+def process(date_str):
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    archive_previous(date_str)
+
+    trades = load_master_data()
+    results, skipped = [], 0
+
+    for trade in trades:
+        symbol = trade.get("symbol", "").replace("USDT", "")
+        trade_id = trade.get("trade_id")
+
+        snapshots = load_snapshots(symbol, trade_id)
+        meta = extract_snapshot_meta(snapshots)
+        if not meta:
+            skipped += 1
+            continue
+
+        row = {
+            "deal_id": trade_id,
+            "symbol": symbol,
+            "entry_score": trade.get("fork_score"),
+            "current_score": snapshots[-1].get("current_score"),
+            "safu_score": snapshots[-1].get("safu_score"),
+            "recovery_label": 1 if trade.get("pnl_pct", 0) > 0.5 else 0,
+            **meta
+        }
+        results.append(row)
+
+    with open(FINAL_OUTPUT, "w") as f:
+        for row in results:
+            f.write(json.dumps(row) + "\n")
+
+    print(f"✅ Saved {len(results)} records → {FINAL_OUTPUT}")
+    print(f"⚠️ Skipped {skipped} due to missing snapshot or meta")
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--date", help="Date tag for archive naming (default: yesterday UTC)")
+    args = parser.parse_args()
+
+    date_str = args.date or (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
+    process(date_str)
+
+if __name__ == "__main__":
+    main()

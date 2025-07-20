@@ -13,4 +13,4 @@ weights:
 options:
   use_stoch_ob_penalty: true
   use_volume_penalty: true
-  use_macd_bearish_check: false
+  use_macd_bearish_check: true

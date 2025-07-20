@@ -1,0 +1,81 @@
+import os
+import json
+import math
+from datetime import datetime
+from pathlib import Path
+from typing import List, Dict
+
+SNAPSHOT_BASE = Path("/home/signal/market7/data/snapshots")
+
+def sim_generate_snapshot_series(symbol: str, entry_time_ms: int, tf: str = "1h") -> List[dict]:
+    entry_date = datetime.utcfromtimestamp(entry_time_ms / 1000).strftime("%Y-%m-%d")
+    kline_file = SNAPSHOT_BASE / entry_date / f"{symbol}_{tf}_klines.json"
+
+    if not kline_file.exists():
+        raise FileNotFoundError(f"Kline file not found: {kline_file}")
+
+    with open(kline_file, "r") as f:
+        klines = json.load(f)
+
+    # Convert raw kline list data into dicts
+    parsed_klines = []
+    for k in klines:
+        if not isinstance(k, list) or len(k) < 5:
+            continue
+        parsed_klines.append({
+            "timestamp": k[0],
+            "close": float(k[4]),  # string to float
+            "rsi": 50,  # stub fallback
+            "macd_histogram": 0,
+            "adx": 20,
+            "macd_lift": 0,
+            "rsi_slope": 0
+        })
+    klines = parsed_klines
+
+    if not klines:
+        raise ValueError("No valid klines parsed")
+
+    base_price = klines[0]["close"]
+    entry_score = 0.75  # stub
+    safu_score = 0.75   # stub
+
+    snapshots = []
+
+    for k in klines:
+        ts_ms = k["timestamp"]
+        price = k["close"]
+
+        # Simulated metrics
+        drawdown = max(0, (base_price - price) / base_price * 100)
+        tp1_shift = round(1.5 + 0.5 * math.sin(ts_ms / 1e6), 2)
+        be_improvement = round(0.1 + 0.05 * math.cos(ts_ms / 1e6), 2)
+        recovery_odds = 0.85 if drawdown < 2 else 0.65
+        confidence_score = 0.82 if drawdown < 2 else 0.6
+        rsi = k.get("rsi", 50)
+        macd_hist = k.get("macd_histogram", 0)
+        adx = k.get("adx", 20)
+        macd_lift = k.get("macd_lift", 0)
+        rsi_slope = k.get("rsi_slope", 0)
+        current_score = round(entry_score * (1 - 0.01 * drawdown), 4)
+
+        snapshots.append({
+            "timestamp": datetime.utcfromtimestamp(ts_ms / 1000).isoformat(),
+            "symbol": symbol,
+            "entry_score": entry_score,
+            "current_score": current_score,
+            "btc_status": "SAFE",
+            "safu_score": safu_score,
+            "tp1_shift": tp1_shift,
+            "be_improvement": be_improvement,
+            "recovery_odds": recovery_odds,
+            "confidence_score": confidence_score,
+            "rsi": rsi,
+            "macd_histogram": macd_hist,
+            "adx": adx,
+            "macd_lift": macd_lift,
+            "rsi_slope": rsi_slope,
+            "drawdown_pct": drawdown
+        })
+
+    return snapshots

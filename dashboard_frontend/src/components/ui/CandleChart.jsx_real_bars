@@ -1,0 +1,79 @@
+// src/components/ui/CandleChart.jsx
+
+import React, { useRef, useEffect, useState } from "react";
+import {
+  ChartCanvas,
+  Chart,
+  CandlestickSeries,
+  discontinuousTimeScaleProvider,
+  CrossHairCursor,
+  MouseCoordinateX,
+  MouseCoordinateY,
+  EdgeIndicator,
+  XAxis,
+  YAxis,
+  OHLCTooltip,
+} from "react-financial-charts";
+import { timeFormat } from "d3-time-format";
+
+const CandleChart = ({ data }) => {
+  const containerRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 400 });
+
+  useEffect(() => {
+    if (containerRef.current) {
+      setDimensions({
+        width: containerRef.current.offsetWidth,
+        height: containerRef.current.offsetHeight || 400,
+      });
+    }
+  }, []);
+
+  if (!data || data.length === 0) return <div>Loading chart...</div>;
+
+  const formattedData = data.map((d) => ({
+    ...d,
+    date: new Date(d.timestamp * 1000),
+  }));
+
+  const xScaleProvider = discontinuousTimeScaleProvider.inputDateAccessor((d) => d.date);
+  const { data: chartData, xScale, xAccessor, displayXAccessor } = xScaleProvider(formattedData);
+
+  const start = xAccessor(chartData[Math.max(0, chartData.length - 50)]);
+  const end = xAccessor(chartData[chartData.length - 1]);
+  const xExtents = [start, end];
+
+  return (
+    <div ref={containerRef} style={{ width: "100%", minWidth: "100%", flexGrow: 1 }}>
+      <ChartCanvas
+        height={dimensions.height}
+        width={dimensions.width}
+        ratio={1}
+        margin={{ left: 50, right: 50, top: 10, bottom: 30 }}
+        seriesName="BTC"
+        data={chartData}
+        xScale={xScale}
+        xAccessor={xAccessor}
+        displayXAccessor={displayXAccessor}
+        xExtents={xExtents}
+      >
+        <Chart id={1} yExtents={(d) => [d.high, d.low]}>
+          <XAxis ticks={6} />
+          <YAxis ticks={6} />
+          <MouseCoordinateX
+            displayFormat={timeFormat("%b %d %H:%M")}
+            at="bottom"
+            orient="bottom"
+          />
+          <MouseCoordinateY displayFormat={(d) => d.toFixed(2)} />
+          <CandlestickSeries />
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right" yAccessor={(d) => d.close} />
+          <OHLCTooltip origin={[dimensions.width - 160, 10]} />
+        </Chart>
+        <CrossHairCursor />
+      </ChartCanvas>
+    </div>
+  );
+};
+
+export default CandleChart;

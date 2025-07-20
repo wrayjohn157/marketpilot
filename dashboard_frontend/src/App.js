@@ -1,22 +1,22 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import './tailwind.css'; // ✅ Make sure this is correct
 
 // Pages
-import TradeDashboard from "./pages/TradeDashboard.jsx"
 import ActiveTrades from "./pages/ActiveTrades";
-import ScanReview from "./pages/ScanReview";
-import DCATracker from "./pages/DcaTracker";
-import BacktestSummary from "./pages/BacktestSummary";
-import MLMonitor from "./pages/MLMonitor";
-import BTCRiskPanel from "./pages/BTCRiskPanel";
-import ForkScore from "./pages/ForkScore";
-import DcaConfig from "./pages/DcaConfig";
-import TvScreenerConfig from "./pages/TvScreenerConfig";
-import SafuConfig from "./pages/SafuConfig";
 import AskGpt from "./pages/AskGpt";
+import BacktestSummary from "./pages/BacktestSummary";
+import BTCRiskPanel from "./pages/BTCRiskPanel";
+import DcaConfig from "./pages/DcaConfig";
+import DCATracker from "./pages/DcaTracker";
+import ForkScore from "./pages/ForkScore";
 import CodeEditor from "./pages/GptCodeEditor";
+import MLMonitor from "./pages/MLMonitor";
+import SafuConfig from "./pages/SafuConfig";
+import ScanReview from "./pages/ScanReview";
+import TradeDashboard from "./pages/TradeDashboard.jsx";
+import TvScreenerConfig from "./pages/TvScreenerConfig";
+import DcaStrategyBuilder from "./pages/DcaStrategyBuilder";
 
 function App() {
   return (
@@ -39,6 +39,7 @@ function App() {
               <Route path="/dca-config" element={<DcaConfig />} />
               <Route path="/tv-config" element={<TvScreenerConfig />} />
               <Route path="/safu-config" element={<SafuConfig />} />
+              <Route path="/dca-tuner" element={<DcaStrategyBuilder />} />
               <Route path="*" element={<Navigate to="/trade-dashboard" replace />} />
             </Routes>
           </main>

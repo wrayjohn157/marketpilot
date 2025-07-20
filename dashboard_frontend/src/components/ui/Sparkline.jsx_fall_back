@@ -1,0 +1,70 @@
+import React from "react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+} from "recharts";
+
+export function Sparkline({ data }) {
+  if (!Array.isArray(data) || data.length < 2) return null;
+
+  const base = data[0] || 1;
+  const normalized = data.map((v,i) => ({
+    index: i,
+    value: ((v - base) / base) * 100,
+  }));
+
+  const up = normalized.at(-1).value >= 0;
+  const color = up ? "#22c55e" : "#ef4444";
+  const gradientId = up ? "sparkGreen" : "sparkRed";
+
+  return (
+    <div className="absolute inset-0 z-0 h-full min-h-[100px] overflow-visible">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={normalized} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+          <defs>
+            {/* Colored fill gradient */}
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity={0.3}/>
+              <stop offset="80%" stopColor={color} stopOpacity={0}/>
+            </linearGradient>
+
+            {/* Glow filter */}
+            <filter id="glow" height="200%" width="200%" x="-50%" y="-50%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <XAxis hide />
+          <YAxis hide domain={['auto','auto']} />
+
+          {/* glowing fill */}
+          <Area 
+            type="monotone"
+            dataKey="value"
+            fill={`url(#${gradientId})`}
+            stroke="none"
+            isAnimationActive={false}
+          />
+
+          {/* thick, blurred stroke on its own layer */}
+          <Area 
+            type="monotone"
+            dataKey="value"
+            stroke={color}
+            strokeWidth={2.5}
+            fill="none"
+            filter="url(#glow)"
+            isAnimationActive={false}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}

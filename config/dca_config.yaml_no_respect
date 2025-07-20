@@ -1,0 +1,94 @@
+max_trade_usdt: 2000
+base_order_usdt: 200
+drawdown_trigger_pct: 0.9
+safu_score_threshold: 0.5
+score_decay_min: 0.2
+buffer_zone_pct: 0
+require_indicator_health: true
+indicator_thresholds:
+  rsi: 45
+  macd_histogram: 0
+  adx: 10
+use_btc_filter: true
+btc_indicators:
+  rsi_max: 40
+  macd_histogram_max: 0
+  adx_max: 15
+use_trajectory_check: true
+trajectory_thresholds:
+  macd_lift_min: 5.0e-05
+  rsi_slope_min: 1
+require_tp1_feasibility: true
+max_tp1_shift_pct: 30
+require_recovery_odds: true
+min_recovery_probability: 0.5
+min_confidence_odds: 0.65
+use_confidence_override: false
+confidence_dca_guard:
+  safu_score_min: 0.5
+  macd_lift_min: 5.0e-05
+  rsi_slope_min: 1
+  confidence_score_min: 0.7
+  min_confidence_delta: 0.05
+  min_tp1_shift_gain_pct: 1.1
+use_soft_confidence_override: false
+soft_confidence_override:
+  min_confidence: 0.75
+  min_recovery_odds: 0.8
+  min_safu_score: 0.7
+  min_health_score: 0.6
+  min_drawdown_pct: 2
+  min_confidence_delta: 0.05
+  min_tp1_shift_pct: 2
+min_be_improvement_pct: 0.8
+so_volume_table:
+- 20
+- 10
+- 19
+- 36.1
+- 68.59
+- 130.32
+- 247.61
+- 470.46
+- 893.87
+tp1_targets:
+- 0.4
+- 1.1
+- 1.7
+- 2.4
+- 3
+- 3.9
+- 5.2
+- 7.1
+- 10
+zombie_tag:
+  enabled: true
+  min_drawdown_pct: 0.5
+  max_drawdown_pct: 5
+  max_score: 0.3
+  require_zero_recovery_odds: true
+  max_macd_lift: 0
+  max_rsi_slope: 0
+use_ml_spend_model: true
+spend_adjustment_rules:
+  min_volume: 20
+  max_multiplier: 3
+  tp1_shift_soft_cap: 2.5
+  low_dd_pct_limit: 1
+health_scoring:
+  enabled: true
+  weights:
+    recovery_odds: 0.4
+    confidence_score: 0.3
+    safu_score: 0.1
+    entry_score_decay: 0.1
+    indicator_health: 0.1
+  decay_threshold: 0.3
+  indicator_thresholds:
+    rsi_min: 45
+    macd_histogram_min: 0
+    adx_min: 20
+  health_thresholds:
+    healthy: 0.7
+    weak: 0.4
+log_verbose: true
