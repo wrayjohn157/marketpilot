@@ -10,7 +10,7 @@ export default function AccountSummary() {
       .catch((err) => console.error("Error loading account summary:", err));
   }, []);
 
-  const normalizeTo = 25000;
+  const normalizeTo = 24957;
 
   const formatUSD = (value) => {
     return value?.toLocaleString("en-US", {

@@ -16,8 +16,8 @@ with open(PATHS["paper_cred"], "r") as f:
 
 API_KEY = creds["3commas_api_key"]
 API_SECRET = creds["3commas_api_secret"]
-BOT_ID = creds.get("3commas_bot_id", 16017224)
-ACCOUNT_ID = creds.get("3commas_account_id", 32994602)  # fallback
+BOT_ID = creds.get("3commas_bot_id", 16398727)
+ACCOUNT_ID = creds.get("3commas_account_id", 29085460)  # fallback
 
 # === Helper: Sign a request ===
 def sign_request(path: str, query: str = "") -> (str, dict):
@@ -148,7 +148,7 @@ def get_fork_trade_metrics():
     active_count = len(open_deals_info)
     total_pnl = multi_pair_stats.get("profits_in_usd", {}).get("overall_usd_profit", realized_pnl_alltime)
     today_pnl = multi_pair_stats.get("profits_in_usd", {}).get("today_usd_profit", daily_realized_pnl)
-    balance = 25000 + float(total_pnl or 0)
+    balance = multi_pair_stats.get("account_balance", 24957.0)
 
     return {
         "bot_id": BOT_ID,

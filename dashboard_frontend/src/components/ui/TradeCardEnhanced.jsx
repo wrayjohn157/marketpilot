@@ -3,11 +3,13 @@ import { RefreshCw, ShieldCheck, TrendingUp, Activity, Percent, Zap } from "luci
 import { Button } from "./Button";
 import { Card } from "./Card";
 import { Sparkline } from "./Sparkline";
+import { TradingViewChart } from "./TradingViewChart";
 
 export default function TradeCard({ trade }) {
   const [liveTrade, setLiveTrade] = useState(trade);
   const [loading, setLoading] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
+  const [showChart, setShowChart] = useState(false);
 
   const {
     deal_id,
@@ -127,7 +129,13 @@ export default function TradeCard({ trade }) {
       <Card className="w-full max-w-md border border-gray-800 ring-1 ring-gray-700 rounded-xl p-4 shadow-md bg-gray-900/80 backdrop-blur-sm">
         {/* Top: Symbol and Refresh */}
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-base font-semibold tracking-tight text-white">{symbol}</h2>
+          <button
+            onClick={() => setShowChart(true)}
+            className="text-base font-semibold tracking-tight text-white hover:underline"
+            title="View on TradingView"
+          >
+            {symbol}
+          </button>
           <Button size="xs" variant="ghost" onClick={refreshPrice} disabled={loading} title="Refresh">
             <RefreshCw className="w-4 h-4 text-green-400" />
           </Button>
@@ -258,6 +266,19 @@ export default function TradeCard({ trade }) {
           </button>
         </div>
       </Card>
+      {showChart && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-4 w-full max-w-4xl relative">
+            <button
+              onClick={() => setShowChart(false)}
+              className="absolute top-2 right-2 text-black hover:text-red-500 text-xl font-bold"
+            >
+              ×
+            </button>
+            <TradingViewChart symbol={symbol} interval="1h" />
+          </div>
+        </div>
+      )}
     </>
   );
 }

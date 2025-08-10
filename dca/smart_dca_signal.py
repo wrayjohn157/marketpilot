@@ -1,3 +1,13 @@
+from typing import List
+
+
+def detect_local_reversal(prices: List[float]) -> bool:
+    """Detect local bottom reversal (V-shape) from price data."""
+    if len(prices) < 5:
+        return False
+    return prices[-4] > prices[-3] > prices[-2] and prices[-2] < prices[-1]
+
+
 #!/usr/bin/env python3
 import json
 import logging
@@ -187,6 +197,7 @@ def run():
     trades = get_live_3c_trades()
     # print(f"[INFO] Pulled {len(trades)} active trades")
     for trade in trades:
+        step = None  # Ensure step is always defined before use
         # print("[INFO] Pulled trade keys:", list(trade.keys()))
         trigger_pct = config.get("drawdown_trigger_pct", 1.5)
     so_table = config["so_volume_table"]
@@ -194,8 +205,12 @@ def run():
     for trade in trades:
         symbol = trade["pair"]
         short_symbol = symbol.replace("USDT_", "")
-        total_spent = float(trade.get("bought_volume") or 0)
         deal_id = trade.get("id")
+        # --- Calculate spent_so_far using 3Commas trade fields ---
+        base_order_volume = float(trade.get("bought_volume", 0))
+        current_funds = float(trade.get("current_funds", 0))
+        spent_so_far = float(current_funds - base_order_volume)
+        total_spent = base_order_volume
 
         avg_entry_price = float(
             trade.get("bought_average_price")
@@ -259,6 +274,84 @@ def run():
             continue
 
         indicators = get_latest_indicators(short_symbol)
+        # === MACD Cross Guard ===
+        if config.get("require_macd_cross", False):
+            lookback = config.get("macd_cross_lookback", 1)
+            macd_vals = get_latest_indicators(short_symbol).get(
+                "macd_cross_history", []
+            )
+            if len(macd_vals) < lookback + 1:
+                print(f"⚠️ Not enough MACD history to check cross for {symbol}")
+                reason = "insufficient_macd_data"
+                log_entry = {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "deal_id": deal_id,
+                    "symbol": symbol,
+                    "step": 0,
+                    "current_price": current_price,
+                    "avg_entry_price": avg_entry_price,
+                    "entry_score": None,
+                    "current_score": None,
+                    "open_pnl": (
+                        (
+                            (current_price - avg_entry_price)
+                            * (total_spent / avg_entry_price)
+                        )
+                        if avg_entry_price
+                        else 0.0
+                    ),
+                    "tp1_shift": None,
+                    "be_improvement": None,
+                    "recovery_odds": None,
+                    "confidence_score": None,
+                    "safu_score": None,
+                    "btc_status": btc_status,
+                    "tv_tag": None,
+                    "tv_kicker": None,
+                    "zombie_tagged": False,
+                    "decision": "skipped",
+                    "rejection_reason": reason,
+                    "spent": total_spent,
+                }
+                write_log(log_entry)
+                continue
+            macd_prev, signal_prev = macd_vals[-2]
+            macd_curr, signal_curr = macd_vals[-1]
+            if not (macd_prev < signal_prev and macd_curr > signal_curr):
+                print(f"⛔ Skipping {symbol} — no recent MACD cross")
+                reason = "no_macd_cross"
+                log_entry = {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "deal_id": deal_id,
+                    "symbol": symbol,
+                    "step": 0,
+                    "current_price": current_price,
+                    "avg_entry_price": avg_entry_price,
+                    "entry_score": None,
+                    "current_score": None,
+                    "open_pnl": (
+                        (
+                            (current_price - avg_entry_price)
+                            * (total_spent / avg_entry_price)
+                        )
+                        if avg_entry_price
+                        else 0.0
+                    ),
+                    "tp1_shift": None,
+                    "be_improvement": None,
+                    "recovery_odds": None,
+                    "confidence_score": None,
+                    "safu_score": None,
+                    "btc_status": btc_status,
+                    "tv_tag": None,
+                    "tv_kicker": None,
+                    "zombie_tagged": False,
+                    "decision": "skipped",
+                    "rejection_reason": reason,
+                    "spent": total_spent,
+                }
+                write_log(log_entry)
+                continue
         safu_score = get_safu_score(short_symbol, avg_entry_price, current_price)
 
         entry_score = load_entry_score_from_redis(deal_id)
@@ -294,6 +387,46 @@ def run():
                 "drawdown_pct": deviation_pct,
             }
         )
+
+        # === Local Bottom Reversal Detection ===
+        allow_dca = True
+        rejection_reason = None
+        # Attempt to load klines for price action (assume 1h TF from indicators if available)
+        klines = indicators.get("klines", [])
+        if not klines:
+            # If not present, skip reversal check
+            recent_prices = []
+            reversal_signal = False
+        else:
+            recent_prices = [k["close"] for k in klines[-6:]]
+            reversal_signal = detect_local_reversal(recent_prices)
+        # Check YAML bottom reversal filter
+        br_filter = config.get("bottom_reversal_filter", {})
+        # Standard bottom reversal filter logic
+        if br_filter.get("enabled", False):
+            if not reversal_signal:
+                rejection_reason = "no_bottom_reversal"
+                allow_dca = False
+            elif indicators["macd_lift"] < br_filter.get("min_macd_lift", 0.0):
+                rejection_reason = "macd_lift_too_weak"
+                allow_dca = False
+            elif indicators["rsi_slope"] < br_filter.get("min_rsi_slope", 0.0):
+                rejection_reason = "rsi_slope_too_flat"
+                allow_dca = False
+        # --- Bottom Reversal alternate filter (from improved) ---
+        # If bottom_reversal_filter.enabled, allow DCA if MACD lift, RSI slope, and RSI exceed thresholds
+        allow_bottom_dca = False
+        if br_filter.get("enabled", False):
+            min_macd = br_filter.get("min_macd_lift", 0.0)
+            min_slope = br_filter.get("min_rsi_slope", 0.0)
+            rsi_floor = br_filter.get("rsi_floor", 0)
+            rsi = indicators.get("rsi", 0)
+            if (
+                indicators["macd_lift"] > min_macd
+                and indicators["rsi_slope"] > min_slope
+                and rsi > rsi_floor
+            ):
+                allow_bottom_dca = True
 
         snapshot = get_latest_snapshot(symbol, deal_id)
         recovery_odds = predict_recovery_odds(snapshot)
@@ -405,6 +538,80 @@ def run():
             tp1_sim_pct=tp1_shift,
             recovery_odds=recovery_odds,
         )
+        # --- Bottom reversal trigger (new logic, supports soft/hard mode) ---
+        assist_reasons = []
+        rejection_reasons = []
+        br_cfg = config.get("bottom_reversal_trigger", {})
+
+        def bottom_reversal_indicates_reversal(snapshot, br_cfg):
+            # Simple proxy: use bottom_reversal_filter logic (for now)
+            # In real code, this should invoke a utility for bottom reversal detection.
+            min_macd = br_cfg.get("min_macd_lift", 0.0)
+            min_slope = br_cfg.get("min_rsi_slope", 0.0)
+            rsi_floor = br_cfg.get("rsi_floor", 0)
+            rsi = indicators.get("rsi", 0)
+            return (
+                indicators.get("macd_lift", 0.0) > min_macd
+                and indicators.get("rsi_slope", 0.0) > min_slope
+                and rsi > rsi_floor
+            )
+
+        bottom_reversal_ok = False
+        if br_cfg.get("enabled", False):
+            if bottom_reversal_indicates_reversal(snapshot, br_cfg):
+                bottom_reversal_ok = True
+                assist_reasons.append("bottom_reversal_detected")
+            elif br_cfg.get("mode") == "hard":
+                rejection_reasons.append("bottom_reversal_not_confirmed")
+        # In soft mode, bottom reversal only assists, does not block DCA
+        # In hard mode, it blocks if not present
+        if rejection_reasons:
+            should_fire = False
+            reason = rejection_reasons[0]
+
+        # === Enforce RSI floor from bottom_reversal_filter before DCA trigger ===
+        bottom_reversal_cfg = config.get("bottom_reversal_filter", {})
+        rsi_floor = bottom_reversal_cfg.get("rsi_floor", 0)
+        if indicators.get("rsi", 100) < rsi_floor:
+            rejection_reason = f"RSI {indicators['rsi']:.2f} below floor {rsi_floor}"
+            # step may not be set yet; set it to last_fired_step + 1 for logging
+            if step is None:
+                step = get_last_fired_step(deal_id) + 1
+            log_entry = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "deal_id": deal_id,
+                "symbol": symbol,
+                "step": step,
+                "current_price": current_price,
+                "avg_entry_price": avg_entry_price,
+                "entry_score": entry_score,
+                "current_score": current_score,
+                "open_pnl": (
+                    (
+                        (current_price - avg_entry_price)
+                        * (total_spent / avg_entry_price)
+                    )
+                    if avg_entry_price
+                    else 0.0
+                ),
+                "tp1_shift": tp1_shift,
+                "be_improvement": be_improvement,
+                "recovery_odds": recovery_odds,
+                "confidence_score": confidence_score,
+                "safu_score": safu_score,
+                "btc_status": btc_status,
+                "tv_tag": tv_tag,
+                "tv_kicker": tv_kicker,
+                "health_score": health_score,
+                "health_status": health_status,
+                "zombie_tagged": zombie_tagged,
+                "decision": "skipped",
+                "rejection_reason": rejection_reason,
+                "spent": total_spent,
+            }
+            # Log and skip
+            write_log(log_entry)
+            continue
 
         last_conf_score, last_tp1_shift = get_last_snapshot_values(
             short_symbol, deal_id
@@ -417,18 +624,15 @@ def run():
         step_guard = config.get("step_repeat_guard", {})
         if step_guard.get("enabled", True) and last_logged:
             prev_step = last_logged.get("step", 0)
-            prev_conf = last_logged.get("confidence_score", 0)
-            prev_tp1 = last_logged.get("tp1_shift", 0)
+            prev_confidence = last_logged.get("confidence_score", 0)
+            prev_tp1_shift = last_logged.get("tp1_shift", 0)
             same_step = prev_step == get_last_fired_step(deal_id)
-            conf_improved = (confidence_score - prev_conf) > step_guard.get(
-                "min_conf_delta", 0.02
-            )
-            tp1_improved = (tp1_shift - prev_tp1) > step_guard.get(
-                "min_tp1_delta", 0.25
-            )
-
-            if same_step and not (conf_improved or tp1_improved):
-                print(f"🔁 Step {prev_step} already fired, no significant improvement.")
+            min_conf_delta = step_guard.get("min_conf_delta", 0.02)
+            min_tp1_shift = step_guard.get("min_tp1_delta", 0.25)
+            conf_delta_ok = (confidence_score - prev_confidence) >= min_conf_delta
+            tp1_delta_ok = (tp1_shift - prev_tp1_shift) >= min_tp1_shift
+            if same_step and not (conf_delta_ok or tp1_delta_ok):
+                # Only allow re-fire if confidence or TP1 shift improved enough
                 reason = "no_step_improvement"
                 log_entry = {
                     "timestamp": datetime.utcnow().isoformat(),
@@ -464,6 +668,60 @@ def run():
                 }
                 write_log(log_entry)
                 continue
+
+            # === Insert min_price_delta_pct guard after min_conf_delta/min_tp1_delta logic ===
+            def log_reason(deal_id, symbol, reason, msg):
+                # Helper for logging reasons (minimal, for patch completeness)
+                print(msg)
+
+            if config.get("step_repeat_guard", {}).get("enabled", False):
+                last_price = last_logged.get("current_price")
+                if last_price is not None and current_price is not None:
+                    min_price_delta_pct = config["step_repeat_guard"].get(
+                        "min_price_delta_pct", 0
+                    )
+                    price_delta_pct = (
+                        abs((current_price - last_price) / last_price) * 100
+                    )
+                    if price_delta_pct < min_price_delta_pct:
+                        log_msg = f"⛔️ Skipping due to step_repeat_guard.min_price_delta_pct ({price_delta_pct:.2f}% < {min_price_delta_pct}%)"
+                        print(log_msg)
+                        log_reason(deal_id, symbol, "step_repeat_guard_price", log_msg)
+                        # Compose a log entry and skip
+                        log_entry = {
+                            "timestamp": datetime.utcnow().isoformat(),
+                            "deal_id": deal_id,
+                            "symbol": symbol,
+                            "step": prev_step,
+                            "current_price": current_price,
+                            "avg_entry_price": avg_entry_price,
+                            "entry_score": entry_score,
+                            "current_score": current_score,
+                            "open_pnl": (
+                                (
+                                    (current_price - avg_entry_price)
+                                    * (total_spent / avg_entry_price)
+                                )
+                                if avg_entry_price
+                                else 0.0
+                            ),
+                            "tp1_shift": tp1_shift,
+                            "be_improvement": be_improvement,
+                            "recovery_odds": recovery_odds,
+                            "confidence_score": confidence_score,
+                            "safu_score": safu_score,
+                            "btc_status": btc_status,
+                            "tv_tag": tv_tag,
+                            "tv_kicker": tv_kicker,
+                            "health_score": health_score,
+                            "health_status": health_status,
+                            "zombie_tagged": zombie_tagged,
+                            "decision": "skipped",
+                            "rejection_reason": "step_repeat_guard_price",
+                            "spent": total_spent,
+                        }
+                        write_log(log_entry)
+                        continue
 
         # === Step Progression Guard (Prevents runaway steps at similar prices) ===
         progress_guard = config.get("step_progress_guard", {})
@@ -540,29 +798,177 @@ def run():
         #            should_fire = True
 
         last_step = get_last_fired_step(deal_id)
-        step = last_step + 1
+        step = last_step + 1  # step is now set for DCA evaluation
         ladder_amount = so_table[step] if step < len(so_table) else so_table[-1]
 
-        predicted = predict_spend_volume(
-            {
-                **indicators,
+        # --- Spend model volume adjustment ---
+        if config.get("use_ml_spend_model", False):
+            # Use ML spend model if enabled in config
+            from dca.utils.spend_predictor import (
+                predict_spend_volume as predict_spend_amount,
+            )
+
+            # Compose input features as expected by the model
+            input_features = {
                 "entry_score": entry_score,
                 "current_score": current_score,
+                "drawdown_pct": deviation_pct,
+                "safu_score": safu_score,
+                "macd_lift": indicators.get("macd_lift"),
+                "rsi": indicators.get("rsi"),
+                "rsi_slope": indicators.get("rsi_slope"),
+                "adx": indicators.get("adx"),
                 "tp1_shift": tp1_shift,
                 "recovery_odds": recovery_odds,
                 "confidence_score": confidence_score,
                 "zombie_tagged": zombie_tagged,
-                "btc_status": 1 if btc_status == "SAFE" else 0,
+                "btc_rsi": (
+                    indicators.get("btc_context", {}).get("rsi")
+                    if "btc_context" in indicators
+                    else None
+                ),
+                "btc_macd_histogram": (
+                    indicators.get("btc_context", {}).get("macd_histogram")
+                    if "btc_context" in indicators
+                    else None
+                ),
+                "btc_adx": (
+                    indicators.get("btc_context", {}).get("adx")
+                    if "btc_context" in indicators
+                    else None
+                ),
+                "btc_status": (
+                    indicators.get("btc_context", {}).get("status")
+                    if "btc_context" in indicators
+                    else btc_status
+                ),
             }
-        )
+            # If btc_context is not in indicators, try to get from btc_status context
+            # fallback (for legacy): btc_context from get_btc_status
+            if "btc_context" not in indicators:
+                btc_context = {}
+                try:
+                    btc_context = get_btc_status(config.get("btc_indicators", {}))
+                except Exception:
+                    btc_context = {}
+                input_features["btc_rsi"] = (
+                    btc_context["rsi"] if isinstance(btc_context, dict) else None
+                )
+                input_features["btc_macd_histogram"] = (
+                    btc_context["macd_histogram"]
+                    if isinstance(btc_context, dict)
+                    else None
+                )
+                input_features["btc_adx"] = (
+                    btc_context["adx"] if isinstance(btc_context, dict) else None
+                )
+                input_features["btc_status"] = (
+                    btc_context.get("status")
+                    if isinstance(btc_context, dict)
+                    else btc_status
+                )
 
-        desired_volume = adjust_volume(
-            predicted,
-            total_spent,
-            max_budget=config.get("max_trade_usdt", 2000),
-            drawdown_pct=deviation_pct,
-            tp1_shift_pct=tp1_shift,
-        )
+            # Ensure BTC context values are properly cast as floats
+            btc_context = (
+                indicators.get("btc_context")
+                if "btc_context" in indicators
+                else btc_context if "btc_context" in locals() else None
+            )
+            if btc_context and isinstance(btc_context, dict):
+                input_features["btc_rsi"] = float(btc_context.get("rsi", 0.0))
+                input_features["btc_macd_histogram"] = float(
+                    btc_context.get("macd_histogram", 0.0)
+                )
+                input_features["btc_adx"] = float(btc_context.get("adx", 0.0))
+            else:
+                input_features["btc_rsi"] = 0.0
+                input_features["btc_macd_histogram"] = 0.0
+                input_features["btc_adx"] = 0.0
+
+            volume = predict_spend_amount(input_features)
+        else:
+            predicted = predict_spend_volume(
+                {
+                    **indicators,
+                    "entry_score": entry_score,
+                    "current_score": current_score,
+                    "tp1_shift": tp1_shift,
+                    "recovery_odds": recovery_odds,
+                    "confidence_score": confidence_score,
+                    "zombie_tagged": zombie_tagged,
+                    "btc_status": 1 if btc_status == "SAFE" else 0,
+                }
+            )
+            volume = adjust_volume(
+                predicted,
+                total_spent,
+                max_budget=config.get("max_trade_usdt", 2000),
+                drawdown_pct=deviation_pct,
+                tp1_shift_pct=tp1_shift,
+            )
+        predicted_volume = volume
+
+        # === Spend Guard Logic ===
+        if config.get("spend_guard", {}).get("enabled") and deviation_pct is not None:
+            thresholds = config["spend_guard"].get("drawdown_thresholds", [])
+            cap = config.get("max_trade_usdt", 2000)
+
+            for threshold in sorted(thresholds, key=lambda x: x["dd_pct"]):
+                if deviation_pct >= threshold["dd_pct"]:
+                    cap = threshold["max_spend_usdt"]
+
+            # Use spent_so_far as calculated above
+            remaining_allowed = cap - spent_so_far
+            # Stricter spend guard logic
+            if remaining_allowed <= 0 or volume <= 0:
+                print(f"⛔ [Spend Guard] Blocked: Cap ${cap} reached or no volume allowed")
+                rejection_reason = "spend_guard_limit"
+                log_entry = {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "deal_id": deal_id,
+                    "symbol": symbol,
+                    "step": step,
+                    "current_price": current_price,
+                    "avg_entry_price": avg_entry_price,
+                    "entry_score": entry_score,
+                    "current_score": current_score,
+                    "open_pnl": (
+                        (
+                            (current_price - avg_entry_price)
+                            * (total_spent / avg_entry_price)
+                        )
+                        if avg_entry_price
+                        else 0.0
+                    ),
+                    "tp1_shift": tp1_shift,
+                    "be_improvement": be_improvement,
+                    "recovery_odds": recovery_odds,
+                    "confidence_score": confidence_score,
+                    "safu_score": safu_score,
+                    "btc_status": btc_status,
+                    "tv_tag": tv_tag,
+                    "tv_kicker": tv_kicker,
+                    "health_score": health_score,
+                    "health_status": health_status,
+                    "zombie_tagged": zombie_tagged,
+                    "decision": "skipped",
+                    "rejection_reason": rejection_reason,
+                    "spent": total_spent,
+                }
+                write_log(log_entry)
+                continue
+            else:
+                if volume > remaining_allowed:
+                    print(
+                        f"💰 [Spend Guard] Trim: Drawdown {deviation_pct:.2f}% → Cap ${cap} → Remaining Allowed: ${remaining_allowed:.2f}"
+                    )
+                    volume = remaining_allowed
+
+        # --- TP1 shift soft cap volume booster ---
+        tp1_soft_cap = config.get("tp1_shift_soft_cap")
+        if tp1_soft_cap is not None:
+            if tp1_shift < tp1_soft_cap:
+                volume *= 1.25
 
         # === Health Emoji Mapping ===
         health_emoji = {"Healthy": "❤️", "Weak": "⚠️", "Zombie": "☠️"}.get(
@@ -626,11 +1032,93 @@ def run():
         }
         log_entry["spent"] = total_spent
 
+        # === Adaptive Step Spacing Logic ===
+        adaptive_cfg = config.get("adaptive_step_spacing", {})
+        if adaptive_cfg.get("enabled", False) and last_logged:
+            base_spacing_pct = adaptive_cfg.get("base_spacing_pct", 5.0)
+            adx = indicators.get("adx", 20)
+            confidence = confidence_score
+
+            adx_factor = max(1.0, (20 - adx) / 10)  # More spacing if ADX is weak
+            conf_factor = 1.0 - min(
+                confidence, 1.0
+            )  # More spacing if confidence is low
+
+            adjusted_spacing_pct = base_spacing_pct * adx_factor * conf_factor
+
+            last_price = last_logged.get("current_price")
+            if last_price:
+                gap_pct = abs((last_price - current_price) / last_price) * 100
+                if gap_pct < adjusted_spacing_pct:
+                    print(
+                        f"🛑 Adaptive spacing block: gap {gap_pct:.2f}% < {adjusted_spacing_pct:.2f}%"
+                    )
+                    log_entry["rejection_reason"] = "adaptive_spacing_block"
+                    log_entry["decision"] = "skipped"
+                    write_log(log_entry)
+                    continue
+
+        # === DCA Block: Price above last SO price ===
+        last_so_price = trade.get("last_dca_price")
+        if last_so_price:
+            try:
+                last_so_price = float(last_so_price)
+            except Exception:
+                last_so_price = None
+        if last_so_price and current_price >= last_so_price:
+            rejection_reason = "price_above_last_so"
+            should_fire = False
+
+        # === DCA Block: Budget Cap ===
+        dca_cfg = config.get("dca", {}) if "dca" in config else config
+        max_budget = dca_cfg.get("max_usdt_per_trade", 2000)
+        if total_spent + predicted_volume > max_budget:
+            rejection_reason = "budget_exceeded"
+            should_fire = False
+
+        # --- Ensure rejection_reason is reflected in CLI log block ---
         if not should_fire:
-            print(f"[CHECK] Rejection reason: {reason}")
+            print(f"[CHECK] Rejection reason: {rejection_reason or reason}")
             print(f"[CHECK] Indicators: {json.dumps(indicators, indent=2)}")
+            log_entry["rejection_reason"] = rejection_reason or reason
+            if assist_reasons:
+                log_entry["assist_reasons"] = assist_reasons
             write_log(log_entry)
             continue
+
+        # === Trailing Step Guard Enforcement ===
+        trailing_cfg = config.get("trailing_step_guard", {})
+        if trailing_cfg.get("enabled", False) and last_logged:
+            last_price = last_logged.get("current_price")
+            min_gap = trailing_cfg.get("min_pct_gap_from_last_dca", 2.0)
+            allow_override_conf = trailing_cfg.get("allow_override_if_confidence_gt", None)
+            allow_override_time = trailing_cfg.get("allow_override_if_time_elapsed_min", None)
+
+            gap_pct = (
+                abs((current_price - last_price) / last_price) * 100
+                if last_price
+                else 0.0
+            )
+
+            time_since_last = (
+                (datetime.utcnow() - datetime.fromisoformat(last_logged["timestamp"])).total_seconds() / 60
+                if last_logged.get("timestamp")
+                else 999
+            )
+
+            allow_override = (
+                (allow_override_conf is not None and confidence_score >= allow_override_conf)
+                or (allow_override_time is not None and time_since_last >= allow_override_time)
+            )
+
+            if gap_pct < min_gap and not allow_override:
+                print(
+                    f"⛔️ Trailing Step Guard blocked: gap {gap_pct:.2f}% < {min_gap}%"
+                )
+                log_entry["rejection_reason"] = "trailing_step_guard_block"
+                log_entry["decision"] = "skipped"
+                write_log(log_entry)
+                continue
 
         if was_dca_fired_recently(deal_id, step):
             print("⏳ Already fired this step")
@@ -640,12 +1128,14 @@ def run():
             continue
 
         print(
-            f"✅ Sending DCA signal for {symbol} | Volume: {desired_volume:.2f} USDT (Step {step})"
+            f"✅ Sending DCA signal for {symbol} | Volume: {volume:.2f} USDT (Step {step})"
         )
-        send_dca_signal(symbol, volume=desired_volume)
+        send_dca_signal(symbol, volume=volume)
         update_dca_log(deal_id, step, short_symbol)
         log_entry["decision"] = "fired"
-        log_entry["volume_sent"] = desired_volume
+        log_entry["volume_sent"] = volume
+        if assist_reasons:
+            log_entry["assist_reasons"] = assist_reasons
         write_log(log_entry)
 
 

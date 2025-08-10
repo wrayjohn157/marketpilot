@@ -11,14 +11,14 @@ buffer_zone_pct: 0.0
 # === Indicator Guardrails ===
 require_indicator_health: true
 indicator_thresholds:
-  rsi: 45
-  macd_histogram: 0.0
-  adx: 10
+  rsi: 42
+  macd_histogram: 0.0002
+  adx: 12
 
 # === BTC Market Filter ===
 use_btc_filter: true
 btc_indicators:
-  rsi_max: 40
+  rsi_max: 35
   macd_histogram_max: 0.0
   adx_max: 15
 
@@ -26,7 +26,7 @@ btc_indicators:
 use_trajectory_check: true
 trajectory_thresholds:
   macd_lift_min: 0.00005
-  rsi_slope_min: 1.0
+  rsi_slope_min: 0.75
 
 # === TP1 Feasibility Guard ===
 require_tp1_feasibility: true
@@ -49,16 +49,16 @@ confidence_dca_guard:
   min_tp1_shift_gain_pct: 1.10      # New: Require TP1 shift improvement of at least 0.25%
 
 soft_confidence_override:
-  min_confidence: 0.75
-  min_recovery_odds: 0.8
-  min_safu_score: 0.7
-  min_health_score: 0.6
-  min_drawdown_pct: 2.0
-  min_confidence_delta: 0.05
-  min_tp1_shift_pct: 2.0
+  enabled: false
 
 # === Minimum Impact Guard ===
-min_be_improvement_pct: 0.8
+min_be_improvement_pct: 2.0
+
+# === Step Repeat Guard ===
+step_repeat_guard:
+  enabled: true
+  min_conf_delta: 0.10
+  min_tp1_delta: 1.5
 
 # === Smart SO volume logic ===
 so_volume_table:
@@ -104,3 +104,29 @@ spend_adjustment_rules:
 
 # === Logging Options ===
 log_verbose: true
+
+# === Step Price Enforcement ===
+enforce_price_below_last_step: true
+
+# === Trailing Step Guard ===
+trailing_step_guard:
+  enabled: true
+  min_pct_gap_from_last_dca: 1.0
+
+# === Adaptive Step Spacing ===
+adaptive_step_spacing:
+  enabled: false
+
+# === MACD Cross Filter ===
+# If enabled, require a recent bullish MACD cross before allowing DCA.
+require_macd_cross: false
+macd_cross_lookback: 1
+
+# === Bottom Reversal Filter ===
+bottom_reversal_filter:
+  enabled: true
+  macd_lift_min: 0.00005
+  rsi_slope_min: 0.75
+  local_price_reversal_window: 3   # Number of bars to confirm a local bottom V
+  lookback_bars: 1
+  rsi_floor: 35
