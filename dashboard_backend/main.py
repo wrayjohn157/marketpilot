@@ -38,7 +38,7 @@ from sim_routes.sim_dca_strategies import router as sim_dca_strategy_router
 from eval_routes.price_series_api import router as price_series_router
 from sim_routes.dca_simulate_route import router as dca_simulate_router
 from dashboard_backend.sim_routes.sim_dca_config_api import router as sim_dca_router
-from dashboard_backend.anal.capital_routes import router as capital_router
+#from .anal.capital_routes import router as capital_router #from dashboard_backend.anal.capital_routes import router as capital_router
 
 app.include_router(dca_router)
 app.include_router(ml_confidence_router)
@@ -53,7 +53,7 @@ app.include_router(price_series_router)
 app.include_router(dca_simulate_router)
 app.include_router(sim_dca_strategy_router)
 app.include_router(sim_dca_router)
-app.include_router(capital_router, prefix="/api") #app.include_router(capital_router)
+#app.include_router(capital_router, prefix="/api") #app.include_router(capital_router)
 
 @app.get("/", response_class=HTMLResponse)
 def root():

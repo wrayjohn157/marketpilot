@@ -1,0 +1,37 @@
+# --- leverage_config.yaml ---
+# Trading mode
+enabled: true
+exchange: binance_futures
+margin_mode: isolated         # isolated | cross
+max_leverage: 5
+default_symbol_leverage: 5
+liquidation_buffer_pct: 6.0   # stop adding if liq price comes within this %
+
+# Sizing & risk
+max_trade_notional: 10000     # per-position notional cap
+max_account_notional: 50000   # total across all symbols
+base_order_usdt: 200          # initial margin to post
+so_notional_table:            # scaled by leverage when sizing orders
+  - 1000
+  - 1500
+  - 2500
+  - 4000
+
+# DCA gates (reuse your spot logic ideas)
+drawdown_trigger_pct: 1.2
+require_indicator_health: true
+indicator_thresholds:
+  rsi_min: 42
+  macd_hist_min: 0.0001
+  adx_min: 12
+
+# Trajectory / odds (reuse existing ML)
+use_trajectory_check: true
+trajectory_thresholds:
+  macd_lift_min: 1.0e-04
+  rsi_slope_min: 1.0
+require_recovery_odds: true
+min_recovery_probability: 0.5
+
+# Logging
+log_verbose: true
