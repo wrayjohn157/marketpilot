@@ -123,3 +123,29 @@ ml/models/*.pkl
 ml/models/*.pkl*
 ml/models/*.png
 ml/datasets/**/*.jsonl
+
+# Ignore temp/experimental configs
+config/dca_config.yaml_WIP_old_adder
+config/dca_config.yaml_fallbackAUG6_machinegun_down
+config/paper_cred.json_prelive
+
+# Ignore temp frontend panel versions
+dashboard_frontend/src/components/ConfigPanels/DcaConfigPanel.jsx_fallbackAUG6_machinegundown
+dashboard_frontend/src/components/ConfigPanels/DcaConfigPanel.jsx_working_locked_toggles
+dashboard_frontend/src/components/ui/TradingViewChart.jsx
+
+# Ignore temp DCA configs
+dca/config/cred.json_prelive
+dca/config/dca_config.yaml_fallback_but_manat1400
+
+# Ignore temp DCA scripts
+dca/smart_dca_signal.py_WIP
+dca/smart_dca_signal.py_WIP_no_spendGuard
+dca/smart_dca_signal.py_better_spendguard
+dca/smart_dca_signal.py_falback_but_overfire_manata1400
+dca/smart_dca_signal.py_fallbackAUG6_downspend_machinegun
+dca/smart_dca_signal.py_hold1234
+dca/smart_dca_signal.py_improved
+dca/smart_dca_signal.py_last_one_being_updatedAUG4
+dca/smart_dca_signal.py_spendcap_wrong
+dca/smart_dca_signal.py_unwired_bottomreverse
