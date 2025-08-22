@@ -1,0 +1,170 @@
+[
+  {
+    "symbol": "ADA",
+    "pair": "ADA_USDT",
+    "score": 0.3963,
+    "meta": {
+      "macd_histogram": 0.0,
+      "macd_trend_cross": 0.0,
+      "rsi_direction": 0.8011892225034437,
+      "stoch_rsi_cross": 0.0,
+      "stoch_extreme_penalty": 1.0,
+      "adx_rising": 1.0,
+      "ema_trend_ok": 0.0,
+      "mean_reversion_score": 1.0,
+      "volume_penalty": 1.0,
+      "stoch_rsi_slope": 0.0
+    },
+    "score_hash": "macd_histogram:0.0_macd_trend_cross:0.0_rsi_direction:0.8011892225034437_stoch_rsi_cross:0.0_stoch_extreme_penalty:1.0_adx_rising:1.0_ema_trend_ok:0.0_mean_reversion_score:1.0_volume_penalty:1.0_stoch_rsi_slope:0.0",
+    "timestamp": 1754969411749,
+    "ts_iso": "2025-08-12T03:30:11.749156Z",
+    "side": "long"
+  },
+  {
+    "symbol": "ALGO",
+    "pair": "ALGO_USDT",
+    "score": 0.3922,
+    "meta": {
+      "macd_histogram": 0.0,
+      "macd_trend_cross": 0.0,
+      "rsi_direction": 0.7828563456742099,
+      "stoch_rsi_cross": 0.0,
+      "stoch_extreme_penalty": 1.0,
+      "adx_rising": 1.0,
+      "ema_trend_ok": 0.0,
+      "mean_reversion_score": 1.0,
+      "volume_penalty": 1.0,
+      "stoch_rsi_slope": 0.0
+    },
+    "score_hash": "macd_histogram:0.0_macd_trend_cross:0.0_rsi_direction:0.7828563456742099_stoch_rsi_cross:0.0_stoch_extreme_penalty:1.0_adx_rising:1.0_ema_trend_ok:0.0_mean_reversion_score:1.0_volume_penalty:1.0_stoch_rsi_slope:0.0",
+    "timestamp": 1754969411749,
+    "ts_iso": "2025-08-12T03:30:11.749156Z",
+    "side": "long"
+  },
+  {
+    "symbol": "BCH",
+    "pair": "BCH_USDT",
+    "score": 0.99,
+    "meta": {
+      "macd_histogram": 1.0,
+      "macd_trend_cross": 1.0,
+      "rsi_direction": 1,
+      "stoch_rsi_cross": 0.0,
+      "stoch_extreme_penalty": 1.0,
+      "adx_rising": 1.0,
+      "ema_trend_ok": 1.0,
+      "mean_reversion_score": 0.5,
+      "volume_penalty": 1.0,
+      "stoch_rsi_slope": 0.0
+    },
+    "score_hash": "macd_histogram:1.0_macd_trend_cross:1.0_rsi_direction:1_stoch_rsi_cross:0.0_stoch_extreme_penalty:1.0_adx_rising:1.0_ema_trend_ok:1.0_mean_reversion_score:0.5_volume_penalty:1.0_stoch_rsi_slope:0.0",
+    "timestamp": 1754969411749,
+    "ts_iso": "2025-08-12T03:30:11.749156Z",
+    "side": "long"
+  },
+  {
+    "symbol": "BTC",
+    "pair": "BTC_USDT",
+    "score": 0.44,
+    "meta": {
+      "macd_histogram": 0.0,
+      "macd_trend_cross": 0.0,
+      "rsi_direction": 1,
+      "stoch_rsi_cross": 0.0,
+      "stoch_extreme_penalty": 1.0,
+      "adx_rising": 1.0,
+      "ema_trend_ok": 0.0,
+      "mean_reversion_score": 1.0,
+      "volume_penalty": 1.0,
+      "stoch_rsi_slope": 0.0
+    },
+    "score_hash": "macd_histogram:0.0_macd_trend_cross:0.0_rsi_direction:1_stoch_rsi_cross:0.0_stoch_extreme_penalty:1.0_adx_rising:1.0_ema_trend_ok:0.0_mean_reversion_score:1.0_volume_penalty:1.0_stoch_rsi_slope:0.0",
+    "timestamp": 1754969411749,
+    "ts_iso": "2025-08-12T03:30:11.749156Z",
+    "side": "long"
+  },
+  {
+    "symbol": "DOGE",
+    "pair": "DOGE_USDT",
+    "score": 0.3871,
+    "meta": {
+      "macd_histogram": 0.0,
+      "macd_trend_cross": 0.0,
+      "rsi_direction": 0.7596792705165025,
+      "stoch_rsi_cross": 0.0,
+      "stoch_extreme_penalty": 1.0,
+      "adx_rising": 1.0,
+      "ema_trend_ok": 0.0,
+      "mean_reversion_score": 1.0,
+      "volume_penalty": 1.0,
+      "stoch_rsi_slope": 0.0
+    },
+    "score_hash": "macd_histogram:0.0_macd_trend_cross:0.0_rsi_direction:0.7596792705165025_stoch_rsi_cross:0.0_stoch_extreme_penalty:1.0_adx_rising:1.0_ema_trend_ok:0.0_mean_reversion_score:1.0_volume_penalty:1.0_stoch_rsi_slope:0.0",
+    "timestamp": 1754969411749,
+    "ts_iso": "2025-08-12T03:30:11.749156Z",
+    "side": "long"
+  },
+  {
+    "symbol": "ETC",
+    "pair": "ETC_USDT",
+    "score": 0.3955,
+    "meta": {
+      "macd_histogram": 0.0,
+      "macd_trend_cross": 0.0,
+      "rsi_direction": 0.8606468331458401,
+      "stoch_rsi_cross": 0.0,
+      "stoch_extreme_penalty": 1.0,
+      "adx_rising": 0.8739304105094339,
+      "ema_trend_ok": 0.0,
+      "mean_reversion_score": 1.0,
+      "volume_penalty": 1.0,
+      "stoch_rsi_slope": 0.0
+    },
+    "score_hash": "macd_histogram:0.0_macd_trend_cross:0.0_rsi_direction:0.8606468331458401_stoch_rsi_cross:0.0_stoch_extreme_penalty:1.0_adx_rising:0.8739304105094339_ema_trend_ok:0.0_mean_reversion_score:1.0_volume_penalty:1.0_stoch_rsi_slope:0.0",
+    "timestamp": 1754969411749,
+    "ts_iso": "2025-08-12T03:30:11.749156Z",
+    "side": "long"
+  },
+  {
+    "symbol": "ETH",
+    "pair": "ETH_USDT",
+    "score": 1.0185,
+    "meta": {
+      "macd_histogram": 1.0,
+      "macd_trend_cross": 1.0,
+      "rsi_direction": 1,
+      "stoch_rsi_cross": 0.0,
+      "stoch_extreme_penalty": 1.0,
+      "adx_rising": 0.759299783446199,
+      "ema_trend_ok": 1.0,
+      "mean_reversion_score": 1.0,
+      "volume_penalty": 1.0,
+      "stoch_rsi_slope": 0.0
+    },
+    "score_hash": "macd_histogram:1.0_macd_trend_cross:1.0_rsi_direction:1_stoch_rsi_cross:0.0_stoch_extreme_penalty:1.0_adx_rising:0.759299783446199_ema_trend_ok:1.0_mean_reversion_score:1.0_volume_penalty:1.0_stoch_rsi_slope:0.0",
+    "timestamp": 1754969411749,
+    "ts_iso": "2025-08-12T03:30:11.749156Z",
+    "side": "long"
+  },
+  {
+    "symbol": "XRP",
+    "pair": "XRP_USDT",
+    "score": 0.3839,
+    "meta": {
+      "macd_histogram": 0.0,
+      "macd_trend_cross": 0.0,
+      "rsi_direction": 0.7452126689562331,
+      "stoch_rsi_cross": 0.0,
+      "stoch_extreme_penalty": 1.0,
+      "adx_rising": 1.0,
+      "ema_trend_ok": 0.0,
+      "mean_reversion_score": 1.0,
+      "volume_penalty": 1.0,
+      "stoch_rsi_slope": 0.0
+    },
+    "score_hash": "macd_histogram:0.0_macd_trend_cross:0.0_rsi_direction:0.7452126689562331_stoch_rsi_cross:0.0_stoch_extreme_penalty:1.0_adx_rising:1.0_ema_trend_ok:0.0_mean_reversion_score:1.0_volume_penalty:1.0_stoch_rsi_slope:0.0",
+    "timestamp": 1754969411749,
+    "ts_iso": "2025-08-12T03:30:11.749156Z",
+    "side": "long"
+  }
+]

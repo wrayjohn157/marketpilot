@@ -1,0 +1,3571 @@
+{
+  "generated_at": "2025-08-11T02:54:13.531429",
+  "min_quote_volume_usdt": 3000000.0,
+  "count": 396,
+  "symbols": [
+    {
+      "id": "ETHUSDT",
+      "base": "ETH",
+      "quote": "USDT",
+      "quoteVolume": 20913209038.33,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.01
+    },
+    {
+      "id": "BTCUSDT",
+      "base": "BTC",
+      "quote": "USDT",
+      "quoteVolume": 19784714526.32,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.1
+    },
+    {
+      "id": "SOLUSDT",
+      "base": "SOL",
+      "quote": "USDT",
+      "quoteVolume": 4151715705.4659,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.1
+    },
+    {
+      "id": "ALPACAUSDT",
+      "base": "ALPACA",
+      "quote": "USDT",
+      "quoteVolume": 2911352253.74508,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "XRPUSDT",
+      "base": "XRP",
+      "quote": "USDT",
+      "quoteVolume": 2246537653.4672,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "DOGEUSDT",
+      "base": "DOGE",
+      "quote": "USDT",
+      "quoteVolume": 1793915041.47754,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ENAUSDT",
+      "base": "ENA",
+      "quote": "USDT",
+      "quoteVolume": 1678330455.4216,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "LINKUSDT",
+      "base": "LINK",
+      "quote": "USDT",
+      "quoteVolume": 948593971.349,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "1000PEPEUSDT",
+      "base": "1000PEPE",
+      "quote": "USDT",
+      "quoteVolume": 825678341.5705487,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-07
+    },
+    {
+      "id": "SUIUSDT",
+      "base": "SUI",
+      "quote": "USDT",
+      "quoteVolume": 824139102.8906,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ZKJUSDT",
+      "base": "ZKJ",
+      "quote": "USDT",
+      "quoteVolume": 657624881.49216,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "ADAUSDT",
+      "base": "ADA",
+      "quote": "USDT",
+      "quoteVolume": 564953802.7434,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "LTCUSDT",
+      "base": "LTC",
+      "quote": "USDT",
+      "quoteVolume": 554592688.24,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.1
+    },
+    {
+      "id": "PENGUUSDT",
+      "base": "PENGU",
+      "quote": "USDT",
+      "quoteVolume": 538557381.068962,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "BNXUSDT",
+      "base": "BNX",
+      "quote": "USDT",
+      "quoteVolume": 492004952.04499,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "BNBUSDT",
+      "base": "BNB",
+      "quote": "USDT",
+      "quoteVolume": 469349427.869,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "MYXUSDT",
+      "base": "MYX",
+      "quote": "USDT",
+      "quoteVolume": 428305106.26873,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "UNIUSDT",
+      "base": "UNI",
+      "quote": "USDT",
+      "quoteVolume": 393561340.108,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.001
+    },
+    {
+      "id": "LDOUSDT",
+      "base": "LDO",
+      "quote": "USDT",
+      "quoteVolume": 393510692.4337,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "FARTCOINUSDT",
+      "base": "FARTCOIN",
+      "quote": "USDT",
+      "quoteVolume": 379740506.86541,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "1000BONKUSDT",
+      "base": "1000BONK",
+      "quote": "USDT",
+      "quoteVolume": 357814263.935811,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "AVAAIUSDT",
+      "base": "AVAAI",
+      "quote": "USDT",
+      "quoteVolume": 354952040.64469,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "WIFUSDT",
+      "base": "WIF",
+      "quote": "USDT",
+      "quoteVolume": 339569435.22275,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "AVAXUSDT",
+      "base": "AVAX",
+      "quote": "USDT",
+      "quoteVolume": 320110634.266,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.01
+    },
+    {
+      "id": "BIOUSDT",
+      "base": "BIO",
+      "quote": "USDT",
+      "quoteVolume": 310049953.60211,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "OGUSDT",
+      "base": "OG",
+      "quote": "USDT",
+      "quoteVolume": 300427359.2005,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "ZORAUSDT",
+      "base": "ZORA",
+      "quote": "USDT",
+      "quoteVolume": 293828071.88844,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "TRUMPUSDT",
+      "base": "TRUMP",
+      "quote": "USDT",
+      "quoteVolume": 250691055.81077,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "BCHUSDT",
+      "base": "BCH",
+      "quote": "USDT",
+      "quoteVolume": 247411422.2,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.01
+    },
+    {
+      "id": "AAVEUSDT",
+      "base": "AAVE",
+      "quote": "USDT",
+      "quoteVolume": 232743658.574,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.01
+    },
+    {
+      "id": "HYPEUSDT",
+      "base": "HYPE",
+      "quote": "USDT",
+      "quoteVolume": 223920872.61615,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "ZROUSDT",
+      "base": "ZRO",
+      "quote": "USDT",
+      "quoteVolume": 193784150.53887,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "OPUSDT",
+      "base": "OP",
+      "quote": "USDT",
+      "quoteVolume": 191778995.11177,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "XLMUSDT",
+      "base": "XLM",
+      "quote": "USDT",
+      "quoteVolume": 191438383.21284,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ARBUSDT",
+      "base": "ARB",
+      "quote": "USDT",
+      "quoteVolume": 187641106.45539,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "SWARMSUSDT",
+      "base": "SWARMS",
+      "quote": "USDT",
+      "quoteVolume": 184681568.42746,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "DOTUSDT",
+      "base": "DOT",
+      "quote": "USDT",
+      "quoteVolume": 165937245.894,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "WLDUSDT",
+      "base": "WLD",
+      "quote": "USDT",
+      "quoteVolume": 158529386.7803,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ETCUSDT",
+      "base": "ETC",
+      "quote": "USDT",
+      "quoteVolume": 158514334.887,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "CRVUSDT",
+      "base": "CRV",
+      "quote": "USDT",
+      "quoteVolume": 154353498.899,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "GMXUSDT",
+      "base": "GMX",
+      "quote": "USDT",
+      "quoteVolume": 147227914.75493,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "HBARUSDT",
+      "base": "HBAR",
+      "quote": "USDT",
+      "quoteVolume": 144958300.18102,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "NEIROUSDT",
+      "base": "NEIRO",
+      "quote": "USDT",
+      "quoteVolume": 143100842.0919574,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-08
+    },
+    {
+      "id": "ONDOUSDT",
+      "base": "ONDO",
+      "quote": "USDT",
+      "quoteVolume": 141173912.57178,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "TRXUSDT",
+      "base": "TRX",
+      "quote": "USDT",
+      "quoteVolume": 137626935.88783,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "NEARUSDT",
+      "base": "NEAR",
+      "quote": "USDT",
+      "quoteVolume": 137219118.459,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.001
+    },
+    {
+      "id": "PENDLEUSDT",
+      "base": "PENDLE",
+      "quote": "USDT",
+      "quoteVolume": 134821169.47,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ETHFIUSDT",
+      "base": "ETHFI",
+      "quote": "USDT",
+      "quoteVolume": 131377009.53794,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "1000SHIBUSDT",
+      "base": "1000SHIB",
+      "quote": "USDT",
+      "quoteVolume": 130921097.688059,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "TIAUSDT",
+      "base": "TIA",
+      "quote": "USDT",
+      "quoteVolume": 129799353.5751,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "FILUSDT",
+      "base": "FIL",
+      "quote": "USDT",
+      "quoteVolume": 127077271.748,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "DOLOUSDT",
+      "base": "DOLO",
+      "quote": "USDT",
+      "quoteVolume": 126723848.356609,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "MAGICUSDT",
+      "base": "MAGIC",
+      "quote": "USDT",
+      "quoteVolume": 120826136.12459,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "APTUSDT",
+      "base": "APT",
+      "quote": "USDT",
+      "quoteVolume": 120290970.48698,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "VIDTUSDT",
+      "base": "VIDT",
+      "quote": "USDT",
+      "quoteVolume": 116094468.40266,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "CFXUSDT",
+      "base": "CFX",
+      "quote": "USDT",
+      "quoteVolume": 114799714.36258,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "SEIUSDT",
+      "base": "SEI",
+      "quote": "USDT",
+      "quoteVolume": 114732436.8919,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "VIRTUALUSDT",
+      "base": "VIRTUAL",
+      "quote": "USDT",
+      "quoteVolume": 113103318.9295,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "TAOUSDT",
+      "base": "TAO",
+      "quote": "USDT",
+      "quoteVolume": 110474562.03,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.01
+    },
+    {
+      "id": "SIRENUSDT",
+      "base": "SIREN",
+      "quote": "USDT",
+      "quoteVolume": 110265954.62732,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "GRIFFAINUSDT",
+      "base": "GRIFFAIN",
+      "quote": "USDT",
+      "quoteVolume": 107426738.05517,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ENSUSDT",
+      "base": "ENS",
+      "quote": "USDT",
+      "quoteVolume": 105412457.209,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "PNUTUSDT",
+      "base": "PNUT",
+      "quote": "USDT",
+      "quoteVolume": 99354117.11918,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "INJUSDT",
+      "base": "INJ",
+      "quote": "USDT",
+      "quoteVolume": 87856469.893,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "YALAUSDT",
+      "base": "YALA",
+      "quote": "USDT",
+      "quoteVolume": 86864467.6838,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "LINAUSDT",
+      "base": "LINA",
+      "quote": "USDT",
+      "quoteVolume": 86817665.678621,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "MEMEFIUSDT",
+      "base": "MEMEFI",
+      "quote": "USDT",
+      "quoteVolume": 85830729.479882,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "TONUSDT",
+      "base": "TON",
+      "quote": "USDT",
+      "quoteVolume": 83598609.72726,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "RAYSOLUSDT",
+      "base": "RAYSOL",
+      "quote": "USDT",
+      "quoteVolume": 80402899.75676,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "1000FLOKIUSDT",
+      "base": "1000FLOKI",
+      "quote": "USDT",
+      "quoteVolume": 77339879.32309,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "JUPUSDT",
+      "base": "JUP",
+      "quote": "USDT",
+      "quoteVolume": 74885979.9411,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "INUSDT",
+      "base": "IN",
+      "quote": "USDT",
+      "quoteVolume": 74332004.70784,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "HFTUSDT",
+      "base": "HFT",
+      "quote": "USDT",
+      "quoteVolume": 71610147.90294,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ARCUSDT",
+      "base": "ARC",
+      "quote": "USDT",
+      "quoteVolume": 70871059.65656,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "A2ZUSDT",
+      "base": "A2Z",
+      "quote": "USDT",
+      "quoteVolume": 70833974.686179,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "GALAUSDT",
+      "base": "GALA",
+      "quote": "USDT",
+      "quoteVolume": 69001648.29555,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "MOODENGUSDT",
+      "base": "MOODENG",
+      "quote": "USDT",
+      "quoteVolume": 66780111.14129,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ASRUSDT",
+      "base": "ASR",
+      "quote": "USDT",
+      "quoteVolume": 65530860.4258,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "POPCATUSDT",
+      "base": "POPCAT",
+      "quote": "USDT",
+      "quoteVolume": 65435888.0711,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "AEROUSDT",
+      "base": "AERO",
+      "quote": "USDT",
+      "quoteVolume": 63901938.58598,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "SPXUSDT",
+      "base": "SPX",
+      "quote": "USDT",
+      "quoteVolume": 63849225.9965,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "FETUSDT",
+      "base": "FET",
+      "quote": "USDT",
+      "quoteVolume": 63579950.2283,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "PLAYUSDT",
+      "base": "PLAY",
+      "quote": "USDT",
+      "quoteVolume": 61998440.1283,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "IPUSDT",
+      "base": "IP",
+      "quote": "USDT",
+      "quoteVolume": 59179083.731055,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "AI16ZUSDT",
+      "base": "AI16Z",
+      "quote": "USDT",
+      "quoteVolume": 58268657.32611,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "AIXBTUSDT",
+      "base": "AIXBT",
+      "quote": "USDT",
+      "quoteVolume": 58023300.67604,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "EIGENUSDT",
+      "base": "EIGEN",
+      "quote": "USDT",
+      "quoteVolume": 56982646.91797,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "HYPERUSDT",
+      "base": "HYPER",
+      "quote": "USDT",
+      "quoteVolume": 56638757.0669,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "HEIUSDT",
+      "base": "HEI",
+      "quote": "USDT",
+      "quoteVolume": 56634660.63915,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "OMUSDT",
+      "base": "OM",
+      "quote": "USDT",
+      "quoteVolume": 56578449.415242,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "USUALUSDT",
+      "base": "USUAL",
+      "quote": "USDT",
+      "quoteVolume": 52280192.69397,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "REZUSDT",
+      "base": "REZ",
+      "quote": "USDT",
+      "quoteVolume": 50548094.20461,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "OMNIUSDT",
+      "base": "OMNI",
+      "quote": "USDT",
+      "quoteVolume": 49017567.0534,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ALGOUSDT",
+      "base": "ALGO",
+      "quote": "USDT",
+      "quoteVolume": 48889910.4348,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "STGUSDT",
+      "base": "STG",
+      "quote": "USDT",
+      "quoteVolume": 48742474.6395,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "MAVUSDT",
+      "base": "MAV",
+      "quote": "USDT",
+      "quoteVolume": 47962299.72442,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ORDIUSDT",
+      "base": "ORDI",
+      "quote": "USDT",
+      "quoteVolume": 47949511.6747,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "VINEUSDT",
+      "base": "VINE",
+      "quote": "USDT",
+      "quoteVolume": 44926055.98022,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "TROYUSDT",
+      "base": "TROY",
+      "quote": "USDT",
+      "quoteVolume": 44261336.491637,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "ALPINEUSDT",
+      "base": "ALPINE",
+      "quote": "USDT",
+      "quoteVolume": 40249773.00694,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "SANTOSUSDT",
+      "base": "SANTOS",
+      "quote": "USDT",
+      "quoteVolume": 39938288.1504,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "COMPUSDT",
+      "base": "COMP",
+      "quote": "USDT",
+      "quoteVolume": 39072229.48,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.01
+    },
+    {
+      "id": "NEWTUSDT",
+      "base": "NEWT",
+      "quote": "USDT",
+      "quoteVolume": 38518399.0923,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "TURBOUSDT",
+      "base": "TURBO",
+      "quote": "USDT",
+      "quoteVolume": 38398084.414313,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "XTZUSDT",
+      "base": "XTZ",
+      "quote": "USDT",
+      "quoteVolume": 37192985.771,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "SUSDT",
+      "base": "S",
+      "quote": "USDT",
+      "quoteVolume": 35522040.0567,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ATOMUSDT",
+      "base": "ATOM",
+      "quote": "USDT",
+      "quoteVolume": 35277086.54,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "BOMEUSDT",
+      "base": "BOME",
+      "quote": "USDT",
+      "quoteVolume": 33952900.998199,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "COWUSDT",
+      "base": "COW",
+      "quote": "USDT",
+      "quoteVolume": 33502882.9619,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "COOKIEUSDT",
+      "base": "COOKIE",
+      "quote": "USDT",
+      "quoteVolume": 32892017.4353,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "MKRUSDT",
+      "base": "MKR",
+      "quote": "USDT",
+      "quoteVolume": 32869015.62,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.1
+    },
+    {
+      "id": "ESPORTSUSDT",
+      "base": "ESPORTS",
+      "quote": "USDT",
+      "quoteVolume": 32694055.8001,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "DIAUSDT",
+      "base": "DIA",
+      "quote": "USDT",
+      "quoteVolume": 32536912.5947,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "SANDUSDT",
+      "base": "SAND",
+      "quote": "USDT",
+      "quoteVolume": 32278217.22955,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "RENDERUSDT",
+      "base": "RENDER",
+      "quote": "USDT",
+      "quoteVolume": 32027308.9276,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "SUSHIUSDT",
+      "base": "SUSHI",
+      "quote": "USDT",
+      "quoteVolume": 32014145.2526,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.001
+    },
+    {
+      "id": "DYDXUSDT",
+      "base": "DYDX",
+      "quote": "USDT",
+      "quoteVolume": 31503416.991,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "AGTUSDT",
+      "base": "AGT",
+      "quote": "USDT",
+      "quoteVolume": 31382289.618537,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "CUSDT",
+      "base": "C",
+      "quote": "USDT",
+      "quoteVolume": 31267104.94125,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "TRBUSDT",
+      "base": "TRB",
+      "quote": "USDT",
+      "quoteVolume": 31039544.309,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.01
+    },
+    {
+      "id": "PEOPLEUSDT",
+      "base": "PEOPLE",
+      "quote": "USDT",
+      "quoteVolume": 30982431.83776,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ACTUSDT",
+      "base": "ACT",
+      "quote": "USDT",
+      "quoteVolume": 30572844.34444,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "BSVUSDT",
+      "base": "BSV",
+      "quote": "USDT",
+      "quoteVolume": 30125160.97,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.01
+    },
+    {
+      "id": "SYRUPUSDT",
+      "base": "SYRUP",
+      "quote": "USDT",
+      "quoteVolume": 30054951.73692,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "CAKEUSDT",
+      "base": "CAKE",
+      "quote": "USDT",
+      "quoteVolume": 29596047.3394,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "RSRUSDT",
+      "base": "RSR",
+      "quote": "USDT",
+      "quoteVolume": 29085728.425087,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "GOATUSDT",
+      "base": "GOAT",
+      "quote": "USDT",
+      "quoteVolume": 28945504.35288,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "POLUSDT",
+      "base": "POL",
+      "quote": "USDT",
+      "quoteVolume": 28738553.9225,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "WUSDT",
+      "base": "W",
+      "quote": "USDT",
+      "quoteVolume": 28607474.222655,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "OLUSDT",
+      "base": "OL",
+      "quote": "USDT",
+      "quoteVolume": 27310721.15134,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "JTOUSDT",
+      "base": "JTO",
+      "quote": "USDT",
+      "quoteVolume": 26673550.4158,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "MUSDT",
+      "base": "M",
+      "quote": "USDT",
+      "quoteVolume": 26390377.1835,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "KAITOUSDT",
+      "base": "KAITO",
+      "quote": "USDT",
+      "quoteVolume": 26107947.67777,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "TACUSDT",
+      "base": "TAC",
+      "quote": "USDT",
+      "quoteVolume": 26003927.95783,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ILVUSDT",
+      "base": "ILV",
+      "quote": "USDT",
+      "quoteVolume": 25923639.8718,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.01
+    },
+    {
+      "id": "INITUSDT",
+      "base": "INIT",
+      "quote": "USDT",
+      "quoteVolume": 25784889.2641,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "STXUSDT",
+      "base": "STX",
+      "quote": "USDT",
+      "quoteVolume": 25368684.9003,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "BULLAUSDT",
+      "base": "BULLA",
+      "quote": "USDT",
+      "quoteVolume": 25367133.15383,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ARUSDT",
+      "base": "AR",
+      "quote": "USDT",
+      "quoteVolume": 25155347.951,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "PIPPINUSDT",
+      "base": "PIPPIN",
+      "quote": "USDT",
+      "quoteVolume": 24950330.00552,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "BUSDT",
+      "base": "B",
+      "quote": "USDT",
+      "quoteVolume": 24793323.82968,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "METISUSDT",
+      "base": "METIS",
+      "quote": "USDT",
+      "quoteVolume": 24608822.9705,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.01
+    },
+    {
+      "id": "NAORISUSDT",
+      "base": "NAORIS",
+      "quote": "USDT",
+      "quoteVolume": 24569890.9962,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "1000000MOGUSDT",
+      "base": "1000000MOG",
+      "quote": "USDT",
+      "quoteVolume": 24535896.72696,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "MEMEUSDT",
+      "base": "MEME",
+      "quote": "USDT",
+      "quoteVolume": 24244396.143696,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "ACHUSDT",
+      "base": "ACH",
+      "quote": "USDT",
+      "quoteVolume": 23814611.236905,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "FLOWUSDT",
+      "base": "FLOW",
+      "quote": "USDT",
+      "quoteVolume": 23700089.822,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "SAGAUSDT",
+      "base": "SAGA",
+      "quote": "USDT",
+      "quoteVolume": 23389935.14552,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "XMRUSDT",
+      "base": "XMR",
+      "quote": "USDT",
+      "quoteVolume": 23307746.78,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.001
+    },
+    {
+      "id": "VETUSDT",
+      "base": "VET",
+      "quote": "USDT",
+      "quoteVolume": 23207507.387387,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "1000000BOBUSDT",
+      "base": "1000000BOB",
+      "quote": "USDT",
+      "quoteVolume": 22730528.13509,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ARKMUSDT",
+      "base": "ARKM",
+      "quote": "USDT",
+      "quoteVolume": 22637725.4341,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "MOVEUSDT",
+      "base": "MOVE",
+      "quote": "USDT",
+      "quoteVolume": 22146078.9723,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "TSTUSDT",
+      "base": "TST",
+      "quote": "USDT",
+      "quoteVolume": 22116456.16596,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ZEREBROUSDT",
+      "base": "ZEREBRO",
+      "quote": "USDT",
+      "quoteVolume": 22001069.53619,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "FUNUSDT",
+      "base": "FUN",
+      "quote": "USDT",
+      "quoteVolume": 21738868.004323,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "1000SATSUSDT",
+      "base": "1000SATS",
+      "quote": "USDT",
+      "quoteVolume": 21707551.4211291,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "1INCHUSDT",
+      "base": "1INCH",
+      "quote": "USDT",
+      "quoteVolume": 21506927.9103,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "SSVUSDT",
+      "base": "SSV",
+      "quote": "USDT",
+      "quoteVolume": 21464943.29021,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "BBUSDT",
+      "base": "BB",
+      "quote": "USDT",
+      "quoteVolume": 21076648.7047,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "COMBOUSDT",
+      "base": "COMBO",
+      "quote": "USDT",
+      "quoteVolume": 21057115.62395,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "APEUSDT",
+      "base": "APE",
+      "quote": "USDT",
+      "quoteVolume": 20991097.0245,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "BMTUSDT",
+      "base": "BMT",
+      "quote": "USDT",
+      "quoteVolume": 20934581.50351,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "CHILLGUYUSDT",
+      "base": "CHILLGUY",
+      "quote": "USDT",
+      "quoteVolume": 20829881.91864,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "BRETTUSDT",
+      "base": "BRETT",
+      "quote": "USDT",
+      "quoteVolume": 20506475.39942,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ALLUSDT",
+      "base": "ALL",
+      "quote": "USDT",
+      "quoteVolume": 20332353.573,
+      "minQty": 10.0,
+      "stepSize": 1.0,
+      "tickSize": 0.001
+    },
+    {
+      "id": "STRKUSDT",
+      "base": "STRK",
+      "quote": "USDT",
+      "quoteVolume": 20121738.15291,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "NULSUSDT",
+      "base": "NULS",
+      "quote": "USDT",
+      "quoteVolume": 19986545.1954,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "GRTUSDT",
+      "base": "GRT",
+      "quote": "USDT",
+      "quoteVolume": 19982384.04608,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "BTCDOMUSDT",
+      "base": "BTCDOM",
+      "quote": "USDT",
+      "quoteVolume": 19837202.7,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.1
+    },
+    {
+      "id": "BANANAS31USDT",
+      "base": "BANANAS31",
+      "quote": "USDT",
+      "quoteVolume": 19678509.563511,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "GRASSUSDT",
+      "base": "GRASS",
+      "quote": "USDT",
+      "quoteVolume": 19516246.56787,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "TAGUSDT",
+      "base": "TAG",
+      "quote": "USDT",
+      "quoteVolume": 19473679.0636613,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-07
+    },
+    {
+      "id": "IMXUSDT",
+      "base": "IMX",
+      "quote": "USDT",
+      "quoteVolume": 19439533.6016,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "NEIROETHUSDT",
+      "base": "NEIROETH",
+      "quote": "USDT",
+      "quoteVolume": 19172076.48508,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "IOUSDT",
+      "base": "IO",
+      "quote": "USDT",
+      "quoteVolume": 18771126.07067,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "TAUSDT",
+      "base": "TA",
+      "quote": "USDT",
+      "quoteVolume": 18735685.1035,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ALTUSDT",
+      "base": "ALT",
+      "quote": "USDT",
+      "quoteVolume": 18715493.83776,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "RPLUSDT",
+      "base": "RPL",
+      "quote": "USDT",
+      "quoteVolume": 18634751.4519,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.01
+    },
+    {
+      "id": "RUNEUSDT",
+      "base": "RUNE",
+      "quote": "USDT",
+      "quoteVolume": 18575278.186,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.001
+    },
+    {
+      "id": "NOTUSDT",
+      "base": "NOT",
+      "quote": "USDT",
+      "quoteVolume": 18514947.991377,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "CYBERUSDT",
+      "base": "CYBER",
+      "quote": "USDT",
+      "quoteVolume": 18473771.9305,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "EPTUSDT",
+      "base": "EPT",
+      "quote": "USDT",
+      "quoteVolume": 18268743.361337,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "PAXGUSDT",
+      "base": "PAXG",
+      "quote": "USDT",
+      "quoteVolume": 18232746.7677,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.01
+    },
+    {
+      "id": "BABYUSDT",
+      "base": "BABY",
+      "quote": "USDT",
+      "quoteVolume": 18175713.18504,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "PYTHUSDT",
+      "base": "PYTH",
+      "quote": "USDT",
+      "quoteVolume": 18166043.50104,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "1000CATUSDT",
+      "base": "1000CAT",
+      "quote": "USDT",
+      "quoteVolume": 18074003.80506,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "MASKUSDT",
+      "base": "MASK",
+      "quote": "USDT",
+      "quoteVolume": 17622614.0117,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.001
+    },
+    {
+      "id": "CHZUSDT",
+      "base": "CHZ",
+      "quote": "USDT",
+      "quoteVolume": 17293254.96065,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ORCAUSDT",
+      "base": "ORCA",
+      "quote": "USDT",
+      "quoteVolume": 17228099.4104,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "BSWUSDT",
+      "base": "BSW",
+      "quote": "USDT",
+      "quoteVolume": 17190732.5683,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "VELVETUSDT",
+      "base": "VELVET",
+      "quote": "USDT",
+      "quoteVolume": 17173129.4412,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "MUBARAKUSDT",
+      "base": "MUBARAK",
+      "quote": "USDT",
+      "quoteVolume": 17155074.44357,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "IOTAUSDT",
+      "base": "IOTA",
+      "quote": "USDT",
+      "quoteVolume": 17054502.6682,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "THETAUSDT",
+      "base": "THETA",
+      "quote": "USDT",
+      "quoteVolume": 16965906.7993,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "LPTUSDT",
+      "base": "LPT",
+      "quote": "USDT",
+      "quoteVolume": 16624625.178,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "BERAUSDT",
+      "base": "BERA",
+      "quote": "USDT",
+      "quoteVolume": 16477798.8475,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "BEAMXUSDT",
+      "base": "BEAMX",
+      "quote": "USDT",
+      "quoteVolume": 16458012.722315,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "CELOUSDT",
+      "base": "CELO",
+      "quote": "USDT",
+      "quoteVolume": 16292652.527,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "KASUSDT",
+      "base": "KAS",
+      "quote": "USDT",
+      "quoteVolume": 16084586.20809,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "FISUSDT",
+      "base": "FIS",
+      "quote": "USDT",
+      "quoteVolume": 16008328.09294,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "HUSDT",
+      "base": "H",
+      "quote": "USDT",
+      "quoteVolume": 15986172.08789,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "MOVRUSDT",
+      "base": "MOVR",
+      "quote": "USDT",
+      "quoteVolume": 15834681.51266,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "MANAUSDT",
+      "base": "MANA",
+      "quote": "USDT",
+      "quoteVolume": 15712646.3915,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "KAIAUSDT",
+      "base": "KAIA",
+      "quote": "USDT",
+      "quoteVolume": 15704188.717,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "AXSUSDT",
+      "base": "AXS",
+      "quote": "USDT",
+      "quoteVolume": 15234043.463,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.001
+    },
+    {
+      "id": "ICNTUSDT",
+      "base": "ICNT",
+      "quote": "USDT",
+      "quoteVolume": 15175888.2856,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "LOOMUSDT",
+      "base": "LOOM",
+      "quote": "USDT",
+      "quoteVolume": 15017366.45818,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ROSEUSDT",
+      "base": "ROSE",
+      "quote": "USDT",
+      "quoteVolume": 14831846.81916,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "CARVUSDT",
+      "base": "CARV",
+      "quote": "USDT",
+      "quoteVolume": 14614153.5891,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "SNXUSDT",
+      "base": "SNX",
+      "quote": "USDT",
+      "quoteVolume": 14348925.785,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "OBOLUSDT",
+      "base": "OBOL",
+      "quote": "USDT",
+      "quoteVolume": 14319291.34414,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "NEOUSDT",
+      "base": "NEO",
+      "quote": "USDT",
+      "quoteVolume": 13998620.465,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "FIDAUSDT",
+      "base": "FIDA",
+      "quote": "USDT",
+      "quoteVolume": 13904369.49038,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "NXPCUSDT",
+      "base": "NXPC",
+      "quote": "USDT",
+      "quoteVolume": 13493406.79773,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ANIMEUSDT",
+      "base": "ANIME",
+      "quote": "USDT",
+      "quoteVolume": 13275554.81653,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "BICOUSDT",
+      "base": "BICO",
+      "quote": "USDT",
+      "quoteVolume": 13237682.4018,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "MANTAUSDT",
+      "base": "MANTA",
+      "quote": "USDT",
+      "quoteVolume": 13197512.22654,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "PORT3USDT",
+      "base": "PORT3",
+      "quote": "USDT",
+      "quoteVolume": 12914029.20722,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "LAYERUSDT",
+      "base": "LAYER",
+      "quote": "USDT",
+      "quoteVolume": 12823394.28041,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ZKUSDT",
+      "base": "ZK",
+      "quote": "USDT",
+      "quoteVolume": 12769913.6254,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "GLMUSDT",
+      "base": "GLM",
+      "quote": "USDT",
+      "quoteVolume": 12749915.9721,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "KAVAUSDT",
+      "base": "KAVA",
+      "quote": "USDT",
+      "quoteVolume": 12689610.4831,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "RDNTUSDT",
+      "base": "RDNT",
+      "quote": "USDT",
+      "quoteVolume": 12343584.44832,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "LQTYUSDT",
+      "base": "LQTY",
+      "quote": "USDT",
+      "quoteVolume": 12104417.41364,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "DOGSUSDT",
+      "base": "DOGS",
+      "quote": "USDT",
+      "quoteVolume": 12075677.5955745,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-07
+    },
+    {
+      "id": "GMTUSDT",
+      "base": "GMT",
+      "quote": "USDT",
+      "quoteVolume": 11972202.77984,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "RVNUSDT",
+      "base": "RVN",
+      "quote": "USDT",
+      "quoteVolume": 11931113.27183,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "HAEDALUSDT",
+      "base": "HAEDAL",
+      "quote": "USDT",
+      "quoteVolume": 11768853.765333,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "LISTAUSDT",
+      "base": "LISTA",
+      "quote": "USDT",
+      "quoteVolume": 11741874.4823,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "CETUSUSDT",
+      "base": "CETUS",
+      "quote": "USDT",
+      "quoteVolume": 11536786.2344,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "AINUSDT",
+      "base": "AIN",
+      "quote": "USDT",
+      "quoteVolume": 11520105.13504,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "FXSUSDT",
+      "base": "FXS",
+      "quote": "USDT",
+      "quoteVolume": 11299976.09589,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "UMAUSDT",
+      "base": "UMA",
+      "quote": "USDT",
+      "quoteVolume": 11255649.85,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.001
+    },
+    {
+      "id": "MYROUSDT",
+      "base": "MYRO",
+      "quote": "USDT",
+      "quoteVolume": 11197673.13758,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ZENUSDT",
+      "base": "ZEN",
+      "quote": "USDT",
+      "quoteVolume": 11109594.596,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "FIOUSDT",
+      "base": "FIO",
+      "quote": "USDT",
+      "quoteVolume": 11026134.23856,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "MEWUSDT",
+      "base": "MEW",
+      "quote": "USDT",
+      "quoteVolume": 10994221.465929,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "BLURUSDT",
+      "base": "BLUR",
+      "quote": "USDT",
+      "quoteVolume": 10948299.7424,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "OMGUSDT",
+      "base": "OMG",
+      "quote": "USDT",
+      "quoteVolume": 10920359.6502,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "SKATEUSDT",
+      "base": "SKATE",
+      "quote": "USDT",
+      "quoteVolume": 10880414.50104,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "MELANIAUSDT",
+      "base": "MELANIA",
+      "quote": "USDT",
+      "quoteVolume": 10844905.801506,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "USDCUSDT",
+      "base": "USDC",
+      "quote": "USDT",
+      "quoteVolume": 10836624.233786,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "BANANAUSDT",
+      "base": "BANANA",
+      "quote": "USDT",
+      "quoteVolume": 10829719.6219,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "JASMYUSDT",
+      "base": "JASMY",
+      "quote": "USDT",
+      "quoteVolume": 10784951.135612,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "AXLUSDT",
+      "base": "AXL",
+      "quote": "USDT",
+      "quoteVolume": 10635713.44867,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "HIPPOUSDT",
+      "base": "HIPPO",
+      "quote": "USDT",
+      "quoteVolume": 10604162.925054,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "KSMUSDT",
+      "base": "KSM",
+      "quote": "USDT",
+      "quoteVolume": 10571321.07,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.01
+    },
+    {
+      "id": "XAIUSDT",
+      "base": "XAI",
+      "quote": "USDT",
+      "quoteVolume": 10570838.74896,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "CHESSUSDT",
+      "base": "CHESS",
+      "quote": "USDT",
+      "quoteVolume": 10569421.14521,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "BDXNUSDT",
+      "base": "BDXN",
+      "quote": "USDT",
+      "quoteVolume": 10378298.63313,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "1MBABYDOGEUSDT",
+      "base": "1MBABYDOGE",
+      "quote": "USDT",
+      "quoteVolume": 10331225.0321332,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-07
+    },
+    {
+      "id": "BONDUSDT",
+      "base": "BOND",
+      "quote": "USDT",
+      "quoteVolume": 10318452.3471,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "DMCUSDT",
+      "base": "DMC",
+      "quote": "USDT",
+      "quoteVolume": 10054931.681742,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "MILKUSDT",
+      "base": "MILK",
+      "quote": "USDT",
+      "quoteVolume": 9962703.82597,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ALPHAUSDT",
+      "base": "ALPHA",
+      "quote": "USDT",
+      "quoteVolume": 9802564.20563,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "XEMUSDT",
+      "base": "XEM",
+      "quote": "USDT",
+      "quoteVolume": 9727490.2775,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "IDOLUSDT",
+      "base": "IDOL",
+      "quote": "USDT",
+      "quoteVolume": 9612108.14717,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "CKBUSDT",
+      "base": "CKB",
+      "quote": "USDT",
+      "quoteVolume": 9457290.271539,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "RAREUSDT",
+      "base": "RARE",
+      "quote": "USDT",
+      "quoteVolume": 9402632.25567,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "MINAUSDT",
+      "base": "MINA",
+      "quote": "USDT",
+      "quoteVolume": 9390960.361,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "CROSSUSDT",
+      "base": "CROSS",
+      "quote": "USDT",
+      "quoteVolume": 9215747.96821,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "AUCTIONUSDT",
+      "base": "AUCTION",
+      "quote": "USDT",
+      "quoteVolume": 9136939.75871,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.01
+    },
+    {
+      "id": "KNCUSDT",
+      "base": "KNC",
+      "quote": "USDT",
+      "quoteVolume": 9063090.3868,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "FLMUSDT",
+      "base": "FLM",
+      "quote": "USDT",
+      "quoteVolume": 9048445.2427,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "API3USDT",
+      "base": "API3",
+      "quote": "USDT",
+      "quoteVolume": 8939795.6358,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "1000LUNCUSDT",
+      "base": "1000LUNC",
+      "quote": "USDT",
+      "quoteVolume": 8935250.94784,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "1000XECUSDT",
+      "base": "1000XEC",
+      "quote": "USDT",
+      "quoteVolume": 8806426.86825,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "PORTALUSDT",
+      "base": "PORTAL",
+      "quote": "USDT",
+      "quoteVolume": 8704681.725989,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "UXLINKUSDT",
+      "base": "UXLINK",
+      "quote": "USDT",
+      "quoteVolume": 8617523.2877,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ALICEUSDT",
+      "base": "ALICE",
+      "quote": "USDT",
+      "quoteVolume": 8550897.51,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "SIGNUSDT",
+      "base": "SIGN",
+      "quote": "USDT",
+      "quoteVolume": 8509437.96375,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "EGLDUSDT",
+      "base": "EGLD",
+      "quote": "USDT",
+      "quoteVolume": 8257571.249,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.01
+    },
+    {
+      "id": "PLUMEUSDT",
+      "base": "PLUME",
+      "quote": "USDT",
+      "quoteVolume": 8171507.458,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "YFIUSDT",
+      "base": "YFI",
+      "quote": "USDT",
+      "quoteVolume": 8164480.8,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.1
+    },
+    {
+      "id": "ZILUSDT",
+      "base": "ZIL",
+      "quote": "USDT",
+      "quoteVolume": 8027067.01847,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "AUSDT",
+      "base": "A",
+      "quote": "USDT",
+      "quoteVolume": 7920265.84242,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "IOTXUSDT",
+      "base": "IOTX",
+      "quote": "USDT",
+      "quoteVolume": 7766988.58424,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "EDUUSDT",
+      "base": "EDU",
+      "quote": "USDT",
+      "quoteVolume": 7725958.8541,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "SKYAIUSDT",
+      "base": "SKYAI",
+      "quote": "USDT",
+      "quoteVolume": 7630768.27376,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "VANRYUSDT",
+      "base": "VANRY",
+      "quote": "USDT",
+      "quoteVolume": 7594365.96983,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "GASUSDT",
+      "base": "GAS",
+      "quote": "USDT",
+      "quoteVolume": 7592263.5951,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "VELODROMEUSDT",
+      "base": "VELODROME",
+      "quote": "USDT",
+      "quoteVolume": 7577454.47411,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "SHELLUSDT",
+      "base": "SHELL",
+      "quote": "USDT",
+      "quoteVolume": 7424576.9531,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ZRCUSDT",
+      "base": "ZRC",
+      "quote": "USDT",
+      "quoteVolume": 7405167.76186,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "HIFIUSDT",
+      "base": "HIFI",
+      "quote": "USDT",
+      "quoteVolume": 7282004.64532,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "SXTUSDT",
+      "base": "SXT",
+      "quote": "USDT",
+      "quoteVolume": 7278424.52664,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "SUPERUSDT",
+      "base": "SUPER",
+      "quote": "USDT",
+      "quoteVolume": 7276962.3278,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "AIUSDT",
+      "base": "AI",
+      "quote": "USDT",
+      "quoteVolume": 7240374.39025,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "YGGUSDT",
+      "base": "YGG",
+      "quote": "USDT",
+      "quoteVolume": 7126279.0854,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "HOOKUSDT",
+      "base": "HOOK",
+      "quote": "USDT",
+      "quoteVolume": 7122850.20386,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "THEUSDT",
+      "base": "THE",
+      "quote": "USDT",
+      "quoteVolume": 7108046.22032,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "COTIUSDT",
+      "base": "COTI",
+      "quote": "USDT",
+      "quoteVolume": 7093143.03168,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "VICUSDT",
+      "base": "VIC",
+      "quote": "USDT",
+      "quoteVolume": 6962242.6239,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ALCHUSDT",
+      "base": "ALCH",
+      "quote": "USDT",
+      "quoteVolume": 6953096.7736,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "SPELLUSDT",
+      "base": "SPELL",
+      "quote": "USDT",
+      "quoteVolume": 6843788.588189,
+      "minQty": 100.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-07
+    },
+    {
+      "id": "SYNUSDT",
+      "base": "SYN",
+      "quote": "USDT",
+      "quoteVolume": 6840744.2134,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "AEVOUSDT",
+      "base": "AEVO",
+      "quote": "USDT",
+      "quoteVolume": 6838062.14953,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "XVGUSDT",
+      "base": "XVG",
+      "quote": "USDT",
+      "quoteVolume": 6803584.2688611,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "IDUSDT",
+      "base": "ID",
+      "quote": "USDT",
+      "quoteVolume": 6797286.0952,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "QNTUSDT",
+      "base": "QNT",
+      "quote": "USDT",
+      "quoteVolume": 6794679.934,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.01
+    },
+    {
+      "id": "SLPUSDT",
+      "base": "SLP",
+      "quote": "USDT",
+      "quoteVolume": 6663240.780797,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "C98USDT",
+      "base": "C98",
+      "quote": "USDT",
+      "quoteVolume": 6603436.1171,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "LITUSDT",
+      "base": "LIT",
+      "quote": "USDT",
+      "quoteVolume": 6499824.186,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "NFPUSDT",
+      "base": "NFP",
+      "quote": "USDT",
+      "quoteVolume": 6489197.798683,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "BIGTIMEUSDT",
+      "base": "BIGTIME",
+      "quote": "USDT",
+      "quoteVolume": 6358316.87431,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ZRXUSDT",
+      "base": "ZRX",
+      "quote": "USDT",
+      "quoteVolume": 6282550.8564,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "VOXELUSDT",
+      "base": "VOXEL",
+      "quote": "USDT",
+      "quoteVolume": 6199992.47112,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "KMNOUSDT",
+      "base": "KMNO",
+      "quote": "USDT",
+      "quoteVolume": 6183449.6588,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "MEUSDT",
+      "base": "ME",
+      "quote": "USDT",
+      "quoteVolume": 6159328.14667,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "DASHUSDT",
+      "base": "DASH",
+      "quote": "USDT",
+      "quoteVolume": 6156741.06,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.01
+    },
+    {
+      "id": "AIOTUSDT",
+      "base": "AIOT",
+      "quote": "USDT",
+      "quoteVolume": 6155107.51664,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ONEUSDT",
+      "base": "ONE",
+      "quote": "USDT",
+      "quoteVolume": 6145293.15159,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "QTUMUSDT",
+      "base": "QTUM",
+      "quote": "USDT",
+      "quoteVolume": 6104676.21,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "WALUSDT",
+      "base": "WAL",
+      "quote": "USDT",
+      "quoteVolume": 6100731.7799,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "HMSTRUSDT",
+      "base": "HMSTR",
+      "quote": "USDT",
+      "quoteVolume": 6041496.3391898,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "DEGOUSDT",
+      "base": "DEGO",
+      "quote": "USDT",
+      "quoteVolume": 5938544.33,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "1000CHEEMSUSDT",
+      "base": "1000CHEEMS",
+      "quote": "USDT",
+      "quoteVolume": 5893561.2057892,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "ENJUSDT",
+      "base": "ENJ",
+      "quote": "USDT",
+      "quoteVolume": 5745434.72444,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "CTSIUSDT",
+      "base": "CTSI",
+      "quote": "USDT",
+      "quoteVolume": 5738739.6824,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "MORPHOUSDT",
+      "base": "MORPHO",
+      "quote": "USDT",
+      "quoteVolume": 5718020.60805,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "BELUSDT",
+      "base": "BEL",
+      "quote": "USDT",
+      "quoteVolume": 5692862.8288,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "REDUSDT",
+      "base": "RED",
+      "quote": "USDT",
+      "quoteVolume": 5659215.2531,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "PHBUSDT",
+      "base": "PHB",
+      "quote": "USDT",
+      "quoteVolume": 5645492.8108,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "PIXELUSDT",
+      "base": "PIXEL",
+      "quote": "USDT",
+      "quoteVolume": 5600804.7187,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "STOUSDT",
+      "base": "STO",
+      "quote": "USDT",
+      "quoteVolume": 5577619.15249,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "SKLUSDT",
+      "base": "SKL",
+      "quote": "USDT",
+      "quoteVolume": 5528469.42757,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "DYMUSDT",
+      "base": "DYM",
+      "quote": "USDT",
+      "quoteVolume": 5440769.86326,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "STORJUSDT",
+      "base": "STORJ",
+      "quote": "USDT",
+      "quoteVolume": 5389958.2805,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "BAKEUSDT",
+      "base": "BAKE",
+      "quote": "USDT",
+      "quoteVolume": 5347734.8111,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "DRIFTUSDT",
+      "base": "DRIFT",
+      "quote": "USDT",
+      "quoteVolume": 5305102.6346,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "TANSSIUSDT",
+      "base": "TANSSI",
+      "quote": "USDT",
+      "quoteVolume": 5276321.47077,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "BANKUSDT",
+      "base": "BANK",
+      "quote": "USDT",
+      "quoteVolume": 5271591.768225,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "1000RATSUSDT",
+      "base": "1000RATS",
+      "quote": "USDT",
+      "quoteVolume": 5195168.36971,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "SWELLUSDT",
+      "base": "SWELL",
+      "quote": "USDT",
+      "quoteVolume": 5172654.51552,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ANKRUSDT",
+      "base": "ANKR",
+      "quote": "USDT",
+      "quoteVolume": 5166435.18854,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "BROCCOLI714USDT",
+      "base": "BROCCOLI714",
+      "quote": "USDT",
+      "quoteVolume": 5133708.18603,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ATHUSDT",
+      "base": "ATH",
+      "quote": "USDT",
+      "quoteVolume": 5094345.82634,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ATAUSDT",
+      "base": "ATA",
+      "quote": "USDT",
+      "quoteVolume": 5028906.2416,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "HOTUSDT",
+      "base": "HOT",
+      "quote": "USDT",
+      "quoteVolume": 5015219.21057,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "VVVUSDT",
+      "base": "VVV",
+      "quote": "USDT",
+      "quoteVolume": 4903721.28561,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "ICXUSDT",
+      "base": "ICX",
+      "quote": "USDT",
+      "quoteVolume": 4866827.9169,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ZECUSDT",
+      "base": "ZEC",
+      "quote": "USDT",
+      "quoteVolume": 4834447.97,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.01
+    },
+    {
+      "id": "ONTUSDT",
+      "base": "ONT",
+      "quote": "USDT",
+      "quoteVolume": 4830862.3289,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "KDAUSDT",
+      "base": "KDA",
+      "quote": "USDT",
+      "quoteVolume": 4773970.3009,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "WOOUSDT",
+      "base": "WOO",
+      "quote": "USDT",
+      "quoteVolume": 4764099.51964,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ORBSUSDT",
+      "base": "ORBS",
+      "quote": "USDT",
+      "quoteVolume": 4744389.826334,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "USTCUSDT",
+      "base": "USTC",
+      "quote": "USDT",
+      "quoteVolume": 4675142.322658,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "ARKUSDT",
+      "base": "ARK",
+      "quote": "USDT",
+      "quoteVolume": 4670461.9403,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "SXPUSDT",
+      "base": "SXP",
+      "quote": "USDT",
+      "quoteVolume": 4583967.7726,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "B3USDT",
+      "base": "B3",
+      "quote": "USDT",
+      "quoteVolume": 4533231.674471,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "LRCUSDT",
+      "base": "LRC",
+      "quote": "USDT",
+      "quoteVolume": 4533036.46247,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "SCRUSDT",
+      "base": "SCR",
+      "quote": "USDT",
+      "quoteVolume": 4515831.2763,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.001
+    },
+    {
+      "id": "PROMUSDT",
+      "base": "PROM",
+      "quote": "USDT",
+      "quoteVolume": 4505868.9799,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "BALUSDT",
+      "base": "BAL",
+      "quote": "USDT",
+      "quoteVolume": 4464711.842,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "LUNA2USDT",
+      "base": "LUNA2",
+      "quote": "USDT",
+      "quoteVolume": 4445281.1377,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "LEVERUSDT",
+      "base": "LEVER",
+      "quote": "USDT",
+      "quoteVolume": 4421540.4339099,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-07
+    },
+    {
+      "id": "CGPTUSDT",
+      "base": "CGPT",
+      "quote": "USDT",
+      "quoteVolume": 4399562.81749,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "PONKEUSDT",
+      "base": "PONKE",
+      "quote": "USDT",
+      "quoteVolume": 4376714.44796,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "XCNUSDT",
+      "base": "XCN",
+      "quote": "USDT",
+      "quoteVolume": 4355226.67543,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "TUSDT",
+      "base": "T",
+      "quote": "USDT",
+      "quoteVolume": 4301808.51773,
+      "minQty": 0.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "STMXUSDT",
+      "base": "STMX",
+      "quote": "USDT",
+      "quoteVolume": 4248092.57636,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "SQDUSDT",
+      "base": "SQD",
+      "quote": "USDT",
+      "quoteVolume": 4219083.30485,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "MOCAUSDT",
+      "base": "MOCA",
+      "quote": "USDT",
+      "quoteVolume": 4203924.01966,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "JSTUSDT",
+      "base": "JST",
+      "quote": "USDT",
+      "quoteVolume": 4130518.309207,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "GPSUSDT",
+      "base": "GPS",
+      "quote": "USDT",
+      "quoteVolume": 4123109.35258,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "DEEPUSDT",
+      "base": "DEEP",
+      "quote": "USDT",
+      "quoteVolume": 4094451.21593,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "BATUSDT",
+      "base": "BAT",
+      "quote": "USDT",
+      "quoteVolume": 4076753.5154,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "DEXEUSDT",
+      "base": "DEXE",
+      "quote": "USDT",
+      "quoteVolume": 4025250.77599,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "VANAUSDT",
+      "base": "VANA",
+      "quote": "USDT",
+      "quoteVolume": 4003203.84383,
+      "minQty": 0.01,
+      "stepSize": 0.01,
+      "tickSize": 0.001
+    },
+    {
+      "id": "DEGENUSDT",
+      "base": "DEGEN",
+      "quote": "USDT",
+      "quoteVolume": 3999839.987004,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "TRUUSDT",
+      "base": "TRU",
+      "quote": "USDT",
+      "quoteVolume": 3964390.7753,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "PROMPTUSDT",
+      "base": "PROMPT",
+      "quote": "USDT",
+      "quoteVolume": 3958718.9864,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "B2USDT",
+      "base": "B2",
+      "quote": "USDT",
+      "quoteVolume": 3932688.9017,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "DEFIUSDT",
+      "base": "DEFI",
+      "quote": "USDT",
+      "quoteVolume": 3816793.5,
+      "minQty": 0.001,
+      "stepSize": 0.001,
+      "tickSize": 0.1
+    },
+    {
+      "id": "ZETAUSDT",
+      "base": "ZETA",
+      "quote": "USDT",
+      "quoteVolume": 3734406.4104,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "BRUSDT",
+      "base": "BR",
+      "quote": "USDT",
+      "quoteVolume": 3732443.31703,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "BANDUSDT",
+      "base": "BAND",
+      "quote": "USDT",
+      "quoteVolume": 3626912.3986,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "AGLDUSDT",
+      "base": "AGLD",
+      "quote": "USDT",
+      "quoteVolume": 3591259.4599,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "ACEUSDT",
+      "base": "ACE",
+      "quote": "USDT",
+      "quoteVolume": 3585731.16071,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "CHRUSDT",
+      "base": "CHR",
+      "quote": "USDT",
+      "quoteVolume": 3575548.2281,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "LUMIAUSDT",
+      "base": "LUMIA",
+      "quote": "USDT",
+      "quoteVolume": 3553715.58767,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "CATIUSDT",
+      "base": "CATI",
+      "quote": "USDT",
+      "quoteVolume": 3535305.07773,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "JOEUSDT",
+      "base": "JOE",
+      "quote": "USDT",
+      "quoteVolume": 3482592.62884,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "IOSTUSDT",
+      "base": "IOST",
+      "quote": "USDT",
+      "quoteVolume": 3454876.943055,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "AKTUSDT",
+      "base": "AKT",
+      "quote": "USDT",
+      "quoteVolume": 3447467.7116,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "HIGHUSDT",
+      "base": "HIGH",
+      "quote": "USDT",
+      "quoteVolume": 3375223.28162,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "PUFFERUSDT",
+      "base": "PUFFER",
+      "quote": "USDT",
+      "quoteVolume": 3374869.49899,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "CELRUSDT",
+      "base": "CELR",
+      "quote": "USDT",
+      "quoteVolume": 3223054.74485,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "FUSDT",
+      "base": "F",
+      "quote": "USDT",
+      "quoteVolume": 3115993.737519,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-06
+    },
+    {
+      "id": "DUSKUSDT",
+      "base": "DUSK",
+      "quote": "USDT",
+      "quoteVolume": 3106866.33979,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "MBOXUSDT",
+      "base": "MBOX",
+      "quote": "USDT",
+      "quoteVolume": 3094615.80231,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 0.0001
+    },
+    {
+      "id": "PHAUSDT",
+      "base": "PHA",
+      "quote": "USDT",
+      "quoteVolume": 3089392.98751,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "POLYXUSDT",
+      "base": "POLYX",
+      "quote": "USDT",
+      "quoteVolume": 3087500.70033,
+      "minQty": 1.0,
+      "stepSize": 1.0,
+      "tickSize": 1e-05
+    },
+    {
+      "id": "RONINUSDT",
+      "base": "RONIN",
+      "quote": "USDT",
+      "quoteVolume": 3061870.45982,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.001
+    },
+    {
+      "id": "RLCUSDT",
+      "base": "RLC",
+      "quote": "USDT",
+      "quoteVolume": 3029852.1239,
+      "minQty": 0.1,
+      "stepSize": 0.1,
+      "tickSize": 0.0001
+    }
+  ]
+}
