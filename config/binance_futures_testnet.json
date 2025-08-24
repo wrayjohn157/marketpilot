@@ -1,0 +1,8 @@
+{
+  "api_key": "04512f1e1b60c1673084884308ea3490c328fcba5faf3894a72367dcf38b6503",
+  "api_secret": "13c7e7370d1f7f4d11bb8fdff75dc872cd947862e805b87e6faa0d35eed2b919",
+  "testnet": true,
+  "type": "usdtm",
+  "default_leverage": 5,
+  "is_cross_margin": false
+}
