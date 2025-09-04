@@ -1,1 +1,0 @@
-"""Test package for Market7 trading system."""

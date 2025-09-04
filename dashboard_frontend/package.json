@@ -1,24 +1,16 @@
 {
-  "name": "market5-dashboard",
-  "version": "0.1.0",
+  "name": "market7-dashboard",
+  "version": "2.0.0",
   "private": true,
-  "proxy": "http://161.97.148.148:8000",
   "dependencies": {
     "@radix-ui/react-collapsible": "^1.1.8",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.8.4",
-    "bootstrap": "^5.3.3",
-    "d3": "^7.9.0",
-    "framer-motion": "^12.9.2",
-    "lightweight-charts": "^3.8.0",
     "lucide-react": "^0.503.0",
     "react": "^18.3.1",
-    "react-bootstrap": "^2.10.9",
     "react-dom": "^18.3.1",
-    "react-financial-charts": "^2.0.1",
     "react-router-dom": "^6.22.3",
     "react-scripts": "^5.0.1",
     "recharts": "^2.15.4",
@@ -28,7 +20,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build:prod": "GENERATE_SOURCEMAP=false npm run build",
+    "analyze": "npm run build && npx bundle-analyzer build/static/js/*.js"
   },
   "eslintConfig": {
     "extends": [
@@ -47,5 +41,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "description": "Market7 Trading Dashboard Frontend",
+  "homepage": ".",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }
