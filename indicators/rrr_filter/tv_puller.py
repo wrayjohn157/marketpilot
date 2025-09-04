@@ -43,7 +43,7 @@ for row in data:
     parts = row.get("s", "").split(":", 1)
 if len(parts) != 2:
             # continue
-_, pair = parts
+    _, pair = parts
 if not pair.endswith("USDT"):
             # continue
 symbol = pair[:-4]  # Strip "USDT"

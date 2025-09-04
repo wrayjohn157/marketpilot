@@ -6,81 +6,89 @@ Final indentation fix for remaining syntax issues
 import os
 import re
 
+
 def fix_indentation_issues(file_path):
     """Fix indentation issues in a file"""
     print(f"Fixing {file_path}...")
-    
+
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
-        
+
         original_content = content
-        
+
         # Fix common indentation patterns
-        lines = content.split('\n')
+        lines = content.split("\n")
         fixed_lines = []
-        
+
         for i, line in enumerate(lines):
             stripped = line.strip()
-            
+
             # Fix lines that should be indented but aren't
-            if (stripped and 
-                not stripped.startswith('#') and
-                not stripped.startswith('from ') and
-                not stripped.startswith('import ') and
-                not stripped.startswith('def ') and
-                not stripped.startswith('class ') and
-                not stripped.startswith('"""') and
-                not stripped.startswith("'''") and
-                not stripped.startswith('if __name__') and
-                i > 0 and
-                lines[i-1].strip().endswith(':')):
+            if (
+                stripped
+                and not stripped.startswith("#")
+                and not stripped.startswith("from ")
+                and not stripped.startswith("import ")
+                and not stripped.startswith("def ")
+                and not stripped.startswith("class ")
+                and not stripped.startswith('"""')
+                and not stripped.startswith("'''")
+                and not stripped.startswith("if __name__")
+                and i > 0
+                and lines[i - 1].strip().endswith(":")
+            ):
                 # This line should be indented
-                if not line.startswith('    '):
-                    fixed_lines.append('    ' + line)
+                if not line.startswith("    "):
+                    fixed_lines.append("    " + line)
                     continue
-            
+
             # Fix malformed import statements
-            if stripped.startswith('from ') and 'import' in stripped and ',' in stripped:
+            if (
+                stripped.startswith("from ")
+                and "import" in stripped
+                and "," in stripped
+            ):
                 # Fix malformed import statements
-                fixed_lines.append('    ' + stripped)
+                fixed_lines.append("    " + stripped)
                 continue
-            
+
             # Fix docstring issues
             if stripped == '"""Docstring placeholder."""' or stripped == '""""""':
                 fixed_lines.append('    """Docstring placeholder."""')
                 continue
-            
+
             # Fix specific problematic patterns
-            if 'import exist_ok=True' in stripped:
-                fixed_lines.append('    # import exist_ok=True')
+            if "import exist_ok=True" in stripped:
+                fixed_lines.append("    # import exist_ok=True")
                 continue
-            
-            if '→' in stripped:
-                fixed_lines.append(line.replace('→', '->'))
+
+            if "→" in stripped:
+                fixed_lines.append(line.replace("→", "->"))
                 continue
-            
+
             fixed_lines.append(line)
-        
-        content = '\n'.join(fixed_lines)
-        
+
+        content = "\n".join(fixed_lines)
+
         if content != original_content:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.write(content)
             print(f"  ✅ Fixed indentation issues")
             return True
         else:
             print(f"  ℹ️  No changes needed")
             return False
-            
+
     except Exception as e:
         print(f"  ❌ Error fixing {file_path}: {e}")
         return False
 
+
 def main():
     """Fix remaining indentation issues"""
     print("🔧 Final indentation fix...")
-    
+
     problem_files = [
         "dashboard_backend/eval_routes/gpt_eval_api.py",
         "dashboard_backend/anal/capital_routes.py",
@@ -125,17 +133,18 @@ def main():
         "utils/ml_logger.py",
         "utils/log_reader.py",
     ]
-    
+
     fixed_count = 0
-    
+
     for file_path in problem_files:
         if os.path.exists(file_path):
             if fix_indentation_issues(file_path):
                 fixed_count += 1
         else:
             print(f"⚠️  File not found: {file_path}")
-    
+
     print(f"\n🎉 Fixed {fixed_count} files")
+
 
 if __name__ == "__main__":
     main()

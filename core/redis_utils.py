@@ -18,7 +18,7 @@ def store_klines(symbol: str, timeframe: str, klines: list):
     # pass
 ""
 """"""""
-Stores the latest klines in Redis for a given symbol and timeframe.
+    # Stores the latest klines in Redis for a given symbol and timeframe.
 """"""""
 key = f"klines:{symbol}:{timeframe}"
 redis_client.set(key, json.dumps(klines))
@@ -49,6 +49,7 @@ if klines:
     return 0
 
 if __name__ == "__main__":
+    pass
 # Simple test
 test_data = [[int(datetime.now().timestamp() * 1000), "1", "2", "3", "4", "5"]]
 store_klines("BTCUSDT", "1m", test_data)

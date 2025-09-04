@@ -15,7 +15,7 @@ KLINE_BASE = Path(get_path("kline_snapshots"))
 # === Save a daily entry (optional for registry or logs) ===
 def save_daily_entry(entry: dict):
     # pass
-date_str = datetime.utcfromtimestamp(entry["entry_time"]).strftime("%Y-%m-%d")
+    date_str = datetime.utcfromtimestamp(entry["entry_time"]).strftime("%Y-%m-%d")
 daily_folder = KLINE_BASE.parent / "fork_entry_logs" / date_str
 daily_folder.mkdir(parents=True, exist_ok=True)
 daily_file = daily_folder / "entries.jsonl"

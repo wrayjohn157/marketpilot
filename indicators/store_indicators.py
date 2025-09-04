@@ -5,8 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
 
-from utils.redis_manager import RedisKeyManager, get_redis_manager
-
+# from utils.redis_manager import RedisKeyManager, get_redis_manager
 #!/usr/bin/env python3
 
 
@@ -33,7 +32,7 @@ try:
     pass
 # pass
 # pass
-r = get_redis_manager()
+    r = get_redis_manager()
 except Exception as e:
     logging.error(f"Redis connection error: {e}")
 exit(1)

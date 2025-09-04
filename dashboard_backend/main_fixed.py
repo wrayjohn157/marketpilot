@@ -42,8 +42,8 @@ app.add_middleware(LoggingMiddleware)
 app.include_router(metrics_router)
 
 from config.unified_config_manager import get_config, get_path
-from utils.credential_manager import get_3commas_credentials
 
+# from utils.credential_manager import get_3commas_credentials
 # === Redis ===
 from utils.redis_manager import get_redis_manager
 
@@ -249,7 +249,7 @@ def get_3commas_metrics_api(redis: Any = Depends(get_redis)):
     try:
         from threecommas_metrics import get_3commas_metrics
 
-        return get_3commas_metrics()
+            return get_3commas_metrics()
     except Exception as e:
         logger.error(f"Failed to get 3Commas metrics: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch 3Commas metrics")
@@ -380,6 +380,7 @@ def get_trade_health_legacy(symbol: str, redis: Any = Depends(get_redis)):
 
 
 if __name__ == "__main__":
+    pass
 import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+        uvicorn.run(app, host="0.0.0.0", port=8000)

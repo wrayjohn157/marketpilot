@@ -11,7 +11,7 @@ def evaluate_trade(tp1_score: Any, ema_score: Any, adx_score: Any, ttp_score: An
 """"""""
 Evaluate a trade based on RRR sub-scores and return pass/fail and reasons.
 
-Args:
+    # Args:
     tp1_score (float): Scaled TP1 vs ATR score
 ema_score (float): Scaled EMA slope score
 adx_score (float): Scaled ADX score

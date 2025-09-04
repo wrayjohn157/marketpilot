@@ -12,6 +12,7 @@ def parse_iso(ts: str) -> datetime:
 # With fractional seconds (e.g., 2025-05-01T20:43:22.594Z)
     return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
 except ValueError:
+    pass
 # Fallback to second-only precision
     return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
 

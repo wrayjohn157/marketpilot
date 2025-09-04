@@ -20,7 +20,7 @@ OUTPUT_DIR = Path("/home/signal/market7/ml/merged")
 
 # === Loaders ===
 def load_jsonl(path: Any) -> Any:
-    if not path.exists():
+        if not path.exists():
         return []
 with open(path) as f:
         return [json.loads(line.strip()) for line in f if line.strip()]
@@ -29,7 +29,7 @@ def save_jsonl(path: Any, records: Any) -> Any:
     path.parent.mkdir(parents=True, exist_ok=True)
 with open(path, "w") as f:
     for rec in records:
-    f.write(json.dumps(rec) + ""
+        f.write(json.dumps(rec) + "\n")
 n")"
 
 # === Matchers ===
@@ -42,8 +42,7 @@ if fork.get("symbol") != symbol or "ts_iso" not in fork:
 fork_time = dateparser.parse(fork["ts_iso"])
 if abs((ts - fork_time).total_seconds()) <= 60:
             return fork
-    return None
-
+        return None
 def find_tv(symbol: Any, ts: Any, tvs: Any) -> Any:
     for tv in tvs:
     if not isinstance(tv, dict):
@@ -53,8 +52,7 @@ if tv.get("symbol") != symbol or not tv.get("pass") or "ts_iso" not in tv:
 tv_time = dateparser.parse(tv["ts_iso"])
 if abs((ts - tv_time).total_seconds()) <= 30:
             return tv
-    return None
-
+        return None
 def find_btc(ts: Any, btc_snaps: Any) -> Any:
     closest = None
 min_delta = float("inf")

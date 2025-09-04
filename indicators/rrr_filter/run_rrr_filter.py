@@ -1,8 +1,7 @@
 import json
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from utils.redis_manager import RedisKeyManager, get_redis_manager
-
+# from utils.redis_manager import RedisKeyManager, get_redis_manager
 from .evaluate import evaluate_trade
 from .time_to_profit import analyze_time_to_tp1
 from .trend_slope import calculate_ema_slope
@@ -11,11 +10,10 @@ from .trend_slope import calculate_ema_slope
 
 
 # Redis setup
-r = get_redis_manager()
-
+    r = get_redis_manager()
 def run_rrr_filter(symbol: Any, klines: Any, atr: Any, adx: Any, ema_values: Any) -> Any:
 # TP1 vs ATR score
-tp1_target = 0.5
+    tp1_target = 0.5
 tp1_score = min(max(tp1_target / atr, 0), 1) if atr else 0.0
 
 # EMA slope score

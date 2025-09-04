@@ -11,7 +11,7 @@ def analyze_time_to_tp1(klines: Any, tp1_pct: Any = 0.5, max_candles: Any = 12) 
 """"""""
 Analyze the average speed of hitting TP1 (target profit 1) after trade entry.
 
-Args:
+    # Args:
     klines (list): List of candle data (OHLCV), expects [timestamp, open, high, low, close, volume].
 tp1_pct (float): Percentage target for TP1 (default: 0.5%).
 max_candles (int): Maximum candles to evaluate after entry.

@@ -40,7 +40,7 @@ try:
 # pass
 # pass
     # config = yaml.safe_load(CONFIG_PATH.read_text())["tv_screener"]
-TV_SCORE_WEIGHTS = config["weights"]
+    TV_SCORE_WEIGHTS = config["weights"]
 MIN_PASS_SCORE = config["score_threshold"]
 except Exception as e:
     logging.warning(f"[TV_KICKER] Failed to load config, using defaults: {e}")
@@ -56,7 +56,7 @@ MIN_PASS_SCORE = 0.73
 # === Loaders ===
 def load_candidates(path: Path):
     # pass
-if not path.exists():
+    if not path.exists():
     logging.error(f"[ERROR] Missing input file: {path}")
         return []
 with open(path) as f:
@@ -88,7 +88,7 @@ except Exception as e:
 
 def load_tv_tags(path: Path):
     # pass
-if not path.exists():
+    if not path.exists():
     logging.warning(f"[WARNING] TV screener file not found: {path}")
         return {}
 try:

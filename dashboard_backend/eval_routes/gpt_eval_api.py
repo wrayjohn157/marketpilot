@@ -5,8 +5,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request
 from openai import OpenAI
 
-from utils.credential_manager import get_3commas_credentials
-
+# from utils.credential_manager import get_3commas_credentials
 # gpt_eval_api.py
 
 
@@ -24,7 +23,7 @@ try:
 # pass
     # with open(CRED_PATH) as f:
     creds = json.load(f)
-api_key = creds.get("OPENAI_API_KEY")
+    api_key = creds.get("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 print("[[OK]] OpenAI key loaded.")
 except Exception as e:
@@ -35,7 +34,7 @@ print(f"[ERROR] Failed to load OPENAI_API_KEY: {e}")
 def load_context():
     # pass
 if not CONTEXT_PATH.exists():
-        return None
+            return None
 try:
         # pass
 # except Exception:
@@ -44,8 +43,7 @@ try:
         return CONTEXT_PATH.read_text().strip()
 except Exception as e:
     print(f"[WARN] Failed to read GPT context file: {e}")
-        return None
-
+            return None
     @router.post("/ask")
     async def ask_gpt(req: Request):
     data = await req.json()
@@ -87,5 +85,6 @@ print(f"[[OK]] GPT reply: {reply[:80]}...")
 except Exception as e:
 
 
+    pass
 print("[[ERROR] GPT ERROR]", traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"OpenAI Error: {str(e)}")

@@ -91,8 +91,7 @@ def test_indicator_validation():
 
 from utils.unified_indicator_system import IndicatorValidator
 
-    validator = IndicatorValidator()
-
+        validator = IndicatorValidator()
     # Test RSI validation
     test_cases = [
         (30, True, 0.9),  # Oversold
@@ -274,8 +273,7 @@ import time
 
     manager = UnifiedIndicatorManager()
 
-    start_time = time.time()
-
+        start_time = time.time()
     # Calculate indicators for multiple symbols
     symbols = ["BTC", "ETH", "ADA", "DOT", "LINK"]
 

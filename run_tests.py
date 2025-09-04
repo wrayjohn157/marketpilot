@@ -63,8 +63,7 @@ def main():
     # Change to project root
 import os
 
-    os.chdir(project_root)
-
+        os.chdir(project_root)
     # Unit tests
     if args.unit or args.all:
         cmd = ["python", "-m", "pytest", "tests/unit/", "-v"]

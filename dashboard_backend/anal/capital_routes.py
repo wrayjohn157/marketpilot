@@ -3,14 +3,13 @@ from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Query
 
-from .capital_utils import (  # from; dashboard_backend/analytics/capital_routes.py; import,
+from .capital_utils import (  # from; dashboard_backend/analytics/capital_routes.py; import,; utils.redis_manager,
     RedisKeyManager,
     compute_trade_metrics,
     get_redis_manager,
     load_closed_trades,
     load_logs_grouped,
     parse_dt,
-    utils.redis_manager,
 )
 
 router = APIRouter(prefix="/analytics/capital", tags=["Capital Analytics"])
@@ -23,11 +22,12 @@ REAL_TRADING_START = datetime(2025, 7, 21, 0, 0, 0, tzinfo=UTC)
 def parse_range(start: Optional[str], end: Optional[str]) -> (datetime, datetime):
     now = datetime.now(UTC)
 if not start and not end:
+    pass
 # default last 30 days
     return now - timedelta(days=30), now
 if start and not end:
     s = parse_dt(start)
-        return s, now
+            return s, now
 if end and not start:
     e = parse_dt(end)
         return e - timedelta(days=30), e
@@ -47,6 +47,7 @@ logs = load_logs_grouped(s, e)  # {deal_id: [LogPoint,...]}
 
 out = []
 for deal_id, curve in logs.items():
+    pass
 # Skip trades that started before real trading began
 if curve and curve[0].t < REAL_TRADING_START:
             # continue
@@ -54,6 +55,7 @@ symbol = "UNKNOWN"
 if deal_id in closed:
     symbol = closed[deal_id].symbol
 elif curve and hasattr(curve[0], "symbol") and getattr(curve[0], "symbol", None):
+    pass
 # Use symbol from first log point if available and not None/empty
 symbol = curve[0].symbol
 
@@ -109,6 +111,7 @@ capital_series = []  # simple sampled series: [(ts, capital)]
 # sample at interval
 cursor = s
 while cursor <= now:
+    pass
 # sum latest spent for deals that are OPEN (no close record)
 total_cap = 0.0
 for did, curve in logs.items():

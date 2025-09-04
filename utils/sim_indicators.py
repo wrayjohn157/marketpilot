@@ -12,7 +12,7 @@ import ta
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 def load_klines_from_disk(symbol: str, tf: str, date_str: str) -> pd.DataFrame:
-    filepath = f"/home/signal/market7/data/snapshots/{date_str}/{symbol}_{tf}_klines.json"
+            filepath = f"/home/signal/market7/data/snapshots/{date_str}/{symbol}_{tf}_klines.json"
 if not os.path.exists(filepath):
         raise FileNotFoundError(f"Snapshot file not found: {filepath}")
 
@@ -29,8 +29,7 @@ df["high"] = pd.to_numeric(df["high"])
 df["low"] = pd.to_numeric(df["low"])
 df["close"] = pd.to_numeric(df["close"])
 df["volume"] = pd.to_numeric(df["volume"])
-    return df
-
+        return df
 def compute_ema(df: Any, period: Any = 50) -> Any:
     return ta.trend.EMAIndicator(close=df["close"], window=period).ema_indicator().iloc[-1]
 

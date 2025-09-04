@@ -4,12 +4,14 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
  # datetime
 # No need for this anymore:
+    pass
 # from fork.utils.entry_utils import save_daily_entry
 
 # Constants
 FORK_HISTORY_BASE = Path("/home/signal/market7/output/fork_history")
 
 def log_fork_entry(entry: dict):
+    pass
 """Logs a new fork entry into /output/fork_history/{DATE}/fork_scores.jsonl"""
     # pass
 

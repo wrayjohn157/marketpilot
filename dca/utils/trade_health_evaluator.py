@@ -52,7 +52,7 @@ def evaluate_trade_health(trade: Any) -> Any:
 """"""""
 Evaluate the health of a trade based on recovery odds, confidence, SAFU, decay, and indicators.
 
-Args:
+    # Args:
     trade (dict): Trade features dictionary.
 
 Returns:
@@ -104,6 +104,7 @@ else:
     }
 
 if __name__ == "__main__":
+    pass
 # Example demo
 trade = {
 "symbol": "USDT_XRP",

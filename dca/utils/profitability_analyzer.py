@@ -243,7 +243,7 @@ def main():
     """Main function for command-line usage"""
 import argparse
 
-    parser = argparse.ArgumentParser(description="Analyze DCA profitability")
+        parser = argparse.ArgumentParser(description="Analyze DCA profitability")
     parser.add_argument("--days", type=int, default=7, help="Number of days to analyze")
     parser.add_argument("--output", type=str, help="Output file for report")
 

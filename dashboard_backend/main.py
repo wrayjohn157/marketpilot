@@ -12,8 +12,7 @@ app = FastAPI()
 # === Redis ===
 from utils.redis_manager import get_redis_manager
 
-r = get_redis_manager()
-
+    r = get_redis_manager()
 # === Allow CORS from anywhere (or restrict to your domain) ===
 app.add_middleware(
     CORSMiddleware,
@@ -156,6 +155,7 @@ def trade_health(symbol: str):
 
 @app.get("/3commas/metrics")
 def threecommas_metrics():
+    pass
 from threecommas_metrics import get_3commas_metrics
 
-    return get_3commas_metrics()
+        return get_3commas_metrics()

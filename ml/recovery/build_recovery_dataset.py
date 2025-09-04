@@ -26,7 +26,7 @@ REQUIRED_MODEL_FEATURES = [
 ]
 
 def load_jsonl(path: Any) -> Any:
-    if not path.exists():
+        if not path.exists():
         return []
 with open(path, "r") as f:
         return [json.loads(line) for line in f if line.strip()]
@@ -141,7 +141,7 @@ record = {
 record.update(extract_trends(snapshots))
 missing = [k for k in REQUIRED_MODEL_FEATURES if k not in record or record[k] is None]
 if missing:
-    print(f"[WARNING] Missing fields: {missing} → Skipped.")
+    print(f"[WARNING] Missing fields: {missing} -> Skipped.")
                 # continue
 fout.write(json.dumps(record) + ""
     n")"

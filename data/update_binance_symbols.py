@@ -41,7 +41,7 @@ if quote_asset == "USDT" and base_asset not in EXCLUDE_TOKENS and status == "TRA
 # [OK] Save Tradable Pairs to JSON
 def save_pairs_to_json(pairs: Any) -> Any:
     with open(OUTPUT_FILE, "w") as f:
-    json.dump(sorted(pairs), f, indent=4)
+        json.dump(sorted(pairs), f, indent=4)
 print(f""
 n[FOLDER] Tradable pairs saved to {OUTPUT_FILE}")"
 

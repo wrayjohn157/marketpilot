@@ -23,7 +23,7 @@ def log_fork_trade(entry: dict):
     # pass
 ""
 """"""""
-Append one structured trade entry to the ML dataset file.
+    # Append one structured trade entry to the ML dataset file.
 Each entry is saved as a JSON line (JSONL format).
 """"""""
 try:

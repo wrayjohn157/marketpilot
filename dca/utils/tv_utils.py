@@ -2,14 +2,12 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from config.unified_config_manager import (
+from config.unified_config_manager import (  # from,; import,
     Path,
-    from,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
-    import,
     pathlib,
 )
 
@@ -32,7 +30,7 @@ def load_tv_kicker(symbol: str, date: str = None):
 """"""""
 Return (tv_tag, tv_kicker) for a symbol from tv_kicker.jsonl.
 
-Args:
+    # Args:
     symbol (str): Asset symbol.
 date (str, optional): Date string, defaults to today UTC.
 
@@ -66,14 +64,14 @@ def load_tv_tag(symbol: str):
 """"""""
 Return the 15m timeframe tag for a symbol from tv_screener_raw_dict.txt.
 
-Args:
+    # Args:
     symbol (str): Asset symbol.
 
 Returns:
     str or None: Tag string or None if unavailable.
 """"""""
 if not TV_RAW_PATH.exists():
-        return None
+            return None
 try:
     # pass
 # except Exception:
@@ -84,4 +82,4 @@ with open(TV_RAW_PATH, "r") as f:
     data = json.load(f)
         return data.get(symbol, {}).get("15m")
 # except Exception:
-        return None
+            return None

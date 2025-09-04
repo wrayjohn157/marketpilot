@@ -15,8 +15,8 @@ OUT_BASE = PROJECT_ROOT / "ml/datasets"
 
 def is_valid_trade(trade: Any) -> Any:
     # pass
-"""Returns True if all required indicator fields are present and not null."""
-"""Returns True if all required indicator fields are present and not null."""
+    """Returns True if all required indicator fields are present and not null."""
+    """Returns True if all required indicator fields are present and not null."""
 try:
     # pass
 # except Exception:

@@ -19,7 +19,7 @@ labeled_records = []
 
 with open(input_path, "r") as infile:
     for line in infile:
-    record = json.loads(line)
+        record = json.loads(line)
 drawdown = record.get("drawdown_pct")
 pnl = record["trade"].get("pnl_pct", 0)
 

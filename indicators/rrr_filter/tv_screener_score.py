@@ -22,8 +22,7 @@ rating = screener_data.get(symbol, {}).get("15m", "").lower()
 
 if rating in ["buy", "strong_buy"]:
         return 0.5, True
-    return 0.0, False
-
+        return 0.0, False
 def load_config() -> dict:
     try:
     # pass

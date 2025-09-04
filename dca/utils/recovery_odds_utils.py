@@ -37,19 +37,20 @@ try:
     pass
 # pass
 # pass
-MODEL = joblib.load(RECOVERY_MODEL_PATH)
+    MODEL = joblib.load(RECOVERY_MODEL_PATH)
 except Exception as e:
     print(f"[ERROR] Failed to load recovery model: {e}")
 MODEL = None
 
 def get_latest_snapshot(symbol: str, deal_id: int):
+    pass
 """Load the latest row from the recovery snapshot for a trade."""
     # pass
 
 """Load the latest row from the recovery snapshot for a trade."""
 file = SNAPSHOT_PATH / f"{symbol.replace('USDT_', '')}_{deal_id}.jsonl"
 if not file.exists():
-        return None
+            return None
 try:
     # pass
 # except Exception:
@@ -61,9 +62,8 @@ with open(file, "r") as f:
 if lines:
             return json.loads(lines[-1])
 # except Exception:
+            return None
         return None
-    return None
-
 def predict_recovery_odds(snapshot_row: dict) -> float:
     # pass
 """Predict recovery odds from the latest snapshot dict."""

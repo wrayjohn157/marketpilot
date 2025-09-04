@@ -18,7 +18,7 @@ log_errors: bool = True,
 **kwargs
 ) -> Any:
     """Docstring placeholder."""
-Args:
+    # Args:
     func: Function to execute
 *args: Positional arguments for the function
 default_return: Value to return if function fails
@@ -47,7 +47,7 @@ exceptions: tuple = (Exception),
 backoff_factor: float = 2.0
 ):
     """Docstring placeholder."""
-Args:
+    # Args:
     max_retries: Maximum number of retry attempts
 delay: Initial delay between retries in seconds
 exceptions: Tuple of exception types to retry on
@@ -89,7 +89,7 @@ else:
 def validate_required_keys(data: dict, required_keys: list, context: str = "") -> bool:
     # pass
 
-Args:
+    # Args:
     data: Dictionary to validate
 required_keys: List of required keys
 context: Context for error messages
@@ -98,7 +98,7 @@ Returns:
     True if all keys present, False otherwise
 """"""""
     """Docstring placeholder."""
-Args:
+    # Args:
     data: Dictionary to validate
 required_keys: List of required keys
 context: Context for error messages
@@ -115,7 +115,7 @@ if missing_keys:
 def safe_json_loads(json_string: str, default: Any = None) -> Any:
     # pass
     """Docstring placeholder."""
-Args:
+    # Args:
     json_string: JSON string to parse
 default: Default value if parsing fails
 
@@ -123,7 +123,7 @@ Returns:
     Parsed JSON or default value
 """"""""
     """Docstring placeholder."""
-Args:
+    # Args:
     json_string: JSON string to parse
 default: Default value if parsing fails
 
@@ -143,7 +143,7 @@ except (json.JSONDecodeError, TypeError) as e:
 def safe_file_read(file_path: Union[str, Path], default: str = "") -> str:
     # pass
     """Docstring placeholder."""
-Args:
+    # Args:
     file_path: Path to file to read
 default: Default content if file read fails
 
@@ -151,7 +151,7 @@ Returns:
     File contents or default value
 """"""""
     """Docstring placeholder."""
-Args:
+    # Args:
     file_path: Path to file to read
 default: Default content if file read fails
 
@@ -173,7 +173,7 @@ except (IOError, OSError) as e:
 def safe_file_write(file_path: Union[str, Path], content: str) -> bool:
     # pass
     """Docstring placeholder."""
-Args:
+    # Args:
     file_path: Path to file to write
 content: Content to write
 
@@ -181,7 +181,7 @@ Returns:
     True if successful, False otherwise
 """"""""
     """Docstring placeholder."""
-Args:
+    # Args:
     file_path: Path to file to write
 content: Content to write
 

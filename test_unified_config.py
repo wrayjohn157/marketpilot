@@ -390,14 +390,14 @@ n🧪 Testing Performance..."
 import time
 
     # Test config manager initialization time
-    start_time = time.time()
+        start_time = time.time()
     config_manager = UnifiedConfigManager()
     init_time = time.time() - start_time
 
     print(f"      Config manager initialization: {init_time:.3f} seconds")
 
     # Test path access performance
-    start_time = time.time()
+        start_time = time.time()
     for _ in range(100):
         try:
             config_manager.get_path("base")
@@ -408,7 +408,7 @@ import time
     print(f"      100 path accesses: {path_access_time:.3f} seconds")
 
     # Test config access performance
-    start_time = time.time()
+        start_time = time.time()
     for _ in range(100):
         try:
             config_manager.get_config("dca_config")

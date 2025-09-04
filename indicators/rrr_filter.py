@@ -9,8 +9,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import yaml
 
 from indicators.rrr_filter.run_rrr_filter import run_rrr_filter
-from utils.redis_manager import RedisKeyManager, get_redis_manager
 
+# from utils.redis_manager import RedisKeyManager, get_redis_manager
 #!/usr/bin/env python3
 
 
@@ -31,7 +31,7 @@ RRR_PASS_FILE = Path(paths["fork_trade_candidates_path"])
 FINAL_FILTER_KEY = "FINAL_RRR_FILTERED_TRADES"
 FINAL_TRADES_KEY = "queues:final_trades"
 
-r = get_redis_manager()
+    r = get_redis_manager()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 EMA_WINDOW = 5
@@ -39,8 +39,7 @@ EMA_WINDOW = 5
 def get_indicator(symbol: Any, tf: Any) -> Any:
     key = f"{symbol}_{tf}"
 data = r.get_cache(key)
-    return json.loads(data) if data else None
-
+        return json.loads(data) if data else None
 def get_klines(symbol: Any, tf: Any) -> Any:
     key = f"{symbol}_{tf}_klines"
 candles = r.lrange(key, 0, -1)

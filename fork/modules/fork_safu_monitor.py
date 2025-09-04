@@ -14,14 +14,12 @@ import yaml
 from ta.momentum import RSIIndicator
 from ta.trend import MACD
 
-from config.unified_config_manager import (
-    from,
+from config.unified_config_manager import (  # from,; import,
     get_3commas_credentials,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
-    import,
     utils.credential_manager,
 )
 
@@ -110,7 +108,7 @@ except Exception as e:
 def load_indicators_from_disk(symbol: Any, tf: Any = "15m") -> Any:
     date_str = datetime.utcnow().strftime("%Y-%m-%d")
 path = SNAPSHOT_BASE / date_str / f"{symbol}_{tf}_klines.json"
-if not path.exists():
+    if not path.exists():
     logging.warning(f"[Fallback] Kline file not found: {path}")
         return {}
 
@@ -204,13 +202,13 @@ entry_price = float(trade.get("bought_average") or trade.get("base_order_average
 current_price = float(trade.get("current_price") or 0)
 
 if entry_price == 0 or current_price == 0:
-    logging.warning(f"[Skip] {symbol_3c} → Missing entry/current price")
+    logging.warning(f"[Skip] {symbol_3c} -> Missing entry/current price")
         # return
 price_pct = round((current_price - entry_price) / entry_price * 100, 2)
 
 indicators = load_indicators_from_disk(symbol)
 if not indicators:
-    logging.warning(f"[Skip] {symbol_3c} → No indicators available")
+    logging.warning(f"[Skip] {symbol_3c} -> No indicators available")
         # return
 token = {
         "price": current_price,

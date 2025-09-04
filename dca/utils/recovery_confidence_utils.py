@@ -41,7 +41,7 @@ try:
     pass
 # pass
 # pass
-MODEL = joblib.load(str(MODEL_PATH))
+    MODEL = joblib.load(str(MODEL_PATH))
 logger.info(f"[OK] Loaded confidence model from {MODEL_PATH}")
 except Exception as e:
     logger.error(f"[ERROR] Failed to load confidence model: {e}")

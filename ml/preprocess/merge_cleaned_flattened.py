@@ -12,7 +12,7 @@ def merge_cleaned_files() -> Any:
     merged_count = 0
 with open(OUTPUT_FILE, "w") as fout:
     for path in sorted(MERGED_DIR.glob("cleaned_flattened_2025-05-*.jsonl")):
-    if path.stat().st_size == 0:
+        if path.stat().st_size == 0:
     print(f"[WARNING] Skipping empty file: {path.name}")
                 # continue
 with open(path, "r") as fin:

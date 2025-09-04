@@ -8,16 +8,13 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 
-from config.unified_config_manager import (
+from config.unified_config_manager import (  # utils.redis_manager,; from,; import,
     RedisKeyManager,
-    from,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
     get_redis_manager,
-    import,
-    utils.redis_manager,
 )
 
 #!/usr/bin/env python3
@@ -38,8 +35,7 @@ OUTPUT_FILE = get_path("filtered_pairs")
 MIN_VOLUME_USDT = 3_000_000
 
 # === Redis setup ===
-r = get_redis_manager()
-
+    r = get_redis_manager()
 # === Excluded base tokens ===
 EXCLUDED_BASES = [
 "USDT", "PAXG", "USDC", "FDUSD", "TUSD", "BUSD", "DAI",

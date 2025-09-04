@@ -50,7 +50,7 @@ try:
     pass
 # pass
 # pass
-r = requests.get(url, timeout=10)
+    r = requests.get(url, timeout=10)
 r.raise_for_status()
 df = pd.DataFrame(
 r.json(),
@@ -77,11 +77,10 @@ df = df.astype(
 "volume": float,
 }
 )
-        return df
+            return df
 except Exception as e:
     logging.warning(f"[ERROR] {symbol} {interval}: {e}")
-        return None
-
+            return None
 def compute_indicators(df: Any) -> Any:
     try:
     # pass
@@ -119,8 +118,7 @@ indicators["timestamp"] = int(df["time"].iloc[-1] // 1000)
     return indicators
 except Exception as e:
     logging.warning(f"[WARNING] Indicator calc failed: {e}")
-        return None
-
+            return None
 def save_snapshot(symbol: Any, tf: Any, date_str: Any, indicators: Any) -> Any:
     day_folder = SNAPSHOT_DIR / date_str
 day_folder.mkdir(parents=True, exist_ok=True)

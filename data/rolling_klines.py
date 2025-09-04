@@ -8,15 +8,12 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 
-from config.unified_config_manager import (
-    from,
+from config.unified_config_manager import (  # utils.redis_manager,; from,; import,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
     get_redis_manager,
-    import,
-    utils.redis_manager,
 )
 
 # /home/signal/market7/data/rolling_klines.py
@@ -35,8 +32,7 @@ sys.path.append(str(PROJECT_ROOT))
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 # === Redis config ===
-r = get_redis_manager()
-
+    r = get_redis_manager()
 # === Timeframes + settings ===
 TIMEFRAMES = ["15m", "1h", "4h"]
 KLINE_LIMIT = 210
@@ -104,8 +100,7 @@ resp.raise_for_status()
         return resp.json()
 except Exception as e:
     logging.warning(f"[WARNING] Failed to fetch klines for {symbol} {interval}: {e}")
-        return None
-
+            return None
 def save_klines_to_disk(symbol: Any, tf: Any, data: Any) -> Any:
     snapshot_dir = get_snapshot_dir()
 filename = snapshot_dir / f"{symbol.upper()}_{tf}_klines.json"

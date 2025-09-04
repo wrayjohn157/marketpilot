@@ -8,17 +8,14 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 
-from config.unified_config_manager import (
-    from,
+from config.unified_config_manager import (  # utils.redis_manager,; from,; import,
     get_3commas_credentials,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
     get_redis_manager,
-    import,
     utils.credential_manager,
-    utils.redis_manager,
 )
 
 # /home/signal/market7/fork/utils/fork_entry_utils.py
@@ -58,8 +55,7 @@ filepath = SNAPSHOT_BASE / date_str / filename
 
 if not filepath.exists():
     print(f"[WARN] Snapshot not found: {filepath}")
-        return None
-
+            return None
 with open(filepath, "r") as f:
     klines = json.load(f)
 

@@ -14,8 +14,8 @@ RAW_DIR = PROJECT_ROOT / "ml/datasets/raw_paper"
 SCRUBBED_DIR = PROJECT_ROOT / "ml/datasets/scrubbed_paper"
 
 def normalize_symbol(pair: str) -> str:
-    if "_" in pair:
-    quote, base = pair.split("_")
+        if "_" in pair:
+        quote, base = pair.split("_")
         return f"{base.upper()}{quote.upper()}"
     return pair.upper()
 
@@ -54,8 +54,7 @@ def scrub_trade(record: Any) -> Any:
         }
 except Exception as e:
     print(f"[WARNING] Skipping malformed trade: {e}")
-        return None
-
+            return None
 def main() -> Any:
     parser = argparse.ArgumentParser(description="Scrub raw paper trades to a unified format.")
 parser.add_argument("--date", type=str, help="Date in YYYY-MM-DD format. Defaults to yesterday.")
