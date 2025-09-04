@@ -1,15 +1,19 @@
-# /home/signal/market7/fork/utils/fork_entry_utils.py
-
-import json
-import time
-import hmac
-import hashlib
-import requests
-from datetime import datetime
 from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+
 import redis
+import requests
 
 from config.config_loader import PATHS
+import hashlib
+import hmac
+import time
+
+# /home/signal/market7/fork/utils/fork_entry_utils.py
+
+from
+ datetime import datetime
 
 # Paths
 SNAPSHOT_BASE = PATHS["snapshots"]
@@ -26,17 +30,17 @@ DEDUP_EXPIRY_SECONDS = 3600 * 6  # 6 hours
 
 # === Core Fork Entry Utilities ===
 
-def compute_score_hash(indicators):
+def compute_score_hash(indicators: Any) -> Any:
     keys = ["macd_histogram", "stoch_rsi_cross", "rsi_recovery", "adx_rising", "ema_price_reclaim"]
     return "_".join([f"{k}:{indicators.get(k, 0)}" for k in keys])
 
-def get_day_folder(entry_time):
+def get_day_folder(entry_time: Any) -> Any:
     day = datetime.utcfromtimestamp(entry_time).strftime("%Y-%m-%d")
     folder = PATHS["live_logs"] / day
     folder.mkdir(parents=True, exist_ok=True)
     return folder
 
-def get_entry_price(symbol, entry_ts):
+def get_entry_price(symbol: Any, entry_ts: Any) -> Any:
     date_str = datetime.utcfromtimestamp(entry_ts).strftime("%Y-%m-%d")
     base = symbol.replace("USDT", "") if symbol.endswith("USDT") else symbol
     filename = f"{base}_15m_klines.json"
@@ -59,7 +63,7 @@ def get_entry_price(symbol, entry_ts):
 
     return fallback_price
 
-def save_daily_entry(entry):
+def save_daily_entry(entry: Any) -> Any:
     folder = get_day_folder(entry["entry_time"])
     out_path = folder / "completed_forks.jsonl"
     with open(out_path, "a") as f:
@@ -67,19 +71,19 @@ def save_daily_entry(entry):
 
 # === Registry Utilities ===
 
-def load_registry():
+def load_registry() -> Any:
     if REGISTRY_PATH.exists():
         with open(REGISTRY_PATH, "r") as f:
             return json.load(f)
     return {}
 
-def save_registry(registry):
+def save_registry(registry: Any) -> Any:
     with open(REGISTRY_PATH, "w") as f:
         json.dump(registry, f, indent=2)
 
 # === 3Commas Utilities ===
 
-def get_live_3c_symbols():
+def get_live_3c_symbols() -> Any:
     try:
         with open(CRED_PATH, "r") as f:
             creds = json.load(f)

@@ -1,9 +1,14 @@
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+
+import pandas as pd
+
+import joblib
+
 #!/usr/bin/env python3
 
-import json
-import joblib
-import pandas as pd
-from pathlib import Path
+from
+ pathlib import Path
 
 # === Dynamic Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7
@@ -26,7 +31,6 @@ except Exception as e:
     print(f"[ERROR] Failed to load recovery model: {e}")
     MODEL = None
 
-
 def get_latest_snapshot(symbol: str, deal_id: int):
     """Load the latest row from the recovery snapshot for a trade."""
     file = SNAPSHOT_PATH / f"{symbol.replace('USDT_', '')}_{deal_id}.jsonl"
@@ -40,7 +44,6 @@ def get_latest_snapshot(symbol: str, deal_id: int):
     except Exception:
         return None
     return None
-
 
 def predict_recovery_odds(snapshot_row: dict) -> float:
     """Predict recovery odds from the latest snapshot dict."""

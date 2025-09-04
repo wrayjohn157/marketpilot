@@ -1,7 +1,7 @@
-import os
-import json
 from datetime import datetime
 from typing import Optional
+import json
+import os
 
 # Allow overriding the snapshot directory via env var
 DEFAULT_BTC_CONTEXT_DIR = os.environ.get(

@@ -1,11 +1,14 @@
+        from pathlib import Path
+        import json
+from typing import Any, Callable, Optional, Type, Union
+import logging
+
+                        import time
+import functools
+
 """Centralized error handling utilities for Market7."""
 
-import logging
-import functools
-from typing import Any, Callable, Optional, Type, Union
-
 logger = logging.getLogger(__name__)
-
 
 def safe_execute(
     func: Callable,
@@ -34,7 +37,6 @@ def safe_execute(
         if log_errors:
             logger.error(f"Error in {func.__name__}: {e}")
         return default_return
-
 
 def retry_on_failure(
     max_retries: int = 3,
@@ -66,7 +68,6 @@ def retry_on_failure(
                             f"Attempt {attempt + 1} failed for {func.__name__}: {e}. "
                             f"Retrying in {current_delay:.2f}s..."
                         )
-                        import time
                         time.sleep(current_delay)
                         current_delay *= backoff_factor
                     else:
@@ -77,7 +78,6 @@ def retry_on_failure(
         
         return wrapper
     return decorator
-
 
 def validate_required_keys(data: dict, required_keys: list, context: str = "") -> bool:
     """Validate that required keys exist in data dictionary.
@@ -96,7 +96,6 @@ def validate_required_keys(data: dict, required_keys: list, context: str = "") -
         return False
     return True
 
-
 def safe_json_loads(json_string: str, default: Any = None) -> Any:
     """Safely parse JSON string.
     
@@ -108,12 +107,10 @@ def safe_json_loads(json_string: str, default: Any = None) -> Any:
         Parsed JSON or default value
     """
     try:
-        import json
         return json.loads(json_string)
     except (json.JSONDecodeError, TypeError) as e:
         logger.warning(f"Failed to parse JSON: {e}")
         return default
-
 
 def safe_file_read(file_path: Union[str, Path], default: str = "") -> str:
     """Safely read file contents.
@@ -132,7 +129,6 @@ def safe_file_read(file_path: Union[str, Path], default: str = "") -> str:
         logger.warning(f"Failed to read file {file_path}: {e}")
         return default
 
-
 def safe_file_write(file_path: Union[str, Path], content: str) -> bool:
     """Safely write content to file.
     
@@ -144,7 +140,6 @@ def safe_file_write(file_path: Union[str, Path], content: str) -> bool:
         True if successful, False otherwise
     """
     try:
-        from pathlib import Path
         Path(file_path).parent.mkdir(parents=True, exist_ok=True)
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)

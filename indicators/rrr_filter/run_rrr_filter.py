@@ -1,14 +1,19 @@
-#!/usr/bin/env python3
-import redis
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from .evaluate import evaluate_trade
+
+import redis
+
 from .time_to_profit import analyze_time_to_tp1
 from .trend_slope import calculate_ema_slope
+
+#!/usr/bin/env python3
+from
+ .evaluate import evaluate_trade
 
 # Redis setup
 r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
-def run_rrr_filter(symbol, klines, atr, adx, ema_values):
+def run_rrr_filter(symbol: Any, klines: Any, atr: Any, adx: Any, ema_values: Any) -> Any:
     # TP1 vs ATR score
     tp1_target = 0.5
     tp1_score = min(max(tp1_target / atr, 0), 1) if atr else 0.0

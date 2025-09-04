@@ -1,14 +1,4 @@
-def should_dca(
-    trade,
-    config,
-    indicators,
-    btc_status,
-    entry_score,
-    current_score,
-    safu_score,
-    tp1_sim_pct,
-    recovery_odds,
-):
+def should_dca(trade: Any, config: Any, indicators: Any, btc_status: Any, entry_score: Any, current_score: Any, safu_score: Any, tp1_sim_pct: Any, recovery_odds: Any, : Any) -> Any:
     # === BTC Filter ===
     if config.get("use_btc_filter", True) and btc_status != "SAFE":
         return False, "btc_unsafe", recovery_odds

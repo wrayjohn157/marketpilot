@@ -1,12 +1,17 @@
-#!/usr/bin/env python3
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
 import os
 import sys
-import json
-import glob
-import yaml
+
 import numpy as np
-from pathlib import Path
-from datetime import datetime
+import yaml
+
+import glob
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Patch sys.path to reach /market7/ ===
 CURRENT_FILE = Path(__file__).resolve()
@@ -30,11 +35,11 @@ os.makedirs(tv_day_folder, exist_ok=True)
 OUTPUT_FILE = os.path.join(tv_day_folder, "tv_screener_raw_dict.txt")
 
 # === Helper Functions ===
-def load_klines(file_path):
+def load_klines(file_path: Any) -> Any:
     with open(file_path, "r") as f:
         return json.load(f)
 
-def compute_tv_rating(klines):
+def compute_tv_rating(klines: Any) -> Any:
     closes = [float(k[4]) for k in klines[-50:]]
     highs = [float(k[2]) for k in klines[-50:]]
     lows = [float(k[3]) for k in klines[-50:]]

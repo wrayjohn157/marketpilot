@@ -1,12 +1,17 @@
-#!/usr/bin/env python3
-import argparse
+from typing import Dict, List, Optional, Any, Union, Tuple
 import logging
-import pandas as pd
 import xgboost as xgb
-import joblib
-from pathlib import Path
-from sklearn.model_selection import train_test_split
+
+import pandas as pd
+
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
+import argparse
+import joblib
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Setup Logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -26,7 +31,7 @@ REQUIRED_FIELDS = [
     "snapshot_min_score", "snapshot_min_rsi", "snapshot_time_to_max_drawdown_min"
 ]
 
-def load_dataset(path, target):
+def load_dataset(path: Any, target: Any) -> Any:
     df = pd.read_json(path, lines=True)
     df = df[[*REQUIRED_FIELDS, target]].dropna()
     logger.info(f"Using {len(df)} rows with non-null '{target}'")
@@ -34,7 +39,7 @@ def load_dataset(path, target):
     y = df[target]
     return X, y
 
-def main(input_path, output_path, target_field):
+def main(input_path: Any, output_path: Any, target_field: Any) -> Any:
     logger.info("Loading dataset...")
     X, y = load_dataset(input_path, target_field)
 

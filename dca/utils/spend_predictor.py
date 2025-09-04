@@ -1,12 +1,17 @@
+from typing import Dict, List, Optional, Any, Union, Tuple
+import logging
+
+import pandas as pd
+
+import joblib
+
 #!/usr/bin/env python3
 """
 Utility to predict DCA spend volume based on trained XGBoost model.
 """
 
-import joblib
-import pandas as pd
-from pathlib import Path
-import logging
+from
+ pathlib import Path
 
 # === Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7
@@ -39,7 +44,6 @@ BTC_STATUS_KEYS = [
     "btc_status_nan"
 ]
 
-
 def predict_spend_volume(input_features: dict) -> float:
     """Predict spend volume based on input feature dictionary."""
     if MODEL is None:
@@ -69,7 +73,6 @@ def predict_spend_volume(input_features: dict) -> float:
     except Exception as e:
         logger.error(f"Spend prediction failed: {e}")
         return 0.0
-
 
 def adjust_volume(
     predicted_volume: float,

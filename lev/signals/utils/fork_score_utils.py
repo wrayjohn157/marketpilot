@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
-
-import json
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Tuple
+import json
 
 from indicators.fork_score_filter import compute_subscores
+
+#!/usr/bin/env python3
 
 # === Dynamic Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7

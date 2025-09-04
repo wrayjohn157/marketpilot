@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-def calculate_ema_slope(ema_values, window=5):
+def calculate_ema_slope(ema_values: Any, window: Any = 5) -> Any:
     """
     Calculate the slope of the EMA over a sliding window.
 

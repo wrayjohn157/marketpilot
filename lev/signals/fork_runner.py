@@ -1,18 +1,22 @@
-#!/usr/bin/env python3
-import os, sys, json, time, redis, logging, requests, hmac, hashlib
-from pathlib import Path
 from datetime import datetime
-import subprocess
+from typing import Dict, List, Optional, Any, Union, Tuple
+import os, sys, json, time, redis, logging, requests, hmac, hashlib
+
 import yaml
+
+from config.config_loader import PATHS
+from fork.utils.entry_utils import get_entry_price, compute_score_hash
+from fork.utils.fork_entry_logger import log_fork_entry
+import subprocess
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Setup ===
 CURRENT_FILE = Path(__file__).resolve()
 PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
-
-from config.config_loader import PATHS
-from fork.utils.fork_entry_logger import log_fork_entry
-from fork.utils.entry_utils import get_entry_price, compute_score_hash
 
 # === Config Paths ===
 FORK_SCORE_SCRIPT = PROJECT_ROOT / "indicators" / "fork_score_filter.py"
@@ -46,15 +50,15 @@ API_KEY = creds["3commas_api_key"]
 API_SECRET = creds["3commas_api_secret"]
 
 # === Helpers ===
-def format_pair(symbol):
+def format_pair(symbol: Any) -> Any:
     return f"USDT_{symbol.replace('USDT', '').replace('USDT_', '')}"
 
-def sign_payload(payload, token):
+def sign_payload(payload: Any, token: Any) -> Any:
     q = "&".join(f"{k}={v}" for k, v in sorted(payload.items()))
     payload["sign"] = hmac.new(token.encode(), q.encode(), hashlib.sha256).hexdigest()
     return payload
 
-def send_to_3c(symbol, bot_id):
+def send_to_3c(symbol: Any, bot_id: Any) -> Any:
     payload = {
         "message_type": "bot",
         "bot_id": bot_id,
@@ -72,7 +76,7 @@ def send_to_3c(symbol, bot_id):
         logging.error(f"❌ Failed to send {symbol} to bot {bot_id}: {e}")
         return False
 
-def get_active_trades():
+def get_active_trades() -> Any:
     try:
         path = "/public/api/ver1/deals?scope=active"
         sig = hmac.new(API_SECRET.encode(), path.encode(), hashlib.sha256).hexdigest()
@@ -85,7 +89,7 @@ def get_active_trades():
         return set()
 
 # === BTC Status from file ===
-def get_latest_btc_status():
+def get_latest_btc_status() -> Any:
     today = datetime.utcnow().strftime("%Y-%m-%d")
     btc_log_path = BTC_LOGS_DIR / today / "btc_snapshots.jsonl"
     if not btc_log_path.exists():
@@ -101,7 +105,7 @@ def get_latest_btc_status():
         return "neutral"
 
 # === TV Status ===
-def check_tv_status():
+def check_tv_status() -> Any:
     try:
         cfg = yaml.safe_load(TV_CONFIG_PATH.read_text()).get("tv_screener", {})
         enabled = cfg.get("enabled", False)
@@ -114,7 +118,7 @@ def check_tv_status():
         return False, False, "unknown", False
 
 # === Main ===
-def main():
+def main() -> Any:
     logging.info("🚀 Fork Trade Runner starting...")
 
     # Step 1: Run fork_score_filter.py

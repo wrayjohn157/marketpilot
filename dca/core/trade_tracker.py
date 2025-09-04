@@ -1,13 +1,12 @@
-"""Trade tracking utilities for DCA operations."""
-
-import json
-import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, Any
+import json
+import logging
+
+"""Trade tracking utilities for DCA operations."""
 
 logger = logging.getLogger(__name__)
-
 
 class TradeTracker:
     """Tracks DCA trade operations and prevents duplicate signals."""

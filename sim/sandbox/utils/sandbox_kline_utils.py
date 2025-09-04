@@ -1,10 +1,13 @@
-import pandas as pd
-import os
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from pathlib import Path
+import os
 
+import pandas as pd
 
-def load_klines_around_time(symbol, tf, center_time, lookback_candles=24):
+from
+ pathlib import Path
+
+def load_klines_around_time(symbol: Any, tf: Any, center_time: Any, lookback_candles: Any = 24) -> Any:
     """
     Loads a window of klines centered around `center_time` from local snapshot files.
     """
@@ -62,7 +65,6 @@ def load_klines_around_time(symbol, tf, center_time, lookback_candles=24):
             return df.reset_index().to_dict(orient="records")
 
     return []
-
 
 def tf_to_ms(tf: str):
     if tf.endswith("m"):

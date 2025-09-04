@@ -1,14 +1,15 @@
-import os
-import json
-import math
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict
+import json
+import os
+
+    from glob import glob
+import math
 
 SNAPSHOT_BASE = Path("/home/signal/market7/data/snapshots")
 
 def sim_generate_snapshot_series(symbol: str, entry_time_ms: int, tf: str = "1h") -> List[dict]:
-    from glob import glob
 
     def parse_kline_file(path):
         with open(path, "r") as f:

@@ -1,11 +1,16 @@
-import pandas as pd
-import xgboost as xgb
-import shap
-import joblib
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from sklearn.model_selection import train_test_split
+import xgboost as xgb
+
+import pandas as pd
+
 from sklearn.metrics import classification_report, confusion_matrix
+import joblib
 import matplotlib.pyplot as plt
+import shap
+
+from
+ sklearn.model_selection import train_test_split
 
 # === Load labeled SAFU snapshot data ===
 INPUT_PATH = "/home/signal/market7/ml/datasets/safu_analysis/labeled_safu_dca.jsonl"

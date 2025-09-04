@@ -1,16 +1,20 @@
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+
+import argparse
+
 #!/usr/bin/env python3
 
-import json
-import argparse
-from datetime import datetime, timedelta
-from pathlib import Path
+from
+ datetime import datetime, timedelta
 
 # === Updated Paths ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
 ENRICHED_BASE = PROJECT_ROOT / "live/enriched"
 OUT_BASE = PROJECT_ROOT / "ml/datasets"
 
-def is_valid_trade(trade):
+def is_valid_trade(trade: Any) -> Any:
     """Returns True if all required indicator fields are present and not null."""
     try:
         indicators = trade["fork_score"]["indicators"]
@@ -23,11 +27,11 @@ def is_valid_trade(trade):
     except:
         return False
 
-def label_trade(trade):
+def label_trade(trade: Any) -> Any:
     """Label as winner if pnl_pct >= 0.3%."""
     return 1 if trade.get("pnl_pct", -999) >= 0.3 else 0
 
-def extract_dataset(start_date, end_date):
+def extract_dataset(start_date: Any, end_date: Any) -> Any:
     current = start_date
     merged = []
 

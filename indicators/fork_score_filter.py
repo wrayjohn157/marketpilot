@@ -1,15 +1,21 @@
-#!/usr/bin/env python3
-import os
-import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
+import os
+import sys
+
+import pandas as pd
 import redis
 import yaml
+
+from config.config_loader import PATHS
 import re
-import pandas as pd
-from ta.momentum import stochrsi
-from pathlib import Path
-from datetime import datetime
+
+#!/usr/bin/env python3
+from
+ ta.momentum import stochrsi
 
 # === Setup ===
 CURRENT_FILE = Path(__file__).resolve()
@@ -17,7 +23,6 @@ PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
 # --- Load paths from config_loader ---
-from config.config_loader import PATHS
 
 CONFIG_PATH = PATHS["base"] / "config" / "fork_score_config.yaml"
 FORK_INPUT_FILE = PATHS["fork_candidates"]
@@ -41,8 +46,7 @@ MIN_SCORE = config.get("min_score", 0.73)
 WEIGHTS = config.get("weights", {})
 OPTIONS = config.get("options", {})
 
-
-def extract_float(val):
+def extract_float(val: Any) -> Any:
     if val is None:
         return 0.0
     s = str(val).strip().replace("'", "").replace('"', "")
@@ -55,8 +59,7 @@ def extract_float(val):
         match = re.search(r"[-+]?\d*\.\d+|\d+", s)
         return float(match.group()) if match else 0.0
 
-
-def btc_sentiment_multiplier():
+def btc_sentiment_multiplier() -> Any:
     price = extract_float(r.get("BTC_1h_latest_close"))
     ema50 = extract_float(r.get("BTC_1h_EMA50"))
     rsi = extract_float(r.get("BTC_15m_RSI14"))
@@ -72,8 +75,7 @@ def btc_sentiment_multiplier():
         mult -= 0.05
     return max(0.8, min(mult, 1.2))
 
-
-def compute_stoch_slope(symbol):
+def compute_stoch_slope(symbol: Any) -> Any:
     today = datetime.utcnow().strftime("%Y-%m-%d")
     filepath = SNAPSHOT_BASE / today / f"{symbol.upper()}_15m_klines.json"
     if not filepath.exists():
@@ -95,8 +97,7 @@ def compute_stoch_slope(symbol):
         logging.warning(f"[WARN] Failed to compute stoch slope for {symbol}: {e}")
     return 0.0, None
 
-
-def load_kline_volumes(symbol):
+def load_kline_volumes(symbol: Any) -> Any:
     today = datetime.utcnow().strftime("%Y-%m-%d")
     filepath = SNAPSHOT_BASE / today / f"{symbol.upper()}_15m_klines.json"
     if not filepath.exists():
@@ -111,8 +112,7 @@ def load_kline_volumes(symbol):
     except:
         return None, None
 
-
-def compute_subscores(symbol):
+def compute_subscores(symbol: Any) -> Any:
     data = r.get(f"{symbol.upper()}_1h")
     data = json.loads(data) if data else {}
 
@@ -202,15 +202,13 @@ def compute_subscores(symbol):
 
     return adjusted, subscores, mult, raw_indicators
 
-
-def write_to_history_log(entry, date_str):
+def write_to_history_log(entry: Any, date_str: Any) -> Any:
     path = FORK_HISTORY_BASE / date_str / "fork_scores.jsonl"
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "a") as f:
         f.write(json.dumps(entry) + "\n")
 
-
-def main():
+def main() -> Any:
     if not FORK_INPUT_FILE.exists():
         logging.error(f"Missing: {FORK_INPUT_FILE}")
         return
@@ -289,7 +287,6 @@ def main():
 
     logging.info(f"📂 Saved {len(results)} trades to {OUTPUT_FILE}")
     logging.info(f"📊 Backtest candidates saved to {BACKTEST_CANDIDATES_FILE}")
-
 
 if __name__ == "__main__":
     main()

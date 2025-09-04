@@ -1,13 +1,13 @@
-"""Centralized configuration management for Market7."""
-
-import json
-import logging
-import yaml
 from pathlib import Path
 from typing import Any, Dict, Optional
+import json
+import logging
+
+import yaml
+
+"""Centralized configuration management for Market7."""
 
 logger = logging.getLogger(__name__)
-
 
 class ConfigManager:
     """Centralized configuration management."""
@@ -115,7 +115,6 @@ class ConfigManager:
         for directory in directories:
             directory.mkdir(parents=True, exist_ok=True)
             logger.debug(f"Ensured directory exists: {directory}")
-
 
 # Global config manager instance
 config_manager = ConfigManager(Path(__file__).parent.parent)

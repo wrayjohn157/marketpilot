@@ -1,7 +1,10 @@
-#!/usr/bin/env python3
-import numpy as np
+from typing import Dict, List, Optional, Any, Union, Tuple
 
-def analyze_time_to_tp1(klines, tp1_pct=0.5, max_candles=12):
+#!/usr/bin/env python3
+import
+ numpy as np
+
+def analyze_time_to_tp1(klines: Any, tp1_pct: Any = 0.5, max_candles: Any = 12) -> Any:
     """
     Analyze the average speed of hitting TP1 (target profit 1) after trade entry.
 

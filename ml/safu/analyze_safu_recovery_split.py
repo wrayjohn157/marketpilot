@@ -1,9 +1,13 @@
-import json
+from typing import Dict, List, Optional, Any, Union, Tuple
+
 import pandas as pd
+
+import
+ json
 
 INFILE = "/home/signal/market7/ml/datasets/safu_analysis/labeled_safu_dca.jsonl"
 
-def main():
+def main() -> Any:
     rows = []
     with open(INFILE) as f:
         for line in f:

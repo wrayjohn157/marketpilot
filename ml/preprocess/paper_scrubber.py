@@ -1,9 +1,13 @@
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+
+import argparse
+
 #!/usr/bin/env python3
 
-import json
-import argparse
-from datetime import datetime, timedelta
-from pathlib import Path
+from
+ datetime import datetime, timedelta
 
 # === Updated Dynamic Paths ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
@@ -23,7 +27,7 @@ def normalize_timestamp(ts: str) -> str:
     except Exception:
         return ts
 
-def scrub_trade(record):
+def scrub_trade(record: Any) -> Any:
     try:
         return {
             "trade_id": record["id"],
@@ -44,7 +48,7 @@ def scrub_trade(record):
         print(f"⚠️ Skipping malformed trade: {e}")
         return None
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser(description="Scrub raw paper trades to a unified format.")
     parser.add_argument("--date", type=str, help="Date in YYYY-MM-DD format. Defaults to yesterday.")
     args = parser.parse_args()

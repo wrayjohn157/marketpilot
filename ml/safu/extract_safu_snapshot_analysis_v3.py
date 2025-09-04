@@ -1,19 +1,23 @@
-#!/usr/bin/env python3
-import os
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from pathlib import Path
+import os
+
 from tqdm import tqdm
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # Paths
 BASE = Path("/home/signal/market7")
 SNAPSHOT_DIR = BASE / "ml/datasets/recovery_snapshots"
 OUTPUT_PATH = BASE / "ml/datasets/safu_analysis/merged_safu_dca.jsonl"
 
-def load_jsonl(path):
+def load_jsonl(path: Any) -> Any:
     with open(path, "r") as f:
         return [json.loads(line) for line in f if line.strip()]
 
-def main():
+def main() -> Any:
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     count = 0
 

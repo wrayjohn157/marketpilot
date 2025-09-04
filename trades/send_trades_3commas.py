@@ -1,14 +1,19 @@
-#!/usr/bin/env python3
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import logging
 import os
 import sys
-import time
-import json
+
 import redis
 import requests
+
 import hashlib
 import hmac
-import logging
-from pathlib import Path
+import time
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Logging setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -39,7 +44,7 @@ PRICE_MOVEMENT_THRESHOLD = 0.02  # 2%
 THREECOMMAS_URL = "https://app.3commas.io/trade_signal/trading_view"
 
 # === Functions ===
-def should_send_trade(symbol, current_price):
+def should_send_trade(symbol: Any, current_price: Any) -> Any:
     last_data = r.hget(SENT_TRADES_KEY, symbol)
     if last_data is None:
         return True
@@ -55,7 +60,7 @@ def format_3commas_pair(symbol: str) -> str:
         return f"USDT_{base}"
     return f"USDT_{symbol}"
 
-def send_trade_to_3commas(symbol, current_price):
+def send_trade_to_3commas(symbol: Any, current_price: Any) -> Any:
     pair = format_3commas_pair(symbol)
     payload = {
         "message_type": "bot",
@@ -74,7 +79,7 @@ def send_trade_to_3commas(symbol, current_price):
         logging.error(f"❌ Failed to send {pair} to 3Commas: {e}")
         return False
 
-def main():
+def main() -> Any:
     logging.info("🚀 Sending final trades to 3Commas bot...")
 
     try:

@@ -1,11 +1,15 @@
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import os
+
+from dateutil import parser as dateparser
+import argparse
+
 #!/usr/bin/env python3
 
-import os
-import json
-import argparse
-from pathlib import Path
-from datetime import datetime, timedelta
-from dateutil import parser as dateparser
+from
+ pathlib import Path
 
 # === Config Root Paths ===
 SCRUBBED_DIR = Path("/home/signal/market7/ml/datasets/scrubbed_paper")
@@ -14,19 +18,19 @@ TV_DIR = Path("/home/signal/market7/output/tv_history")
 BTC_DIR = Path("/home/signal/market7/dashboard_backend/btc_logs")
 OUTPUT_BASE = Path("/home/signal/market7/ml/datasets/enriched")
 
-def load_jsonl(path):
+def load_jsonl(path: Any) -> Any:
     if not path.exists():
         return []
     with open(path) as f:
         return [json.loads(line.strip()) for line in f if line.strip()]
 
-def save_jsonl(path, records):
+def save_jsonl(path: Any, records: Any) -> Any:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w") as f:
         for rec in records:
             f.write(json.dumps(rec) + "\n")
 
-def find_fork(symbol, ts, forks):
+def find_fork(symbol: Any, ts: Any, forks: Any) -> Any:
     for fork in forks:
         if not isinstance(fork, dict):
             continue
@@ -37,7 +41,7 @@ def find_fork(symbol, ts, forks):
             return fork
     return None
 
-def find_tv(symbol, ts, tvs):
+def find_tv(symbol: Any, ts: Any, tvs: Any) -> Any:
     for tv in tvs:
         if not isinstance(tv, dict):
             continue
@@ -48,7 +52,7 @@ def find_tv(symbol, ts, tvs):
             return tv
     return None
 
-def find_btc(ts, btc_snaps):
+def find_btc(ts: Any, btc_snaps: Any) -> Any:
     closest = None
     min_delta = float("inf")
     for snap in btc_snaps:
@@ -61,7 +65,7 @@ def find_btc(ts, btc_snaps):
             min_delta = delta
     return closest
 
-def try_load_fork_tv(symbol, ts_iso, fork_cache, tv_cache):
+def try_load_fork_tv(symbol: Any, ts_iso: Any, fork_cache: Any, tv_cache: Any) -> Any:
     ts = dateparser.parse(ts_iso)
     for i in range(0, 3):  # Try entry date, then 1–2 days back
         day = (ts - timedelta(days=i)).strftime("%Y-%m-%d")

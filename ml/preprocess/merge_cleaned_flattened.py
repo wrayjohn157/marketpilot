@@ -1,11 +1,14 @@
-#!/usr/bin/env python3
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from pathlib import Path
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 MERGED_DIR = Path("/home/signal/market7/ml/merged")
 OUTPUT_FILE = MERGED_DIR / "all_cleaned_flattened.jsonl"
 
-def merge_cleaned_files():
+def merge_cleaned_files() -> Any:
     merged_count = 0
     with open(OUTPUT_FILE, "w") as fout:
         for path in sorted(MERGED_DIR.glob("cleaned_flattened_2025-05-*.jsonl")):

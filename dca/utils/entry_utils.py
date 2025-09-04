@@ -1,16 +1,22 @@
-#!/usr/bin/env python3
-
+    from datetime import timedelta
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
-import requests
-import redis
-import pandas as pd
-import hmac
-import hashlib
-from datetime import datetime
-from pathlib import Path
+
 from ta.momentum import RSIIndicator
 from ta.trend import MACD, ADXIndicator
+import pandas as pd
+import redis
+import requests
+
+import hashlib
+import hmac
+
+#!/usr/bin/env python3
+
+from
+ datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +29,8 @@ BTC_LOG_PATH = Path("/home/signal/market7/live/btc_logs")
 # === Redis Setup ===
 REDIS = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
 
-
 # === 3Commas Trade Fetch (Paginated) ===
-def get_live_3c_trades():
+def get_live_3c_trades() -> Any:
     try:
         with open(CRED_PATH, "r") as f:
             creds = json.load(f)
@@ -84,8 +89,7 @@ def get_live_3c_trades():
         logger.error(f"Failed to fetch 3Commas live trades: {e}")
         return []
 
-
-def send_dca_signal(pair, volume=15):
+def send_dca_signal(pair: Any, volume: Any = 15) -> Any:
     try:
         with open(CRED_PATH, "r") as f:
             creds = json.load(f)
@@ -112,8 +116,7 @@ def send_dca_signal(pair, volume=15):
     except Exception as e:
         logger.error(f"Unexpected error sending DCA signal for {pair}: {e}")
 
-
-def get_latest_indicators(symbol, tf="15m"):
+def get_latest_indicators(symbol: Any, tf: Any = "15m") -> Any:
     path = (
         SNAPSHOT_BASE
         / datetime.utcnow().strftime("%Y-%m-%d")
@@ -171,8 +174,7 @@ def get_latest_indicators(symbol, tf="15m"):
         print(f"[ERROR] Could not compute indicators for {symbol}: {e}")
         return {}
 
-
-def get_rsi_slope(symbol, tf="15m", window=3):
+def get_rsi_slope(symbol: Any, tf: Any = "15m", window: Any = 3) -> Any:
     try:
         path = (
             SNAPSHOT_BASE
@@ -192,8 +194,7 @@ def get_rsi_slope(symbol, tf="15m", window=3):
         print(f"[ERROR] RSI slope error for {symbol}: {e}")
         return 0.0
 
-
-def get_macd_lift(symbol, tf="15m", window=3):
+def get_macd_lift(symbol: Any, tf: Any = "15m", window: Any = 3) -> Any:
     try:
         path = (
             SNAPSHOT_BASE
@@ -213,9 +214,7 @@ def get_macd_lift(symbol, tf="15m", window=3):
         print(f"[ERROR] MACD lift error for {symbol}: {e}")
         return 0.0
 
-
-def load_fork_entry_score(symbol, entry_ts):
-    from datetime import timedelta
+def load_fork_entry_score(symbol: Any, entry_ts: Any) -> Any:
 
     best_match = None
     smallest_delta = float("inf")
@@ -257,8 +256,7 @@ def load_fork_entry_score(symbol, entry_ts):
     print(f"[WARN] No matching entry score found for {symbol} at ts={entry_ts}")
     return None
 
-
-def simulate_new_avg_price(current_avg, added_usdt, current_price):
+def simulate_new_avg_price(current_avg: Any, added_usdt: Any, current_price: Any) -> Any:
     try:
         tokens = added_usdt / current_price
         new_total_usdt = current_avg * tokens + added_usdt
@@ -268,8 +266,7 @@ def simulate_new_avg_price(current_avg, added_usdt, current_price):
         print(f"[ERROR] Failed to simulate BE price: {e}")
         return current_avg
 
-
-def load_btc_market_condition():
+def load_btc_market_condition() -> Any:
     try:
         today = datetime.utcnow().strftime("%Y-%m-%d")
         path = BTC_LOG_PATH / today / "btc_snapshots.jsonl"
@@ -283,17 +280,15 @@ def load_btc_market_condition():
         print(f"[WARN] Failed to load BTC condition: {e}")
         return None
 
-
 # === Redis Entry Score Utilities ===
-def save_entry_score_to_redis(deal_id, score):
+def save_entry_score_to_redis(deal_id: Any, score: Any) -> Any:
     try:
         key = f"FORK_ENTRY_SCORE:{deal_id}"
         REDIS.set(key, score)
     except Exception as e:
         print(f"[WARN] Failed to save entry score to Redis: {e}")
 
-
-def load_entry_score_from_redis(deal_id):
+def load_entry_score_from_redis(deal_id: Any) -> Any:
     try:
         key = f"FORK_ENTRY_SCORE:{deal_id}"
         value = REDIS.get(key)

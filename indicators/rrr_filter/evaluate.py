@@ -1,7 +1,10 @@
-#!/usr/bin/env python3
-from indicators.rrr_filter.scorer import score_trade
+from typing import Dict, List, Optional, Any, Union, Tuple
 
-def evaluate_trade(tp1_score, ema_score, adx_score, ttp_score, threshold=0.65, return_reasons=False):
+#!/usr/bin/env python3
+from
+ indicators.rrr_filter.scorer import score_trade
+
+def evaluate_trade(tp1_score: Any, ema_score: Any, adx_score: Any, ttp_score: Any, threshold: Any = 0.65, return_reasons: Any = False) -> Any:
     """
     Evaluate a trade based on RRR sub-scores and return pass/fail and reasons.
 

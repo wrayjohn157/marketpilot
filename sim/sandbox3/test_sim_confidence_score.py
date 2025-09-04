@@ -1,14 +1,17 @@
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import sys
+
+from utils.sim_confidence_utils import inject_snapshot, predict_sim_confidence_score
+import argparse
+
 #!/usr/bin/env python3
 
-import sys
-from pathlib import Path
+from
+ pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-import argparse
-from datetime import datetime
-from utils.sim_confidence_utils import inject_snapshot, predict_sim_confidence_score
-
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--symbol", required=True, help="Symbol name (e.g., MAGIC)")
     parser.add_argument("--entry-time", type=int, required=True, help="Entry timestamp in ms")

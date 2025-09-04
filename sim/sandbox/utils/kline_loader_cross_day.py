@@ -1,8 +1,12 @@
-from pathlib import Path
-SNAPSHOT_BASE = Path("/home/signal/market7/data/snapshots")
-def load_forward_klines_cross_days(symbol, tf, start_time, max_days=30):
     from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+
     import pandas as pd
+
+from
+ pathlib import Path
+SNAPSHOT_BASE = Path("/home/signal/market7/data/snapshots")
+def load_forward_klines_cross_days(symbol: Any, tf: Any, start_time: Any, max_days: Any = 30) -> Any:
 
     all_klines = []
     start_ms = int(start_time)

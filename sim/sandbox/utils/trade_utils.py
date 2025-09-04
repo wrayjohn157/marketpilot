@@ -1,14 +1,15 @@
-from .kline_loader_cross_day import load_forward_klines_cross_days
+from typing import Dict, List, Optional, Any, Union, Tuple
 
+from
+ .kline_loader_cross_day import load_forward_klines_cross_days
 
 # Helper to normalize timestamps to int milliseconds
-def _to_int_timestamp(ts):
+def _to_int_timestamp(ts: Any) -> Any:
     if isinstance(ts, (int, float, str)):
         return int(float(ts))
     elif hasattr(ts, "timestamp"):  # Handles pandas.Timestamp or datetime
         return int(ts.timestamp() * 1000)
     return 0
-
 
 def load_price_at_entry(symbol: str, entry_time: int, tf: str = "1h") -> float:
     print(f"🔍 Loading klines for {symbol} at {entry_time} ({tf})")
@@ -42,7 +43,6 @@ def load_price_at_entry(symbol: str, entry_time: int, tf: str = "1h") -> float:
         return None
     print(f"🟢 Found valid kline at or before entry_time: {valid[-1]}")
     return valid[-1]["close"]
-
 
 def build_mock_trade(symbol: str, entry_time: int, tf: str = "1h") -> dict:
     price = load_price_at_entry(symbol, entry_time, tf)

@@ -1,13 +1,27 @@
-"""Main DCA Engine for intelligent trading decisions."""
-
-import logging
-import yaml
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
+import logging
 
+from ..utils.btc_filter import get_btc_status
+import yaml
+
+        from ..modules.fork_safu_evaluator import load_safu_exit_model
+from ..modules.dca_decision_engine import should_dca
+from ..modules.fork_safu_evaluator import get_safu_score
+from ..utils.entry_utils import (
+from ..utils.fork_score_utils import compute_fork_score
+from ..utils.recovery_confidence_utils import predict_confidence_score
+from ..utils.recovery_odds_utils import (
+from ..utils.spend_predictor import predict_spend_volume, adjust_volume
+from ..utils.trade_health_evaluator import evaluate_trade_health
+from ..utils.tv_utils import load_tv_kicker
+from ..utils.zombie_utils import is_zombie_trade
 from .snapshot_manager import SnapshotManager
 from .trade_tracker import TradeTracker
-from ..utils.entry_utils import (
+from config.config_loader import PATHS
+
+"""Main DCA Engine for intelligent trading decisions."""
+
     get_live_3c_trades,
     get_latest_indicators,
     send_dca_signal,
@@ -18,24 +32,12 @@ from ..utils.entry_utils import (
     save_entry_score_to_redis,
     load_entry_score_from_redis,
 )
-from ..utils.fork_score_utils import compute_fork_score
-from ..modules.fork_safu_evaluator import get_safu_score
-from ..utils.btc_filter import get_btc_status
-from ..modules.dca_decision_engine import should_dca
-from ..utils.recovery_odds_utils import (
     get_latest_snapshot,
     predict_recovery_odds,
     SNAPSHOT_PATH,
 )
-from ..utils.recovery_confidence_utils import predict_confidence_score
-from ..utils.tv_utils import load_tv_kicker
-from ..utils.zombie_utils import is_zombie_trade
-from ..utils.spend_predictor import predict_spend_volume, adjust_volume
-from ..utils.trade_health_evaluator import evaluate_trade_health
-from config.config_loader import PATHS
 
 logger = logging.getLogger(__name__)
-
 
 class DCAEngine:
     """Main DCA Engine for intelligent trading decisions."""
@@ -56,7 +58,6 @@ class DCAEngine:
         )
         
         # Load SAFU model
-        from ..modules.fork_safu_evaluator import load_safu_exit_model
         self.safu_exit_model = load_safu_exit_model()
     
     def _load_config(self) -> Dict[str, Any]:

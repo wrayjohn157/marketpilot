@@ -1,15 +1,21 @@
-#!/usr/bin/env python3
-import os
-import json
-import time
-import logging
-import requests
-import pandas as pd
-from pathlib import Path
 from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import logging
+import os
+
 from ta.momentum import StochRSIIndicator, RSIIndicator
 from ta.trend import EMAIndicator, ADXIndicator, MACD, PSARIndicator
 from ta.volatility import AverageTrueRange
+import pandas as pd
+import requests
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Config ===
 BASE_DIR = Path("/home/signal/market7")
@@ -29,9 +35,8 @@ logging.basicConfig(
 with open(SYMBOLS_FILE) as f:
     SYMBOLS = json.load(f)
 
-
 # === Helpers ===
-def fetch_klines(symbol, interval, end_ts, limit=KLINE_LIMIT):
+def fetch_klines(symbol: Any, interval: Any, end_ts: Any, limit: Any = KLINE_LIMIT) -> Any:
     url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}&endTime={end_ts}"
     try:
         r = requests.get(url, timeout=10)
@@ -67,8 +72,7 @@ def fetch_klines(symbol, interval, end_ts, limit=KLINE_LIMIT):
         logging.warning(f"❌ {symbol} {interval}: {e}")
         return None
 
-
-def compute_indicators(df):
+def compute_indicators(df: Any) -> Any:
     try:
         indicators = {
             "EMA50": EMAIndicator(df["close"], 50).ema_indicator().iloc[-1],
@@ -102,19 +106,16 @@ def compute_indicators(df):
         logging.warning(f"⚠️ Indicator calc failed: {e}")
         return None
 
-
-def save_snapshot(symbol, tf, date_str, indicators):
+def save_snapshot(symbol: Any, tf: Any, date_str: Any, indicators: Any) -> Any:
     day_folder = SNAPSHOT_DIR / date_str
     day_folder.mkdir(parents=True, exist_ok=True)
     jsonl_file = day_folder / f"{symbol}_{tf}.jsonl"
     with open(jsonl_file, "a") as f:
         f.write(json.dumps(indicators) + "\n")
 
-
 # === Main ===
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
-def process_symbol_tf(symbol, tf):
+def process_symbol_tf(symbol: Any, tf: Any) -> Any:
     interval_ms = {
         "1h": 60 * 60 * 1000,
         "4h": 4 * 60 * 60 * 1000,
@@ -136,7 +137,7 @@ def process_symbol_tf(symbol, tf):
             time.sleep(0.1)
         day += pd.Timedelta(days=1)
 
-def run_backfill():
+def run_backfill() -> Any:
     max_workers = 10
     for tf in TIMEFRAMES:
         if tf == "15m":
@@ -148,7 +149,6 @@ def run_backfill():
                     future.result()
                 except Exception as e:
                     logging.error(f"Thread failed: {e}")
-
 
 if __name__ == "__main__":
     run_backfill()

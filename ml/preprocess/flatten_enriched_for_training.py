@@ -1,8 +1,12 @@
-#!/usr/bin/env python3
-import json
-import argparse
-from pathlib import Path
 from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+
+import argparse
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 ENRICHED_ROOT = Path("/home/signal/market7/ml/datasets/enriched")
 FLATTENED_ROOT = Path("/home/signal/market7/ml/datasets/flattened")
@@ -13,7 +17,7 @@ REQUIRED_TRADE_FIELDS = [
     "exit_price", "symbol", "pnl_pct", "safety_orders", "status"
 ]
 
-def is_valid_entry(entry):
+def is_valid_entry(entry: Any) -> Any:
     trade = entry.get("trade")
     fork = entry.get("fork")
 
@@ -28,7 +32,7 @@ def is_valid_entry(entry):
         return False
     return True
 
-def flatten_entry(entry):
+def flatten_entry(entry: Any) -> Any:
     flat = {}
 
     trade = entry["trade"]
@@ -68,7 +72,7 @@ def flatten_entry(entry):
 
     return flat
 
-def process_file(date_str):
+def process_file(date_str: Any) -> Any:
     input_path = ENRICHED_ROOT / date_str / "enriched_data.jsonl"
     output_path = FLATTENED_ROOT / f"{CLEANED_PREFIX}{date_str}.jsonl"
 
@@ -88,7 +92,7 @@ def process_file(date_str):
     print(f"✅ {date_str}: Saved {len(cleaned)} rows → {output_path.name}")
     return len(cleaned)
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser(description="Flatten enriched_data.jsonl for ML training.")
     parser.add_argument("--date", help="Target date (YYYY-MM-DD), defaults to yesterday UTC")
     args = parser.parse_args()

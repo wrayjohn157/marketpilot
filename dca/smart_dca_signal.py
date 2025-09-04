@@ -83,7 +83,8 @@ def get_last_snapshot_values(symbol, deal_id):
                 return 0.0, 0.0
             last = json.loads(lines[-1])
             return last.get("confidence_score", 0.0), last.get("tp1_shift", 0.0)
-    except:
+    except (json.JSONDecodeError, IOError, KeyError) as e:
+        logger.warning(f"Failed to read snapshot for {symbol}_{deal_id}: {e}")
         return 0.0, 0.0
 
 
@@ -98,7 +99,8 @@ def get_last_logged_snapshot(deal_id):
         if not entries:
             return None
         return entries[-1]
-    except:
+    except (json.JSONDecodeError, IOError) as e:
+        logger.warning(f"Failed to read tracking data for deal {deal_id}: {e}")
         return None
 
 
@@ -112,7 +114,8 @@ def get_last_fired_step(deal_id):
                 obj = json.loads(line)
                 if obj["deal_id"] == deal_id and obj.get("step", 0) > last:
                     last = obj["step"]
-            except:
+            except (json.JSONDecodeError, KeyError) as e:
+                logger.debug(f"Failed to parse tracking line: {e}")
                 continue
     return last
 
@@ -126,7 +129,8 @@ def was_dca_fired_recently(deal_id, step):
                 obj = json.loads(line)
                 if obj["deal_id"] == deal_id and obj["step"] == step:
                     return True
-            except:
+            except (json.JSONDecodeError, KeyError) as e:
+                logger.debug(f"Failed to parse tracking line: {e}")
                 continue
     return False
 
@@ -225,7 +229,8 @@ def run():
                 datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp()
                 * 1000
             )
-        except:
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Failed to parse entry timestamp: {e}")
             entry_ts = None
 
         if avg_entry_price == 0:

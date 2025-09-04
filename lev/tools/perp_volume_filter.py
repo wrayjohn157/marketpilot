@@ -1,8 +1,14 @@
-#!/usr/bin/env python3
-from __future__ import annotations
-import argparse, json, logging, requests
 from datetime import datetime
 from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+import argparse, json, logging, requests
+
+    import redis
+
+from __future__ import
+
+#!/usr/bin/env python3
+ annotations
 
 # --- Paths resolved relative to this file ---
 # this file lives at: <repo>/lev/tools/perp_volume_filter.py
@@ -16,7 +22,6 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 # Optional Redis (for “we have klines cached” gating)
 try:
-    import redis
     REDIS_AVAILABLE = True
 except Exception:
     REDIS_AVAILABLE = False
@@ -41,7 +46,7 @@ def fetch_futures_24h() -> dict[str, float]:
         out[sym] = qv
     return out
 
-def main():
+def main() -> Any:
     ap = argparse.ArgumentParser(description="Filter Binance USDT-M PERPETUALs by 24h quote volume (and optional Redis klines gate).")
     ap.add_argument("--min-volume", type=float, default=3_000_000, help="Minimum 24h quote volume in USDT (default: 3,000,000)")
     ap.add_argument("--no-redis", action="store_true", help="Disable Redis gating even if redis is installed")

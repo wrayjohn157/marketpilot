@@ -1,8 +1,12 @@
-#!/usr/bin/env python3
-import json, logging, argparse
-from pathlib import Path
 from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json, logging, argparse
+
 import yaml
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
@@ -38,7 +42,7 @@ def load_tv(path: Path):
         logging.warning(f"[tv_kicker] bad tv json {path}: {e}")
         return {}
 
-def main():
+def main() -> Any:
     ap = argparse.ArgumentParser("TV kicker for lev (side-aware)")
     ap.add_argument("--side", choices=["long","short"], required=True)
     ap.add_argument("--candidates", required=True,

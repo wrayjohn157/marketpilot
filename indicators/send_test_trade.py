@@ -1,6 +1,9 @@
-#!/usr/bin/env python3
-import requests
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
+
+#!/usr/bin/env python3
+import
+ requests
 
 BOT_ID = 16017224
 EMAIL_TOKEN = "aa5bba08-4875-41bc-91a0-5e0bb66c72b0"

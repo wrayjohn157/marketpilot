@@ -1,14 +1,20 @@
-#!/usr/bin/env python3
-import os
-import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
+import os
+import sys
+
+import pandas as pd
 import redis
 import yaml
-import re
-import argparse
-import pandas as pd
 
+from config.config_loader import PATHS
+import argparse
+import re
+
+#!/usr/bin/env python3
 
 # --- Dummy Redis for --no-redis mode or fallback ---
 class DummyRedis:
@@ -24,10 +30,8 @@ class DummyRedis:
     def delete(self, *args, **kwargs):
         return 0
 
-
-from ta.momentum import stochrsi
-from pathlib import Path
-from datetime import datetime
+from
+ ta.momentum import stochrsi
 
 # --- Leverage universe (10 coins) ---
 ALLOWED_TICKERS = {
@@ -44,7 +48,6 @@ ALLOWED_TICKERS = {
 }
 ALIASES = {"DODGE": "DOGE"}
 
-
 def _to_usdt_symbol(s: str) -> str:
     s = (s or "").upper().strip()
     s = ALIASES.get(s, s)
@@ -52,14 +55,12 @@ def _to_usdt_symbol(s: str) -> str:
         return s
     return f"{s}USDT"
 
-
 # === Setup ===
 CURRENT_FILE = Path(__file__).resolve()
 PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
 # --- Load paths from config_loader ---
-from config.config_loader import PATHS
 
 # Default paths (can be overridden by CLI)
 DEFAULT_CONFIG_PATH = Path("lev/signals/config/fork_config.yaml")
@@ -82,7 +83,6 @@ logging.basicConfig(
 )
 
 # === Config loader ===
-
 
 def load_config(path: Path) -> tuple:
     if not Path(path).exists():
@@ -121,14 +121,12 @@ def load_config(path: Path) -> tuple:
     options = cfg.get("options", {}) or {}
     return (min_score, weights, options, cfg)
 
-
 # --- Module-level defaults (overridden in main) ---
 MIN_SCORE = 0.73
 WEIGHTS = {}
 OPTIONS = {}
 
-
-def extract_float(val):
+def extract_float(val: Any) -> Any:
     if val is None:
         return 0.0
     s = str(val).strip().replace("'", "").replace('"', "")
@@ -137,10 +135,9 @@ def extract_float(val):
     try:
         s_clean = s.replace("np.float64(", "").replace(")", "")
         return float(s_clean)
-    except:
+    except (ValueError, TypeError):
         match = re.search(r"[-+]?\d*\.\d+|\d+", s)
         return float(match.group()) if match else 0.0
-
 
 def btc_sentiment_multiplier(side: str = "long"):
     """
@@ -203,8 +200,7 @@ def btc_sentiment_multiplier(side: str = "long"):
     )
     return mult
 
-
-def compute_stoch_slope(symbol):
+def compute_stoch_slope(symbol: Any) -> Any:
     today = datetime.utcnow().strftime("%Y-%m-%d")
     filepath = SNAPSHOT_BASE / today / f"{symbol.upper()}_15m_klines.json"
     if not filepath.exists():
@@ -226,8 +222,7 @@ def compute_stoch_slope(symbol):
         logging.warning(f"[WARN] Failed to compute stoch slope for {symbol}: {e}")
     return 0.0, None
 
-
-def load_kline_volumes(symbol):
+def load_kline_volumes(symbol: Any) -> Any:
     today = datetime.utcnow().strftime("%Y-%m-%d")
     filepath = SNAPSHOT_BASE / today / f"{symbol.upper()}_15m_klines.json"
     if not filepath.exists():
@@ -239,9 +234,9 @@ def load_kline_volumes(symbol):
         if len(volumes) < 2:
             return None, None
         return volumes[-1], sum(volumes[:-1]) / (len(volumes) - 1)
-    except:
+    except (FileNotFoundError, json.JSONDecodeError, IndexError, ValueError, TypeError) as e:
+        logger.warning(f"Failed to load volume data from {filepath}: {e}")
         return None, None
-
 
 def compute_subscores(symbol, side: str = "long"):
     data = r.get(f"{symbol.upper()}_1h") if r else None
@@ -347,15 +342,13 @@ def compute_subscores(symbol, side: str = "long"):
 
     return adjusted, subscores, mult, raw_indicators
 
-
-def write_to_history_log(entry, date_str):
+def write_to_history_log(entry: Any, date_str: Any) -> Any:
     path = FORK_HISTORY_BASE / date_str / "fork_scores.jsonl"
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "a") as f:
         f.write(json.dumps(entry) + "\n")
 
-
-def main():
+def main() -> Any:
     global REDIS_PREFIX, r, MIN_SCORE, WEIGHTS, OPTIONS
     parser = argparse.ArgumentParser(
         description="Fork score filter for leverage (long/short)"
@@ -560,7 +553,6 @@ def main():
 
     logging.info(f"📂 Saved {len(results)} {args.side} trades to {output_path}")
     logging.info(f"📊 Backtest candidates saved to {backtest_path}")
-
 
 if __name__ == "__main__":
     main()

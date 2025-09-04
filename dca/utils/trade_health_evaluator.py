@@ -1,12 +1,17 @@
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+
+import yaml
+
+import math
+
 #!/usr/bin/env python3
 """
 Trade Health Evaluator for DCA module (config-aware).
 """
 
-import json
-import math
-import yaml
-from pathlib import Path
+from
+ pathlib import Path
 
 # === Load config ===
 CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "dca_config.yaml"
@@ -42,7 +47,7 @@ decay_threshold = HEALTH_CONFIG.get("decay_threshold", defaults["decay_threshold
 thresholds = HEALTH_CONFIG.get("indicator_thresholds", defaults["indicator_thresholds"])
 health_thresholds = HEALTH_CONFIG.get("health_thresholds", defaults["health_thresholds"])
 
-def evaluate_trade_health(trade):
+def evaluate_trade_health(trade: Any) -> Any:
     """
     Evaluate the health of a trade based on recovery odds, confidence, SAFU, decay, and indicators.
 

@@ -1,6 +1,10 @@
-# test_kline_loader.py
-from sim_kline_loader import load_klines_across_days
+from typing import Dict, List, Optional, Any, Union, Tuple
 import sys
+
+from sim_kline_loader import
+
+# test_kline_loader.py
+ load_klines_across_days
 
 if __name__ == "__main__":
     symbol = sys.argv[1]

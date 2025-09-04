@@ -1,13 +1,18 @@
+from typing import Dict, List, Optional, Any, Union, Tuple
+import logging
+
+import pandas as pd
+
+import joblib
+
 #!/usr/bin/env python3
 """
 Sim utility to predict DCA spend volume using the trained XGBoost model.
 Allows injection of model overrides for testing.
 """
 
-import joblib
-import pandas as pd
-from pathlib import Path
-import logging
+from
+ pathlib import Path
 
 # === Paths ===
 BASE_DIR = Path(__file__).resolve().parents[3]  # /market7
@@ -40,7 +45,6 @@ BTC_STATUS_KEYS = [
     "btc_status_nan"
 ]
 
-
 def predict_sim_spend_volume(input_features: dict, model_override=None) -> float:
     """Sim version of spend prediction with optional model injection."""
     model = model_override or MODEL
@@ -71,7 +75,6 @@ def predict_sim_spend_volume(input_features: dict, model_override=None) -> float
     except Exception as e:
         logger.error(f"Sim spend prediction failed: {e}")
         return 0.0
-
 
 def adjust_volume(
     predicted_volume: float,

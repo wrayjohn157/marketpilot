@@ -1,12 +1,16 @@
-#!/usr/bin/env python3
-import pandas as pd
+from typing import Dict, List, Optional, Any, Union, Tuple
+import logging
+
 import requests
 import ta
-import logging
+
+#!/usr/bin/env python3
+import
+ pandas as pd
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
-def fetch_binance_klines(symbol="BTCUSDT", interval="1h", limit=251):
+def fetch_binance_klines(symbol: Any = "BTCUSDT", interval: Any = "1h", limit: Any = 251) -> Any:
     url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
     try:
         response = requests.get(url, timeout=10)
@@ -27,7 +31,7 @@ def fetch_binance_klines(symbol="BTCUSDT", interval="1h", limit=251):
         logging.error(f"Error fetching klines: {e}")
         return None
 
-def compute_ema(df, period=50):
+def compute_ema(df: Any, period: Any = 50) -> Any:
     try:
         ema_indicator = ta.trend.EMAIndicator(close=df["close"], window=period)
         return ema_indicator.ema_indicator().iloc[-1]
@@ -35,7 +39,7 @@ def compute_ema(df, period=50):
         logging.error(f"Error computing EMA({period}): {e}")
         return None
 
-def compute_rsi(df, period=14):
+def compute_rsi(df: Any, period: Any = 14) -> Any:
     try:
         rsi_indicator = ta.momentum.RSIIndicator(close=df["close"], window=period)
         return rsi_indicator.rsi().iloc[-1]
@@ -43,7 +47,7 @@ def compute_rsi(df, period=14):
         logging.error(f"Error computing RSI({period}): {e}")
         return None
 
-def compute_adx(df, period=14):
+def compute_adx(df: Any, period: Any = 14) -> Any:
     try:
         adx_indicator = ta.trend.ADXIndicator(high=df["high"], low=df["low"], close=df["close"], window=period)
         return adx_indicator.adx().iloc[-1]
@@ -51,7 +55,7 @@ def compute_adx(df, period=14):
         logging.error(f"Error computing ADX({period}): {e}")
         return None
 
-def compute_qqe(df, rsi_period=14, smoothing=5):
+def compute_qqe(df: Any, rsi_period: Any = 14, smoothing: Any = 5) -> Any:
     try:
         rsi_indicator = ta.momentum.RSIIndicator(close=df["close"], window=rsi_period)
         rsi = rsi_indicator.rsi()
@@ -61,7 +65,7 @@ def compute_qqe(df, rsi_period=14, smoothing=5):
         logging.error(f"Error computing QQE: {e}")
         return None
 
-def compute_psar(df, step=0.02, max_step=0.2):
+def compute_psar(df: Any, step: Any = 0.02, max_step: Any = 0.2) -> Any:
     try:
         psar_indicator = ta.trend.PSARIndicator(
             high=df["high"],
@@ -75,7 +79,7 @@ def compute_psar(df, step=0.02, max_step=0.2):
         logging.error(f"Error computing PSAR: {e}")
         return None
 
-def compute_atr(df, period=14):
+def compute_atr(df: Any, period: Any = 14) -> Any:
     try:
         atr_indicator = ta.volatility.AverageTrueRange(
             high=df["high"],
@@ -88,7 +92,7 @@ def compute_atr(df, period=14):
         logging.error(f"Error computing ATR({period}): {e}")
         return None
 
-def compute_vwap(df):
+def compute_vwap(df: Any) -> Any:
     try:
         typical_price = (df["high"] + df["low"] + df["close"]) / 3
         cum_vol_price = (typical_price * df["volume"]).cumsum()
@@ -99,7 +103,7 @@ def compute_vwap(df):
         logging.error(f"Error computing VWAP: {e}")
         return None
 
-def compute_macd_full(df, fast=12, slow=26, signal=9):
+def compute_macd_full(df: Any, fast: Any = 12, slow: Any = 26, signal: Any = 9) -> Any:
     try:
         macd_indicator = ta.trend.MACD(close=df["close"], window_fast=fast, window_slow=slow, window_sign=signal)
         macd_line = macd_indicator.macd()
@@ -116,7 +120,7 @@ def compute_macd_full(df, fast=12, slow=26, signal=9):
         logging.error(f"Error computing MACD: {e}")
         return None
 
-def compute_all_indicators(df):
+def compute_all_indicators(df: Any) -> Any:
     indicators = {}
 
     indicators["EMA50"] = compute_ema(df, 50)

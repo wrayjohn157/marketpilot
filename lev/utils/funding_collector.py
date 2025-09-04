@@ -1,8 +1,13 @@
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-import time
-import requests
+
 import redis
-from pathlib import Path
+import requests
+
+import time
+
+from
+ pathlib import Path
 
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -14,11 +19,11 @@ r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 # Binance API template
 FUNDING_RATE_URL = "https://fapi.binance.com/fapi/v1/fundingRate?symbol={}&limit=1"
 
-def load_symbols():
+def load_symbols() -> Any:
     with open(SYMBOLS_PATH, "r") as f:
         return json.load(f)
 
-def fetch_funding(symbol):
+def fetch_funding(symbol: Any) -> Any:
     try:
         url = FUNDING_RATE_URL.format(symbol)
         resp = requests.get(url, timeout=5)
@@ -33,7 +38,7 @@ def fetch_funding(symbol):
         print(f"⚠️ Error fetching {symbol}: {e}")
     return None
 
-def save_to_redis(symbol, entry, max_len=48):
+def save_to_redis(symbol: Any, entry: Any, max_len: Any = 48) -> Any:
     key = f"funding:{symbol}"
 
     # Force delete if wrong type

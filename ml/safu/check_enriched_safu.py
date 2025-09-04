@@ -1,8 +1,11 @@
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import os
+
 #!/usr/bin/env python3
 
-import os
-import json
-from pathlib import Path
+from
+ pathlib import Path
 
 BASE_DIR = Path("/home/signal/market7/ml/datasets/enriched")
 found_any = False

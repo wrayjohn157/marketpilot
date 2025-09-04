@@ -1,6 +1,9 @@
-#!/usr/bin/env python3
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from pathlib import Path
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Configuration ===
 PROJECT_ROOT = Path("/home/signal/market7").resolve()

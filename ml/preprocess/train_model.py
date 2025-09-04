@@ -1,30 +1,35 @@
-#!/usr/bin/env python3
-import os
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+from xgboost import XGBClassifier
 import json
+import os
+
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+import pandas as pd
+
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
 import argparse
 import joblib
-import pandas as pd
-import numpy as np
-from datetime import datetime
-from pathlib import Path
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report
-from xgboost import XGBClassifier
-import shap
 import matplotlib.pyplot as plt
+import shap
+
+#!/usr/bin/env python3
+from
+ datetime import datetime
 
 # === CONFIG ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "ml/datasets"
 MODEL_DIR = PROJECT_ROOT / "ml/models"
 
-def load_data(path):
+def load_data(path: Any) -> Any:
     with open(path, "r") as f:
         records = [json.loads(line) for line in f if line.strip()]
     return pd.json_normalize(records, sep='.')
 
-def prepare_features(df):
+def prepare_features(df: Any) -> Any:
     indicator_cols = [
         "ind_ema50", "ind_rsi", "ind_adx", "ind_atr",
         "ind_stoch_rsi_k", "ind_stoch_rsi_d", "ind_macd",
@@ -59,7 +64,7 @@ def prepare_features(df):
     y = df_clean["label"].astype(int)
     return X, y, available_cols
 
-def train_model(X, y, feature_names, shap_out_path):
+def train_model(X: Any, y: Any, feature_names: Any, shap_out_path: Any) -> Any:
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, stratify=y, random_state=42)
 
     scaler = StandardScaler()
@@ -89,7 +94,7 @@ def train_model(X, y, feature_names, shap_out_path):
 
     return model, scaler
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", required=True, help="Path to master_data.jsonl")
     args = parser.parse_args()

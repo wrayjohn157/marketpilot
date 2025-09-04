@@ -1,19 +1,22 @@
+    import datetime as dt
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+
+from collections import defaultdict
+
 # utils/log_reader.py
 
-import json
-from pathlib import Path
-from collections import defaultdict
-from datetime import datetime
+from
+ pathlib import Path
 
 DCA_LOG_BASE = Path("/home/signal/market7/dca/logs")
-
 
 def load_latest_dca_logs(date: str = None) -> list:
     """
     Reads the latest dca_log.jsonl file for the given date (or today by default)
     and returns the most recent entry per deal_id.
     """
-    import datetime as dt
     if date is None:
         date = dt.datetime.now().strftime("%Y-%m-%d")
 

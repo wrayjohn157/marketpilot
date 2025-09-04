@@ -1,27 +1,30 @@
-#!/usr/bin/env python3
-from __future__ import annotations
-
-import argparse
-import json
-import yaml
-import logging
-import re
-import random
-import sys
-import textwrap
-import shutil
-from pathlib import Path
 from datetime import datetime
-
-from config.config_loader import PATHS
-from lev.exchange import futures_adapter as fa
 from lev.modules.lev_decision_engine import should_add_to_position
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import logging
+import sys
+
+from dca.utils.btc_filter import get_btc_status
+import yaml
+
+from __future__ import
+from config.config_loader import PATHS
+from dca.utils.entry_utils import get_latest_indicators
+from dca.utils.recovery_confidence_utils import predict_confidence_score
+from dca.utils.recovery_odds_utils import predict_recovery_odds
+from lev.exchange import futures_adapter as fa
+import argparse
+import random
+import re
+import shutil
+import textwrap
+
+#!/usr/bin/env python3
+ annotations
 
 # reuse your existing utils
-from dca.utils.entry_utils import get_latest_indicators
-from dca.utils.recovery_odds_utils import predict_recovery_odds
-from dca.utils.recovery_confidence_utils import predict_confidence_score
-from dca.utils.btc_filter import get_btc_status
 
 # ------------------------
 # Paths / Logging
@@ -45,8 +48,6 @@ def _load_spot_bases() -> set[str]:
     except Exception as e:
         log.warning(f"Could not load spot bases from PATHS['filtered_pairs']: {e}")
     return set()
-
-
 
 SPOT_BASES: set[str] = _load_spot_bases()
 
@@ -142,7 +143,6 @@ def _load_json_map(path: str | Path) -> dict:
             out[key] = row
     return out
 
-
 def _fork_value_for(sym: str, fork_map: dict) -> tuple[float | None, str | None]:
     """
     Given a snap symbol (e.g., 'BIO'), return (score, decision) from fork runner map if present.
@@ -190,7 +190,6 @@ def _fork_value_for(sym: str, fork_map: dict) -> tuple[float | None, str | None]
 
     return score_f, dec_norm
 
-
 def _tv_value_for(sym: str, tv_map: dict) -> tuple[str | None, float | None]:
     """
     Given a snap symbol, return (tv_signal, tv_score) if present.
@@ -236,17 +235,14 @@ def _tv_value_for(sym: str, tv_map: dict) -> tuple[str | None, float | None]:
 CHECK_OK = "✅"
 CHECK_NO = "❌"
 
-
 def _fmt_bool(val: bool) -> str:
     return CHECK_OK if bool(val) else CHECK_NO
 
-
-def _fmt_num(val, nd=3):
+def _fmt_num(val: Any, nd: Any = 3) -> Any:
     try:
         return f"{float(val):.{nd}f}"
     except Exception:
         return "-"
-
 
 def _detect_terminal_support() -> bool:
     """Best-effort: enable pretty output if stdout is a TTY and TERM is not dumb."""
@@ -254,7 +250,6 @@ def _detect_terminal_support() -> bool:
         return sys.stdout.isatty() and (shutil.get_terminal_size().columns > 0)
     except Exception:
         return False
-
 
 def _pretty_decision_block(*,
                            symbol: str,
@@ -326,20 +321,16 @@ def _pretty_decision_block(*,
 
     return "\n".join(lines)
 
-
 # ------------------------
 # Helpers
 # ------------------------
-def load_cfg():
+def load_cfg() -> Any:
     return yaml.safe_load(CFG_PATH.read_text())
-
 
 def write_log(entry: dict):
     p = LOG_DIR / f"{datetime.utcnow().strftime('%Y-%m-%d')}.jsonl"
     with open(p, "a") as f:
         f.write(json.dumps(entry) + "\n")
-
-
 
 def _base_symbol(sym: str) -> str:
     """
@@ -351,7 +342,6 @@ def _base_symbol(sym: str) -> str:
         if s.endswith(suffix):
             return s[: -len(suffix)]
     return s
-
 
 # Map a futures symbol to the snapshot base used by spot snapshots.
 def _snapshot_base_for(sym: str) -> str:
@@ -381,7 +371,6 @@ def _snapshot_base_for(sym: str) -> str:
         return stripped
     return stripped or b
 
-
 def _normalize_symbol_to_perp(sym: str) -> str:
     """
     Ensure we return a futures-style symbol like 'BTCUSDT'.
@@ -391,7 +380,6 @@ def _normalize_symbol_to_perp(sym: str) -> str:
     if s.endswith(("USDT", "USDC", "USD", "BUSD")):
         return s
     return s + "USDT"
-
 
 def load_symbols_from_file(path: str) -> list[str]:
     """
@@ -438,7 +426,6 @@ def load_symbols_from_file(path: str) -> list[str]:
     log.info(f"Loaded {len(uniq)} symbols from file: {fp}")
     return uniq
 
-
 def load_available_perps() -> list[str]:
     """
     Best-effort load of Binance USDT-M perps (ids) to use as a fallback when
@@ -459,11 +446,10 @@ def load_available_perps() -> list[str]:
         log.warning(f"Failed to parse {perps_path}: {e}")
         return []
 
-
 # ------------------------
 # Main logic
 # ------------------------
-def run_once(args):
+def run_once(args: Any) -> Any:
     cfg = load_cfg()
     dry_run = args.dry_run if args.dry_run is not None else bool(cfg.get("dry_run", False))
 
@@ -763,8 +749,7 @@ def run_once(args):
             )
         )
 
-
-def main():
+def main() -> Any:
     examples = textwrap.dedent(
         """
         Examples:
@@ -826,7 +811,6 @@ def main():
     except KeyboardInterrupt:
         log.warning("Interrupted by user (Ctrl+C). Exiting cleanly.")
         sys.exit(130)
-
 
 if __name__ == "__main__":
     main()

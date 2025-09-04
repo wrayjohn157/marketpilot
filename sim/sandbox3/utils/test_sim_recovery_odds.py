@@ -1,14 +1,17 @@
+from typing import Dict, List, Optional, Any, Union, Tuple
+import sys
+
+from sim_recovery_odds_utils import sim_predict_recovery_odds
+from sim_snapshot_loader import sim_generate_snapshot_series
+import argparse
+
 #!/usr/bin/env python3
 
-import argparse
-import sys
-from pathlib import Path
+from
+ pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent))
 
-from sim_snapshot_loader import sim_generate_snapshot_series
-from sim_recovery_odds_utils import sim_predict_recovery_odds
-
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--symbol", required=True, help="Symbol (e.g., BTC)")
     parser.add_argument("--entry-time", required=True, type=int, help="Entry timestamp in ms")

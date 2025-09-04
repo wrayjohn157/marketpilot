@@ -1,11 +1,14 @@
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+
 #!/usr/bin/env python3
 """
 TV Screener Utilities for DCA module.
 """
 
-import json
-from pathlib import Path
-from datetime import datetime
+from
+ pathlib import Path
 
 # === Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent.parent

@@ -1,19 +1,23 @@
-#!/usr/bin/env python3
-import sys
-import os
-import json
-import redis
-import logging
-from datetime import datetime
 from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import logging
+import os
+import sys
+
+import redis
 import yaml
+
+from indicators.rrr_filter.run_rrr_filter import run_rrr_filter
+
+#!/usr/bin/env python3
+from
+ datetime import datetime
 
 # Add root to sys.path
 CURRENT_FILE = Path(__file__).resolve()
 PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
-
-from indicators.rrr_filter.run_rrr_filter import run_rrr_filter
 
 # === Load config paths ===
 CONFIG_PATH = PROJECT_ROOT / "config" / "paths_config.yaml"
@@ -32,17 +36,17 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 
 EMA_WINDOW = 5
 
-def get_indicator(symbol, tf):
+def get_indicator(symbol: Any, tf: Any) -> Any:
     key = f"{symbol}_{tf}"
     data = r.get(key)
     return json.loads(data) if data else None
 
-def get_klines(symbol, tf):
+def get_klines(symbol: Any, tf: Any) -> Any:
     key = f"{symbol}_{tf}_klines"
     candles = r.lrange(key, 0, -1)
     return [json.loads(c) for c in candles] if candles else []
 
-def make_json_serializable(obj):
+def make_json_serializable(obj: Any) -> Any:
     if isinstance(obj, dict):
         return {k: make_json_serializable(v) for k, v in obj.items()}
     elif isinstance(obj, list):
@@ -53,7 +57,7 @@ def make_json_serializable(obj):
         return obj
     return str(obj)
 
-def main():
+def main() -> Any:
     logging.info("🚀 Running RRR filter engine...")
     r.delete(FINAL_FILTER_KEY)
     r.delete(FINAL_TRADES_KEY)

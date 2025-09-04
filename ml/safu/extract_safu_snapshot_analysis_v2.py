@@ -1,9 +1,13 @@
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import os
+
+from glob import glob
+
 # extract_safu_snapshot_analysis_v2.py
 
-import os
-import json
-from tqdm import tqdm
-from glob import glob
+from
+ tqdm import tqdm
 
 DCA_DIR = "/home/signal/market7/dca/logs"
 SNAPSHOT_DIR = "/home/signal/market7/ml/datasets/recovery_snapshots"

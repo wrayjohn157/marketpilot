@@ -1,18 +1,24 @@
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+
+from dca_status import compute_indicators  # example: replace with your real function
+import yaml
+
+from config.config_loader import PATHS
+from dashboard_backend.dca.core import (
+from dca_trades_api import adjust_volume  # example: replace with your real function
+from dca_trades_api import should_dca  # example: replace with your real function
+import argparse
+
 # dashboard_backend/dca/core.py
 """
 Core DCA engine functions extracted for reuse in simulation and live evaluation.
 """
 
-import yaml
-from pathlib import Path
-from config.config_loader import PATHS
+from
+ pathlib import Path
 
-# TODO: replace the following imports with your actual DCA logic modules
 # These should point to the modules where your production code lives.
-from dca_status import compute_indicators  # example: replace with your real function
-from dca_trades_api import should_dca  # example: replace with your real function
-from dca_trades_api import adjust_volume  # example: replace with your real function
-
 
 def load_config(path: Path = None, fallback: bool = False):
     """
@@ -29,22 +35,16 @@ def load_config(path: Path = None, fallback: bool = False):
     with open(config_path) as f:
         return yaml.safe_load(f)
 
-
 # simulate_dca.py
 """
 A simple driver script to run DCA simulation using the real engine.
 """
 
-import yaml
-import argparse
-from pathlib import Path
-from dashboard_backend.dca.core import (
     load_config,
     compute_indicators,
     should_dca,
     adjust_volume,
 )
-
 
 def run_sim(data_file: str, config_file: str, fallback: bool = False):
     # Load configuration (fallback uses a separate defaults file)
@@ -67,7 +67,6 @@ def run_sim(data_file: str, config_file: str, fallback: bool = False):
             print(
                 f"DCA step @ {candle.get('timestamp')} → volume={volume:.4f}, reason: {reason}"
             )
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

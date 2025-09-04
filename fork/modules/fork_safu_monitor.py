@@ -1,17 +1,22 @@
-#!/usr/bin/env python3
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import logging
 import os
 import sys
-import json
-import yaml
-import requests
-import logging
-import hmac
-import hashlib
-import pandas as pd
-from pathlib import Path
-from datetime import datetime
-from ta.trend import MACD
+
 from ta.momentum import RSIIndicator
+from ta.trend import MACD
+import pandas as pd
+import requests
+import yaml
+
+import hashlib
+import hmac
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Dynamic Paths (Market7 style) ===
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # ~/market7
@@ -42,7 +47,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 
 # === Functions ===
 
-def send_telegram(msg):
+def send_telegram(msg: Any) -> Any:
     if not ALERTS_ENABLED:
         return
     url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
@@ -55,7 +60,7 @@ def send_telegram(msg):
 def generate_signature(path: str) -> str:
     return hmac.new(API_SECRET.encode(), path.encode(), hashlib.sha256).hexdigest()
 
-def fetch_open_trades():
+def fetch_open_trades() -> Any:
     page = 1
     all_trades = []
     while True:
@@ -82,7 +87,7 @@ def fetch_open_trades():
     logging.info(f"[3C] Total deals returned: {len(all_trades)}")
     return all_trades
 
-def load_indicators_from_disk(symbol, tf="15m"):
+def load_indicators_from_disk(symbol: Any, tf: Any = "15m") -> Any:
     date_str = datetime.utcnow().strftime("%Y-%m-%d")
     path = SNAPSHOT_BASE / date_str / f"{symbol}_{tf}_klines.json"
     if not path.exists():
@@ -120,7 +125,7 @@ def load_indicators_from_disk(symbol, tf="15m"):
         logging.warning(f"[Fallback] Error loading indicators from disk for {symbol}: {e}")
         return {}
 
-def fork_safu_score(token, price_pct):
+def fork_safu_score(token: Any, price_pct: Any) -> Any:
     score = 1.0
     try:
         if token["RSI14"] is not None and token["RSI14"] < 35:
@@ -143,7 +148,7 @@ def fork_safu_score(token, price_pct):
 
     return round(max(0.0, score), 3)
 
-def panic_sell(deal_id):
+def panic_sell(deal_id: Any) -> Any:
     url_path = f"/public/api/ver1/deals/{deal_id}/panic_sell"
     headers = {
         "ApiKey": API_KEY,
@@ -157,7 +162,7 @@ def panic_sell(deal_id):
         logging.warning(f"[3C] Panic sell error: {e}")
         return False
 
-def analyze_trade(trade):
+def analyze_trade(trade: Any) -> Any:
     symbol_3c = trade["pair"]
     symbol = symbol_3c.replace("USDT_", "")
     entry_price = float(trade.get("bought_average") or trade.get("base_order_average_price") or 0)
@@ -199,7 +204,7 @@ def analyze_trade(trade):
             success = panic_sell(trade["id"])
             logging.info(f"[AUTO-CLOSE] {symbol_3c} → {'✅ Closed' if success else '❌ Failed'}")
 
-def main():
+def main() -> Any:
     trades = fetch_open_trades()
     logging.info(f"🔍 Checking {len(trades)} active deals (scope=active)...")
     for trade in trades:

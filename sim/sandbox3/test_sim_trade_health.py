@@ -1,11 +1,15 @@
+from typing import Dict, List, Optional, Any, Union, Tuple
 import sys
-from pathlib import Path
+
+from utils.sim_trade_health_evaluator import evaluate_trade_health
+import argparse
+
+from
+ pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent))
 sys.path.append(str(Path(__file__).resolve().parent / "utils"))
-import argparse
-from utils.sim_trade_health_evaluator import evaluate_trade_health
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser(description="Test SIM Trade Health Evaluator")
     parser.add_argument("--entry_score", type=float, default=0.7)
     parser.add_argument("--current_score", type=float, default=0.4)

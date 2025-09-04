@@ -1,13 +1,17 @@
-#!/usr/bin/env python3
+from typing import Dict, List, Optional, Any, Union, Tuple
+import os
+
 import subprocess
 import time
-import os
-from pathlib import Path
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # Set the absolute base directory for Market7
 BASE_DIR = "/home/signal/market7"
 
-def run_step(description, script_path):
+def run_step(description: Any, script_path: Any) -> Any:
     print(f"\n🟢 Running: {description}")
     if not os.path.exists(script_path):
         print(f"⚠️ Skipping {description}: {script_path} not found.")
@@ -17,7 +21,7 @@ def run_step(description, script_path):
     except subprocess.CalledProcessError as e:
         print(f"❌ Error running {description}: {e}")
 
-def main():
+def main() -> Any:
     print("🚀 Starting Market7 pipeline...")
 
     run_step("BTC Snapshot Logger", os.path.join(BASE_DIR, "dashboard_backend", "btc_logger.py")) #run_step("BTC Market Condition", os.path.join(BASE_DIR, "indicators", "btc_market_condition.py"))

@@ -1,16 +1,37 @@
+    from datetime import datetime, timedelta
+    import json
+    import os
+from typing import Dict, List, Optional, Any, Union, Tuple
+
+    from ta.momentum import RSIIndicator
+    from ta.trend import MACD
+from dca.utils.btc_filter import get_btc_status
+import pandas as pd
+import yaml
+
+    from dca.utils.entry_utils import (
+    from dca.utils.recovery_odds_utils import (
+    from dca.utils.safu_reentry_utils import should_reenter_after_safu
+    from dca.utils.trade_health_evaluator import evaluate_trade_health
+from config.config_loader import PATHS
+from dca.utils.entry_utils import get_latest_indicators, get_rsi_slope, get_macd_lift
+from dca.utils.recovery_confidence_utils import predict_confidence_score
+from dca.utils.spend_predictor import predict_spend_volume
+from dca.utils.zombie_utils import is_zombie_trade
+from modules.dca_decision_engine import should_dca, adjust_volume
+from modules.fork_safu_evaluator import get_safu_exit_decision, load_safu_exit_model
+from modules.fork_safu_evaluator import get_safu_score
+from utils.local_indicators import fetch_binance_klines, compute_all_indicators
+
 """
 Core DCA engine functions extracted for reuse in simulation and live evaluation.
 """
 
-import yaml
-from pathlib import Path
-from config.config_loader import PATHS
-from dca.utils.btc_filter import get_btc_status
-from utils.local_indicators import fetch_binance_klines, compute_all_indicators
-import pandas as pd
+from
+ pathlib import Path
 
 # Helper to load local klines from snapshots (mimics simulate_dca_overlay.py logic)
-def load_local_klines(symbol, tf="15m", lookback=100, base_time=None):
+def load_local_klines(symbol: Any, tf: Any = "15m", lookback: Any = 100, base_time: Any = None) -> Any:
     """
     Load klines from snapshot JSON files around a given timestamp or latest.
 
@@ -20,9 +41,6 @@ def load_local_klines(symbol, tf="15m", lookback=100, base_time=None):
     :param base_time: base timestamp in ms (if None, use most recent file)
     :return: pandas DataFrame or None
     """
-    from datetime import datetime, timedelta
-    import os
-    import json
 
     SNAPSHOT_DIR = Path("/home/signal/market7/data/snapshots")
     date_str = datetime.utcfromtimestamp(base_time / 1000).strftime("%Y-%m-%d") if base_time else datetime.utcnow().strftime("%Y-%m-%d")
@@ -53,18 +71,9 @@ def load_local_klines(symbol, tf="15m", lookback=100, base_time=None):
         print(f"[ERROR] Failed to load klines: {e}")
         return None
 
-# TODO: replace the following imports with your actual DCA logic modules
 # These should point to the modules where your production code lives.
-from dca.utils.entry_utils import get_latest_indicators, get_rsi_slope, get_macd_lift
-from modules.dca_decision_engine import should_dca, adjust_volume
-from dca.utils.recovery_confidence_utils import predict_confidence_score
-from dca.utils.zombie_utils import is_zombie_trade
-from dca.utils.spend_predictor import predict_spend_volume
-from modules.fork_safu_evaluator import get_safu_exit_decision, load_safu_exit_model
-from modules.fork_safu_evaluator import get_safu_score
 
 print("[DEBUG] ✅ core.py simulation triggered")
-
 
 def compute_indicators(symbol: str, tf: str = "15m", entry_time: int = None) -> dict:
     if entry_time:
@@ -74,9 +83,6 @@ def compute_indicators(symbol: str, tf: str = "15m", entry_time: int = None) -> 
 
     if df is None or df.empty:
         return {}
-
-    from ta.momentum import RSIIndicator
-    from ta.trend import MACD
 
     close = df["close"]
     rsi = RSIIndicator(close=close).rsi().iloc[-1]
@@ -91,7 +97,6 @@ def compute_indicators(symbol: str, tf: str = "15m", entry_time: int = None) -> 
         "macd_histogram_prev": macd_hist_prev,
         "macd_lift": macd_lift,
     }
-
 
 def load_config(path: Path = None, fallback: bool = False):
     """
@@ -110,19 +115,16 @@ def load_config(path: Path = None, fallback: bool = False):
     with open(config_path) as f:
         return yaml.safe_load(f)
 
-
-def simulate_dca_step(trade, config):
+def simulate_dca_step(trade: Any, config: Any) -> Any:
     symbol = trade.get("symbol")
     tf = config.get("timeframe", "15m")
     entry_time = trade.get("entry_time")
     indicators = compute_indicators(symbol, tf, entry_time)
 
-    from dca.utils.entry_utils import (
         load_btc_market_condition,
         load_fork_entry_score,
         load_entry_score_from_redis,
     )
-    from dca.utils.recovery_odds_utils import (
         get_latest_snapshot,
         predict_recovery_odds,
     )
@@ -156,11 +158,7 @@ def simulate_dca_step(trade, config):
         }
     )
 
-    from dca.utils.safu_reentry_utils import should_reenter_after_safu
-
     zombie = is_zombie_trade(indicators, recovery_odds, current_score)
-
-    from dca.utils.trade_health_evaluator import evaluate_trade_health
 
     trade_features = {
         "recovery_odds": recovery_odds,

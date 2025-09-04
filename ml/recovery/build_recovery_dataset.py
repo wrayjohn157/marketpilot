@@ -1,9 +1,13 @@
-# build_recovery_dataset.py
-import json
-import argparse
-from pathlib import Path
 from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+
 from dateutil import parser as dtparser
+import argparse
+
+# build_recovery_dataset.py
+from
+ pathlib import Path
 
 # === Input directories ===
 ENRICHED_DIR = Path("/home/signal/market7/ml/datasets/enriched")
@@ -21,13 +25,13 @@ REQUIRED_MODEL_FEATURES = [
     "recovery_label"
 ]
 
-def load_jsonl(path):
+def load_jsonl(path: Any) -> Any:
     if not path.exists():
         return []
     with open(path, "r") as f:
         return [json.loads(line) for line in f if line.strip()]
 
-def extract_trends(snapshots):
+def extract_trends(snapshots: Any) -> Any:
     times, dd_vals, score_vals, rsi_vals = [], [], [], []
     for snap in snapshots:
         try:
@@ -59,7 +63,7 @@ def extract_trends(snapshots):
     except:
         return {k: 0.0 for k in REQUIRED_MODEL_FEATURES if k.startswith("snapshot_")}
 
-def build_daily_dataset(date_str):
+def build_daily_dataset(date_str: Any) -> Any:
     enriched_path = ENRICHED_DIR / date_str / "enriched_data.jsonl"
     dca_path = DCA_LOG_DIR / date_str / "dca_log.jsonl"
     out_path = OUTPUT_DIR / f"{date_str}_recovery.jsonl"

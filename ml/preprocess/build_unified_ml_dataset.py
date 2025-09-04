@@ -1,10 +1,14 @@
-#!/usr/bin/env python3
-import os
-import json
-import argparse
-from pathlib import Path
 from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import os
+
 from dateutil import parser as dtparser
+import argparse
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Paths ===
 PROJECT_ROOT = Path("/home/signal/market7").resolve()
@@ -20,7 +24,7 @@ def load_jsonl(path: Path):
     with open(path, "r") as f:
         return [json.loads(line) for line in f if line.strip()]
 
-def extract_snapshot_meta(snapshots):
+def extract_snapshot_meta(snapshots: Any) -> Any:
     times, dd_vals, score_vals, rsi_vals = [], [], [], []
     for snap in snapshots:
         ts = snap.get("timestamp")
@@ -62,7 +66,7 @@ def extract_snapshot_meta(snapshots):
     }
 
 # === Unified Builder ===
-def build_unified_dataset():
+def build_unified_dataset() -> Any:
     total_written = 0
     total_skipped = 0
 

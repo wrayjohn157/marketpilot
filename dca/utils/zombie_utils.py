@@ -1,6 +1,8 @@
-def is_zombie_trade(indicators, recovery_odds, score):
-    from config.config_loader import PATHS
     import yaml
+
+    from config.config_loader import PATHS
+
+def is_zombie_trade(indicators: Any, recovery_odds: Any, score: Any) -> Any:
 
     config_path = PATHS["dca_config"]
     with open(config_path, "r") as f:

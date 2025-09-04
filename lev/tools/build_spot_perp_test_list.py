@@ -1,7 +1,11 @@
-#!/usr/bin/env python3
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
+
 import argparse
-from pathlib import Path
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # Defaults
 SPOT_LIST_DEFAULT = Path("/home/signal/market7/data/filtered_pairs.json")
@@ -82,7 +86,7 @@ def normalized_for_match(base: str) -> str:
         return "BABYDOGE"
     return b
 
-def main():
+def main() -> Any:
     ap = argparse.ArgumentParser(description="Build spot∩perp list while preserving perp metadata.")
     ap.add_argument("--spot", type=Path, default=SPOT_LIST_DEFAULT,
                     help=f"Path to spot filtered bases (default: {SPOT_LIST_DEFAULT})")

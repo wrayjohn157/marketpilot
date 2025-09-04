@@ -1,8 +1,8 @@
-"""Type definitions for Market7 trading system."""
-
-from typing import Dict, List, Optional, Union, Any, Tuple
 from datetime import datetime
 from pathlib import Path
+from typing import Dict, List, Optional, Union, Any, Tuple
+
+"""Type definitions for Market7 trading system."""
 
 # Basic types
 Symbol = str

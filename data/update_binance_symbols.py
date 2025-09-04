@@ -1,7 +1,11 @@
-#!/usr/bin/env python3
-import requests
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from pathlib import Path
+
+import requests
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # ✅ Binance API Endpoint
 BINANCE_API_URL = "https://api.binance.com/api/v3/exchangeInfo"
@@ -18,7 +22,7 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_FILE = OUTPUT_DIR / "binance_symbols.json"
 
 # ✅ Fetch Tradable USDT Pairs from Binance
-def fetch_usdt_pairs():
+def fetch_usdt_pairs() -> Any:
     response = requests.get(BINANCE_API_URL, timeout=10)
     data = response.json()
     tradable_pairs = []
@@ -35,7 +39,7 @@ def fetch_usdt_pairs():
     return tradable_pairs
 
 # ✅ Save Tradable Pairs to JSON
-def save_pairs_to_json(pairs):
+def save_pairs_to_json(pairs: Any) -> Any:
     with open(OUTPUT_FILE, "w") as f:
         json.dump(sorted(pairs), f, indent=4)
     print(f"\n📁 Tradable pairs saved to {OUTPUT_FILE}")

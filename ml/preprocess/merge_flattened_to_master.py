@@ -1,16 +1,20 @@
-#!/usr/bin/env python3
-import os
-import json
-import argparse
-from pathlib import Path
 from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import os
+
+import argparse
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 FLATTENED_DIR = Path("/home/signal/market7/ml/datasets/flattened")
 OUTPUT_DIR = Path("/home/signal/market7/ml/datasets/unified")
 MASTER_FILE = OUTPUT_DIR / "master_data.jsonl"
 ARCHIVE_DIR = OUTPUT_DIR / "archive"
 
-def merge_flattened_files():
+def merge_flattened_files() -> Any:
     all_records = []
     for file in sorted(FLATTENED_DIR.glob("cleaned_flattened_*.jsonl")):
         with open(file, "r") as f:
@@ -18,7 +22,7 @@ def merge_flattened_files():
             all_records.extend(records)
     return all_records
 
-def archive_existing_master(date_str):
+def archive_existing_master(date_str: Any) -> Any:
     ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
     archive_path = ARCHIVE_DIR / f"master_data_{date_str}.jsonl"
     if MASTER_FILE.exists():
@@ -27,14 +31,14 @@ def archive_existing_master(date_str):
     else:
         print("ℹ️ No previous master data to archive.")
 
-def write_master_file(records):
+def write_master_file(records: Any) -> Any:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     with open(MASTER_FILE, "w") as f:
         for row in records:
             f.write(json.dumps(row) + "\n")
     print(f"✅ Wrote {len(records)} rows to {MASTER_FILE}")
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser(description="Merge all flattened JSONLs into master_data.jsonl")
     parser.add_argument("--date", help="Date for archive name (defaults to today UTC)")
     args = parser.parse_args()

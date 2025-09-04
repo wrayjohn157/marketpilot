@@ -1,7 +1,8 @@
-# /market7/core/fork_scorer.py
+from typing import Dict, Any
 
 import math
-from typing import Dict, Any
+
+# /market7/core/fork_scorer.py
 
 def score_fork(symbol: str, timestamp: int, indicators: Dict[str, Any], config: Dict[str, Any]) -> Dict[str, Any]:
     """

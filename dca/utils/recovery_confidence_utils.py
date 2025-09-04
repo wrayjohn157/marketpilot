@@ -1,10 +1,15 @@
-#!/usr/bin/env python3
-
-import joblib
-import pandas as pd
-from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
+
+import pandas as pd
+
+import joblib
+
+#!/usr/bin/env python3
+
+from
+ pathlib import Path
 
 # === Setup ===
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +35,6 @@ try:
 except Exception as e:
     logger.error(f"❌ Failed to load confidence model: {e}")
     MODEL = None
-
 
 def predict_confidence_score(trade_snapshot: dict) -> float:
     """

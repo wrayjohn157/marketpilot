@@ -1,26 +1,29 @@
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import os
 import sys
-from pathlib import Path
+
+import yaml
+
+from sim_dca_engine import simulate_dca_engine
+from sim_entry_utils import get_entry_price_for_kline
+from sim_kline_loader import load_klines_for_symbol
+import argparse
+
+from
+ pathlib import Path
 
 # Ensure local modules can be imported
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.append(str(BASE_DIR / "core"))
 sys.path.append(str(BASE_DIR / "utils"))
 
-import argparse
-import yaml
-import json
-import os
-from datetime import datetime
-
-from sim_dca_engine import simulate_dca_engine
-from sim_kline_loader import load_klines_for_symbol
-from sim_entry_utils import get_entry_price_for_kline
-
-def load_yaml_config(path):
+def load_yaml_config(path: Any) -> Any:
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--symbol", required=True, help="Symbol like LTC")
     parser.add_argument("--entry_time", type=int, required=True, help="Entry time in ms")

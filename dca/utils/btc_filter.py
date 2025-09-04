@@ -1,16 +1,19 @@
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import logging
+
 #!/usr/bin/env python3
 
-import logging
-import json
-from pathlib import Path
-from datetime import datetime
+from
+ pathlib import Path
 
 # === Dynamic Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /home/signal/market7
 BTC_SNAPSHOT_BASE = BASE_DIR / "dashboard_backend" / "btc_logs" #BTC_SNAPSHOT_BASE = BASE_DIR / "dashboard_backend" / "snapshots" / "btc_"
 
 # === BTC Snapshot Loader ===
-def get_latest_btc_snapshot():
+def get_latest_btc_snapshot() -> Any:
     today = datetime.utcnow().strftime("%Y-%m-%d")
     filepath = BTC_SNAPSHOT_BASE / today / "btc_snapshots.jsonl"
     if not filepath.exists():
@@ -28,7 +31,7 @@ def get_latest_btc_snapshot():
         return None
 
 # === BTC Safety Evaluator ===
-def is_btc_unsafe(cfg):
+def is_btc_unsafe(cfg: Any) -> Any:
     snapshot = get_latest_btc_snapshot()
     if not snapshot:
         logging.warning("[BTC] No snapshot available, skipping BTC filter")
@@ -51,5 +54,5 @@ def is_btc_unsafe(cfg):
     return False
 
 # === Status Returner ===
-def get_btc_status(cfg):
+def get_btc_status(cfg: Any) -> Any:
     return "UNSAFE" if is_btc_unsafe(cfg) else "SAFE"

@@ -1,17 +1,20 @@
-#!/usr/bin/env python3
-from pathlib import Path
+from datetime import datetime
+from pathlib import
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import logging
 import sys
+
+import yaml
+
+from config.config_loader import PATHS
+
+#!/usr/bin/env python3
+ Path
 
 CURRENT_FILE = Path(__file__).resolve()
 PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
-
-import json
-import logging
-from datetime import datetime
-import yaml
-
-from config.config_loader import PATHS
 
 # === Setup Logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -77,7 +80,7 @@ def load_tv_tags(path: Path):
         return {}
 
 # === Main Logic ===
-def main():
+def main() -> Any:
     logging.info("📡 Loading TV tags and fork candidates...")
     candidates = load_candidates(INPUT_FILE)
     tv_tags = load_tv_tags(TV_FILE)

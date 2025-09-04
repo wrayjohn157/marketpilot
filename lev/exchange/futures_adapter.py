@@ -1,7 +1,9 @@
-from __future__ import annotations
+from pathlib import Path
 from typing import Any, Dict, Optional
 import ccxt, json
-from pathlib import Path
+
+from __future__ import annotations
+
 import time
 
 # ---------- helpers ----------

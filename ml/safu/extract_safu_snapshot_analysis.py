@@ -1,26 +1,30 @@
-import os
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-import glob
-from datetime import datetime
-from tqdm import tqdm
+import os
+
 from collections import defaultdict
+from tqdm import tqdm
+import glob
+
+from
+ datetime import datetime
 
 DCA_LOG_BASE = "/home/signal/market7/dca/logs"
 SNAPSHOT_BASE = "/home/signal/market7/ml/datasets/recovery_snapshots"
 OUTPUT_PATH = "/home/signal/market7/ml/datasets/safu_analysis/merged_safu_dca.jsonl"
 SNAPSHOT_TOLERANCE_SEC = 600  # 10 minutes
 
-def load_jsonl(path):
+def load_jsonl(path: Any) -> Any:
     if not os.path.exists(path):
         return []
     with open(path, "r") as f:
         return [json.loads(line.strip()) for line in f if line.strip()]
 
-def load_snapshots_for_date(date_str):
+def load_snapshots_for_date(date_str: Any) -> Any:
     path = os.path.join(SNAPSHOT_BASE, date_str, "recovery_snapshots.jsonl")
     return load_jsonl(path)
 
-def find_nearest_snapshot(snapshots, target_ts):
+def find_nearest_snapshot(snapshots: Any, target_ts: Any) -> Any:
     best = None
     best_delta = float("inf")
     for snap in snapshots:
@@ -30,7 +34,7 @@ def find_nearest_snapshot(snapshots, target_ts):
             best_delta = delta
     return best
 
-def scan_and_merge():
+def scan_and_merge() -> Any:
     merged = []
 
     date_dirs = sorted([d for d in os.listdir(DCA_LOG_BASE)
@@ -96,7 +100,7 @@ def scan_and_merge():
 
     return merged
 
-def save_jsonl(path, data):
+def save_jsonl(path: Any, data: Any) -> Any:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
         for row in data:

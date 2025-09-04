@@ -1,13 +1,18 @@
-#!/usr/bin/env python3
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 import os
-from pathlib import Path
-from datetime import datetime
+
 import redis
 
-# === CONFIG ===
 from config.config_loader import PATHS
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
+
+# === CONFIG ===
 
 INDICATOR_WEIGHTS = {
     "MACD_Histogram": 0.2,
@@ -29,7 +34,7 @@ REDIS_FINAL_TRADES = "fork_score:final"
 r = redis.Redis()
 
 # ===== FUNCTIONS =====
-def score_from_indicators(indicators):
+def score_from_indicators(indicators: Any) -> Any:
     score = 0
     total_weight = 0
     for key, weight in INDICATOR_WEIGHTS.items():
@@ -39,7 +44,7 @@ def score_from_indicators(indicators):
             total_weight += weight
     return round(score / total_weight, 4) if total_weight > 0 else 0
 
-def load_snapshot_indicators(symbol, date_str):
+def load_snapshot_indicators(symbol: Any, date_str: Any) -> Any:
     filename = f"{symbol.upper()}_15m.json"
     path = SNAPSHOT_BASE / date_str / filename
     if not path.exists():
@@ -50,7 +55,7 @@ def load_snapshot_indicators(symbol, date_str):
     except:
         return None
 
-def write_to_history_log(entry, date_str):
+def write_to_history_log(entry: Any, date_str: Any) -> Any:
     out_dir = FORK_HISTORY_BASE / date_str
     out_dir.mkdir(parents=True, exist_ok=True)
     log_path = out_dir / "fork_scores.jsonl"
@@ -58,7 +63,7 @@ def write_to_history_log(entry, date_str):
         f.write(json.dumps(entry) + "\n")
 
 # ===== MAIN =====
-def main():
+def main() -> Any:
     logging.basicConfig(level=logging.INFO)
     today_str = datetime.utcnow().strftime("%Y-%m-%d")
     now_ts = int(datetime.utcnow().timestamp() * 1000)

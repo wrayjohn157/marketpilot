@@ -1,3 +1,19 @@
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import logging
+
+from ta.momentum import StochRSIIndicator, RSIIndicator
+from ta.trend import EMAIndicator, ADXIndicator, MACD, PSARIndicator
+from ta.volatility import AverageTrueRange
+import pandas as pd
+import redis
+import requests
+
+    import argparse
+import time
+
 #!/usr/bin/env python3
 """
 rolling_indicators_with_lev.py
@@ -9,20 +25,8 @@ Run examples:
   INDICATOR_KLINE_SOURCE=futures python3 rolling_indicators_with_lev.py --once
   python3 rolling_indicators_with_lev.py --interval 120
 """
-import os
-import json
-import logging
-import time
-from pathlib import Path
-from datetime import datetime
-
-import requests
-import pandas as pd
-import redis
-
-from ta.momentum import StochRSIIndicator, RSIIndicator
-from ta.trend import EMAIndicator, ADXIndicator, MACD, PSARIndicator
-from ta.volatility import AverageTrueRange
+import
+ os
 
 # ------------------ Config ------------------
 REFRESH_INTERVAL_DEFAULT = 60
@@ -64,8 +68,7 @@ def _read_json(path: Path, default):
         log.warning(f"⚠️ Failed reading {path}: {e}")
     return default
 
-
-def _perp_bases_and_map():
+def _perp_bases_and_map() -> Any:
     """Return (set_of_bases, preferred_id_map) from filtered perps JSON.
     preferred_id_map chooses USDT contract if both USDT and USDC exist.
     """
@@ -79,7 +82,6 @@ def _perp_bases_and_map():
         if (current is None) or (current.endswith("USDC") and sym_id.endswith("USDT")):
             by_base[base] = sym_id
     return bases, by_base
-
 
 def pick_symbol_and_source(base: str):
     """Decide which market to pull klines from, and return (full_symbol, market)
@@ -98,8 +100,7 @@ def pick_symbol_and_source(base: str):
         return perp_map.get(base_u, base_u + "USDT"), "futures"
     return base_u + "USDT", "spot"
 
-
-def fetch_klines_spot(symbol, interval, limit=150):
+def fetch_klines_spot(symbol: Any, interval: Any, limit: Any = 150) -> Any:
     url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
     try:
         resp = requests.get(url, timeout=10)
@@ -127,8 +128,7 @@ def fetch_klines_spot(symbol, interval, limit=150):
         log.warning(f"Failed to fetch SPOT klines for {symbol} {interval}: {e}")
         return None
 
-
-def fetch_klines_futures(symbol, interval, limit=150):
+def fetch_klines_futures(symbol: Any, interval: Any, limit: Any = 150) -> Any:
     url = f"https://fapi.binance.com/fapi/v1/klines?symbol={symbol}&interval={interval}&limit={limit}"
     try:
         resp = requests.get(url, timeout=10)
@@ -156,12 +156,10 @@ def fetch_klines_futures(symbol, interval, limit=150):
         log.warning(f"Failed to fetch FUTURES klines for {symbol} {interval}: {e}")
         return None
 
-
-def fetch_klines_any(symbol, market, interval, limit=150):
+def fetch_klines_any(symbol: Any, market: Any, interval: Any, limit: Any = 150) -> Any:
     if market == "futures":
         return fetch_klines_futures(symbol, interval, limit)
     return fetch_klines_spot(symbol, interval, limit)
-
 
 def compute_indicators(df: pd.DataFrame) -> dict:
     indicators = {}
@@ -194,10 +192,9 @@ def compute_indicators(df: pd.DataFrame) -> dict:
     indicators["timestamp"] = int(time.time())
     return indicators
 
-
 # ---------- symbol loading ----------
 
-def load_symbols():
+def load_symbols() -> Any:
     filtered = set()
     active = set()
 
@@ -228,14 +225,12 @@ def load_symbols():
         log.warning("⚠️ No symbols found from filtered spot/perp lists or fork metrics.")
     return symbols
 
-
 # ---------- snapshot I/O ----------
 
 def get_snapshot_dir() -> Path:
     path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
     path.mkdir(parents=True, exist_ok=True)
     return path
-
 
 def save_to_disk(base: str, tf: str, indicators: dict):
     snapshot_dir = get_snapshot_dir()
@@ -255,10 +250,9 @@ def save_to_disk(base: str, tf: str, indicators: dict):
     except Exception as e:
         log.warning(f"⚠️ Failed to append to JSONL for {base.upper()}_{tf}: {e}")
 
-
 # ------------------ Main loop ------------------
 
-def run_once():
+def run_once() -> Any:
     symbols = load_symbols()
     for base in symbols:
         full_symbol, market = pick_symbol_and_source(base)
@@ -278,9 +272,7 @@ def run_once():
             save_to_disk(base, tf, indicators)
             log.info(f"✅ {key} ({market}) indicators written")
 
-
-def main():
-    import argparse
+def main() -> Any:
 
     ap = argparse.ArgumentParser()
     ap.add_argument("--once", action="store_true", help="Run a single pass and exit")
@@ -295,7 +287,6 @@ def main():
     while True:
         run_once()
         time.sleep(args.interval)
-
 
 if __name__ == "__main__":
     main()

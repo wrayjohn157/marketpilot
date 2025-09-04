@@ -1,14 +1,19 @@
-#!/usr/bin/env python3
-import argparse
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from pathlib import Path
-import pandas as pd
 import xgboost as xgb
-from sklearn.model_selection import train_test_split
+
+import pandas as pd
+
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
+import argparse
 import joblib
 
-def load_dataset(path):
+#!/usr/bin/env python3
+from
+ pathlib import Path
+
+def load_dataset(path: Any) -> Any:
     with open(path, "r") as f:
         data = []
         for line in f:

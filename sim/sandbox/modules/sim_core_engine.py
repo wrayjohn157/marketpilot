@@ -1,11 +1,39 @@
+from pathlib import Path
+from sim.sandbox.utils.kline_loader_cross_day import load_forward_klines_cross_days
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
 import logging
+import sys
+
+    from ta.momentum import RSIIndicator
+    from ta.trend import ADXIndicator
+    from ta.trend import MACD
+from dca.utils.btc_filter import get_btc_status
+import pandas as pd
+import yaml
+
+    from dca.utils.entry_utils import (
+    from dca.utils.recovery_odds_utils import (
+    from dca.utils.safu_reentry_utils import should_reenter_after_safu
+    from dca.utils.trade_health_evaluator import evaluate_trade_health
+    from sim.sandbox.utils.trade_utils import build_mock_trade
+from config.config_loader import PATHS
+from dca.modules.dca_decision_engine import should_dca
+from dca.modules.fork_safu_evaluator import (
+from dca.utils.entry_utils import get_latest_indicators, get_rsi_slope, get_macd_lift
+from dca.utils.recovery_confidence_utils import predict_confidence_score
+from dca.utils.spend_predictor import adjust_volume
+from dca.utils.spend_predictor import predict_spend_volume
+from dca.utils.zombie_utils import is_zombie_trade
+from sim.sandbox.utils.local_indicators import (
+
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s %(levelname)-8s %(message)s",
 )
 logger = logging.getLogger(__name__)
-import sys
-from pathlib import Path
+from
+ pathlib import Path
 
 # allow imports of sandbox modules and top-level packages
 file = Path(__file__).resolve()
@@ -14,33 +42,16 @@ project_root = file.parents[3]  # .../market7
 sys.path.insert(0, str(sandbox_dir))
 sys.path.insert(0, str(project_root))
 
-import yaml
-import json
-from pathlib import Path
-from config.config_loader import PATHS
-from dca.utils.btc_filter import get_btc_status
-from sim.sandbox.utils.local_indicators import (
     fetch_binance_klines,
     compute_all_indicators,
 )
-import pandas as pd
 
-from sim.sandbox.utils.kline_loader_cross_day import load_forward_klines_cross_days
-
-from dca.utils.entry_utils import get_latest_indicators, get_rsi_slope, get_macd_lift
-from dca.modules.dca_decision_engine import should_dca
-from dca.utils.spend_predictor import adjust_volume
-from dca.utils.recovery_confidence_utils import predict_confidence_score
-from dca.utils.zombie_utils import is_zombie_trade
-from dca.utils.spend_predictor import predict_spend_volume
-from dca.modules.fork_safu_evaluator import (
     get_safu_exit_decision,
     load_safu_exit_model,
     get_safu_score,
 )
 
 print("[DEBUG] ✅ core.py simulation triggered")
-
 
 def compute_indicators(symbol: str, tf: str = "15m", entry_time: int = None) -> dict:
     if entry_time:
@@ -52,9 +63,6 @@ def compute_indicators(symbol: str, tf: str = "15m", entry_time: int = None) -> 
     if df is None or df.empty:
         return {}
 
-    from ta.momentum import RSIIndicator
-    from ta.trend import MACD
-
     close = df["close"]
     rsi = RSIIndicator(close=close).rsi().iloc[-1]
     macd = MACD(close=close)
@@ -62,7 +70,6 @@ def compute_indicators(symbol: str, tf: str = "15m", entry_time: int = None) -> 
     macd_hist_prev = macd.macd_diff().iloc[-2]
     macd_lift = macd.macd().iloc[-1] - macd.macd().iloc[-2]
 
-    from ta.trend import ADXIndicator
     adx = ADXIndicator(high=df["high"], low=df["low"], close=df["close"]).adx().iloc[-1]
 
     return {
@@ -72,7 +79,6 @@ def compute_indicators(symbol: str, tf: str = "15m", entry_time: int = None) -> 
         "macd_lift": macd_lift,
         "adx": adx,
     }
-
 
 def load_config(path: Path = None, fallback: bool = False):
     """
@@ -91,19 +97,16 @@ def load_config(path: Path = None, fallback: bool = False):
     with open(config_path) as f:
         return yaml.safe_load(f)
 
-
-def simulate_dca_step(trade, config):
+def simulate_dca_step(trade: Any, config: Any) -> Any:
     symbol = trade.get("symbol")
     tf = config.get("timeframe", "15m")
     entry_time = trade.get("entry_time")
     indicators = compute_indicators(symbol, tf, entry_time)
 
-    from dca.utils.entry_utils import (
         load_btc_market_condition,
         load_fork_entry_score,
         load_entry_score_from_redis,
     )
-    from dca.utils.recovery_odds_utils import (
         get_latest_snapshot,
         predict_recovery_odds,
     )
@@ -137,11 +140,7 @@ def simulate_dca_step(trade, config):
         }
     )
 
-    from dca.utils.safu_reentry_utils import should_reenter_after_safu
-
     zombie = is_zombie_trade(indicators, recovery_odds, current_score)
-
-    from dca.utils.trade_health_evaluator import evaluate_trade_health
 
     trade_features = {
         "recovery_odds": recovery_odds,
@@ -253,12 +252,10 @@ def simulate_dca_step(trade, config):
             "reentry_allowed": reentry_allowed,
         }
 
-
 # --- Added function for running DCA simulation ---
 def run_dca_simulation(
     symbol: str, entry_time: int, tf: str = "1h", config_path: str = None
 ):
-    from sim.sandbox.utils.trade_utils import build_mock_trade
 
     # --- Ensure entry_time is an int ---
     entry_time = int(entry_time)

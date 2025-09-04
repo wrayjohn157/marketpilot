@@ -1,12 +1,15 @@
-import os
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from tqdm import tqdm
+import os
+
+from
+ tqdm import tqdm
 
 SAFU_INPUT = "/home/signal/market7/ml/datasets/safu_analysis/merged_safu_dca.jsonl"
 ENRICHED_ROOT = "/home/signal/market7/ml/datasets/enriched"
 OUTPUT_PATH = "/home/signal/market7/ml/datasets/safu_analysis/labeled_safu_dca.jsonl"
 
-def load_enriched_trades():
+def load_enriched_trades() -> Any:
     enriched_by_id = {}
     for root, _, files in os.walk(ENRICHED_ROOT):
         for fname in files:
@@ -27,7 +30,7 @@ def load_enriched_trades():
                         continue
     return enriched_by_id
 
-def main():
+def main() -> Any:
     print("📥 Loading enriched trade data...")
     enriched = load_enriched_trades()
     print(f"✅ Loaded {len(enriched)} enriched trade outcomes")

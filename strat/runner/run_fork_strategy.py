@@ -1,25 +1,28 @@
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import sys
+
+from config_loader import PATHS
+from scorer.fork_scorer import score_fork
+from utils.strategy_loader import load_strategy_config
+import argparse
+
 # /market7/strat/runner/run_fork_strategy.py
 
-import argparse
-import json
-from pathlib import Path
-from datetime import datetime
-import sys
+from
+ pathlib import Path
 
 # === Add /market7/strat and /market7/config to PYTHONPATH ===
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 sys.path.append(str(Path(__file__).resolve().parents[2] / "config"))
-
-from utils.strategy_loader import load_strategy_config
-from scorer.fork_scorer import score_fork
-from config_loader import PATHS
 
 # === Dynamic paths from PATHS ===
 FORK_INPUT_FILE = PATHS["fork_candidates"] #FORK_INPUT_FILE = PATHS["final_forked_trades"]
 OUTPUT_FILE = PATHS["final_fork_rrr_trades"]
 BACKTEST_CANDIDATES_FILE = PATHS["fork_backtest_candidates"]
 
-def main(strategy_name):
+def main(strategy_name: Any) -> Any:
     config = load_strategy_config(strategy_name)
 
     if not FORK_INPUT_FILE.exists():

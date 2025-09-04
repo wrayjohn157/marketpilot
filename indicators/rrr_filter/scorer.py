@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-def score_trade(tp1_score, ema_score, adx_score, ttp_score, weights=None):
+def score_trade(tp1_score: Any, ema_score: Any, adx_score: Any, ttp_score: Any, weights: Any = None) -> Any:
     """
     Calculates the weighted RRR (Risk Reward Ratio) score for a trade.
 

@@ -1,10 +1,14 @@
-# sim_indicators.py
-
-import os
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
+import logging
+
 import pandas as pd
 import ta
-import logging
+
+# sim_indicators.py
+
+import
+ os
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
@@ -28,32 +32,32 @@ def load_klines_from_disk(symbol: str, tf: str, date_str: str) -> pd.DataFrame:
     df["volume"] = pd.to_numeric(df["volume"])
     return df
 
-def compute_ema(df, period=50):
+def compute_ema(df: Any, period: Any = 50) -> Any:
     return ta.trend.EMAIndicator(close=df["close"], window=period).ema_indicator().iloc[-1]
 
-def compute_rsi(df, period=14):
+def compute_rsi(df: Any, period: Any = 14) -> Any:
     return ta.momentum.RSIIndicator(close=df["close"], window=period).rsi().iloc[-1]
 
-def compute_adx(df, period=14):
+def compute_adx(df: Any, period: Any = 14) -> Any:
     return ta.trend.ADXIndicator(high=df["high"], low=df["low"], close=df["close"], window=period).adx().iloc[-1]
 
-def compute_qqe(df, rsi_period=14, smoothing=5):
+def compute_qqe(df: Any, rsi_period: Any = 14, smoothing: Any = 5) -> Any:
     rsi = ta.momentum.RSIIndicator(close=df["close"], window=rsi_period).rsi()
     return rsi.rolling(window=smoothing).mean().iloc[-1]
 
-def compute_psar(df, step=0.02, max_step=0.2):
+def compute_psar(df: Any, step: Any = 0.02, max_step: Any = 0.2) -> Any:
     return ta.trend.PSARIndicator(high=df["high"], low=df["low"], close=df["close"], step=step, max_step=max_step).psar().iloc[-1]
 
-def compute_atr(df, period=14):
+def compute_atr(df: Any, period: Any = 14) -> Any:
     return ta.volatility.AverageTrueRange(high=df["high"], low=df["low"], close=df["close"], window=period).average_true_range().iloc[-1]
 
-def compute_vwap(df):
+def compute_vwap(df: Any) -> Any:
     typical_price = (df["high"] + df["low"] + df["close"]) / 3
     cum_vol_price = (typical_price * df["volume"]).cumsum()
     cum_volume = df["volume"].cumsum()
     return (cum_vol_price / cum_volume).iloc[-1]
 
-def compute_macd_full(df, fast=12, slow=26, signal=9):
+def compute_macd_full(df: Any, fast: Any = 12, slow: Any = 26, signal: Any = 9) -> Any:
     macd = ta.trend.MACD(close=df["close"], window_fast=fast, window_slow=slow, window_sign=signal)
     macd_line = macd.macd()
     signal_line = macd.macd_signal()
@@ -66,7 +70,7 @@ def compute_macd_full(df, fast=12, slow=26, signal=9):
         "MACD_Histogram_Prev": hist.iloc[-2]
     }
 
-def compute_all_indicators(df):
+def compute_all_indicators(df: Any) -> Any:
     indicators = {}
     indicators["EMA50"] = compute_ema(df, 50)
     indicators["EMA200"] = compute_ema(df, 200)

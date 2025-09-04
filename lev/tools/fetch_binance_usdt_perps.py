@@ -1,9 +1,12 @@
-#!/usr/bin/env python3
-from __future__ import annotations
-import argparse, json, csv
 from pathlib import Path
 from typing import Dict, Any
+import argparse, json, csv
+
+from __future__ import annotations
+
 import ccxt
+
+#!/usr/bin/env python3
 
 def build_exchange(testnet: bool) -> ccxt.binanceusdm:
     ex = ccxt.binanceusdm({
@@ -71,7 +74,7 @@ def save_csv(rows, path: Path):
         w.writeheader()
         w.writerows(rows)
 
-def main():
+def main() -> Any:
     ap = argparse.ArgumentParser(description="Fetch Binance USDT-M PERPETUAL (swap) contracts (TRADING).")
     ap.add_argument("--testnet", action="store_true", help="Use Binance Futures testnet")
     ap.add_argument("--outdir", default="data/perps", help="Output directory")

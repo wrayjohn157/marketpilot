@@ -1,18 +1,21 @@
-#!/usr/bin/env python3
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
 import os
 import sys
-import json
-from datetime import datetime
+
+from sim_btc_context import get_btc_context_for_sim, load_btc_snapshot_for_time
+
+#!/usr/bin/env python3
+from
+ datetime import datetime
 
 # ensure this folder is on PYTHONPATH
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from sim_btc_context import get_btc_context_for_sim, load_btc_snapshot_for_time
-
 def fmt_ts(ts_ms: int) -> str:
     return datetime.utcfromtimestamp(ts_ms // 1000).isoformat()
 
-def usage():
+def usage() -> Any:
     print(f"Usage: {sys.argv[0]} <ts1_ms> [<ts2_ms> ...]")
     print("Example:")
     print(f"  {sys.argv[0]} 1752191745000 1752260400000")

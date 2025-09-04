@@ -1,9 +1,13 @@
-#!/usr/bin/env python3
-import requests
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
-from pathlib import Path
+
+import requests
 import yaml
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Setup ===
 CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "paths_config.yaml"
@@ -23,7 +27,7 @@ RATING_MAP = {
    -1.0: "Strong Sell"
 }
 
-def fetch_tv_recommendations(timeframe="1hr"):
+def fetch_tv_recommendations(timeframe: Any = "1hr") -> Any:
     payload = {
         "filter": [{"left": "exchange", "operation": "equal", "right": "BINANCE"}],
         "symbols": {"query": {"types": []}},
@@ -48,7 +52,7 @@ def fetch_tv_recommendations(timeframe="1hr"):
 
     return out
 
-def main():
+def main() -> Any:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
     try:
         ratings = fetch_tv_recommendations()

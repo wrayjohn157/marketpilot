@@ -1,14 +1,9 @@
-from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
 
-def should_reenter_after_safu(
-    trade,
-    config,
-    indicators,
-    safu_score,
-    tp1_shift_pct,
-    last_safu_time,
-    btc_status
-):
+from
+ datetime import datetime
+
+def should_reenter_after_safu(trade: Any, config: Any, indicators: Any, safu_score: Any, tp1_shift_pct: Any, last_safu_time: Any, btc_status: Any) -> Any:
     """
     Determine whether a trade qualifies for reentry DCA after SAFU was triggered.
 

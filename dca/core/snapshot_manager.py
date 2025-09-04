@@ -1,12 +1,11 @@
-"""Snapshot management utilities for DCA trading."""
-
-import json
-import logging
 from pathlib import Path
 from typing import Optional, Tuple
+import json
+import logging
+
+"""Snapshot management utilities for DCA trading."""
 
 logger = logging.getLogger(__name__)
-
 
 class SnapshotManager:
     """Manages snapshot data for DCA trading decisions."""

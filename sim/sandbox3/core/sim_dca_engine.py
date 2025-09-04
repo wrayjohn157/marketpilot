@@ -1,18 +1,25 @@
-# sim_dca_engine.py
-
-import argparse
-import time
-import json
-from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
 from utils.sim_kline_loader import load_klines_across_days
+import json
+
+    from utils.sim_config_loader import load_yaml_config
+    from utils.sim_kline_loader import load_kline_data
+
+from utils.sim_btc_context import get_btc_context_for_sim
 from utils.sim_entry_utils import compute_indicators_from_klines
 from utils.sim_entry_utils import sim_build_snapshot_features
 from utils.sim_recovery_confidence_utils import predict_confidence_and_recovery
-from utils.sim_spend_predictor import predict_dca_spend
-from utils.sim_btc_context import get_btc_context_for_sim
 from utils.sim_safu_utils import get_safu_score
+from utils.sim_spend_predictor import predict_dca_spend
+import argparse
+import time
 
-def simulate_dca_engine(klines, entry_price, entry_time, symbol, tf, config, override_config=None):
+# sim_dca_engine.py
+
+from
+ pathlib import Path
+
+def simulate_dca_engine(klines: Any, entry_price: Any, entry_time: Any, symbol: Any, tf: Any, config: Any, override_config: Any = None) -> Any:
     results = {"steps": [], "exit_reason": None}
     if not klines:
         results["exit_reason"] = "no_klines"
@@ -160,7 +167,6 @@ def simulate_dca_engine(klines, entry_price, entry_time, symbol, tf, config, ove
     print(json.dumps(results, indent=2))  # CLI printout of results
     return results
 
-
 # CLI support
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -171,9 +177,6 @@ if __name__ == "__main__":
     parser.add_argument("--config", default="/home/signal/market7/sim/config/dca_config.yaml", help="Path to YAML config")
 
     args = parser.parse_args()
-
-    from utils.sim_kline_loader import load_kline_data
-    from utils.sim_config_loader import load_yaml_config
 
     # Load config
     config = load_yaml_config(args.config)

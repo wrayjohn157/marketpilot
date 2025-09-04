@@ -1,11 +1,16 @@
-#!/usr/bin/env python3
-import json
-import hmac
-import hashlib
-import requests
-import argparse
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+
+import requests
+
+import argparse
+import hashlib
+import hmac
+
+#!/usr/bin/env python3
+from
+ datetime import datetime, timedelta, timezone
 
 # === Updated Dynamic Paths ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
@@ -14,15 +19,15 @@ SAVE_BASE = PROJECT_ROOT / "ml/datasets/raw_paper"
 BASE_URL = "https://api.3commas.io"
 LIMIT = 1000
 
-def load_credentials():
+def load_credentials() -> Any:
     with open(CRED_PATH, "r") as f:
         creds = json.load(f)
     return creds["3commas_api_key"], creds["3commas_api_secret"], creds["3commas_bot_id"]
 
-def generate_signature(path, secret):
+def generate_signature(path: Any, secret: Any) -> Any:
     return hmac.new(secret.encode("utf-8"), path.encode("utf-8"), hashlib.sha256).hexdigest()
 
-def fetch_closed_trades(api_key, api_secret, bot_id):
+def fetch_closed_trades(api_key: Any, api_secret: Any, bot_id: Any) -> Any:
     all_trades = []
     page = 1
     while True:
@@ -53,7 +58,7 @@ def fetch_closed_trades(api_key, api_secret, bot_id):
         "completed", "stop_loss_finished", "panic_sold", "manual", "cancelled"
     }]
 
-def filter_trades_by_date(trades, target_date):
+def filter_trades_by_date(trades: Any, target_date: Any) -> Any:
     results = []
     for t in trades:
         try:
@@ -64,7 +69,7 @@ def filter_trades_by_date(trades, target_date):
             print(f"[WARN] Could not parse closed_at for trade {t.get('id')}: {e}")
     return results
 
-def reduce_trade(t):
+def reduce_trade(t: Any) -> Any:
     return {
         "id": t.get("id"),
         "pair": t.get("pair"),
@@ -87,7 +92,7 @@ def reduce_trade(t):
         "tsl_max_price": t.get("tsl_max_price")
     }
 
-def save_trades(trades, target_day):
+def save_trades(trades: Any, target_day: Any) -> Any:
     folder = SAVE_BASE / target_day
     folder.mkdir(parents=True, exist_ok=True)
     file_path = folder / "paper_trades.jsonl"
@@ -96,7 +101,7 @@ def save_trades(trades, target_day):
             f.write(json.dumps(reduce_trade(trade)) + "\n")
     print(f"✅ {len(trades)} trades saved to {file_path}")
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser(description="Pull and save closed 3Commas trades by day.")
     parser.add_argument("--date", type=str, help="Target date in YYYY-MM-DD (defaults to yesterday UTC)")
     args = parser.parse_args()

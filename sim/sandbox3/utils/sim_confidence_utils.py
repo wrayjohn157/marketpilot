@@ -1,13 +1,13 @@
-#!/usr/bin/env python3
-
-import json
 from pathlib import Path
 from typing import List
+import json
 
-import joblib
 import numpy as np
 
 from utils.sim_snapshot_loader import sim_generate_snapshot_series
+import joblib
+
+#!/usr/bin/env python3
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 MODEL_PATH = BASE_DIR / "ml" / "models" / "xgb_confidence_model.pkl"
@@ -33,7 +33,7 @@ FEATURE_COLUMNS = [
     "snapshot_time_to_max_drawdown_min",
 ]
 
-def load_model():
+def load_model() -> Any:
     return joblib.load(MODEL_PATH)
 
 def extract_features(trade_snapshot: dict) -> List[float]:

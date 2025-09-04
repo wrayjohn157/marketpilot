@@ -1,15 +1,20 @@
-#!/usr/bin/env python3
-import os
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-import yaml
 import logging
-import joblib
+import os
+
+from ta.momentum import RSIIndicator
+from ta.trend import MACD
 import numpy as np
 import pandas as pd
-from pathlib import Path
-from datetime import datetime
-from ta.trend import MACD
-from ta.momentum import RSIIndicator
+import yaml
+
+import joblib
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -26,7 +31,6 @@ MIN_SCORE = safu_cfg.get("min_score", 0.4)
 # === Logging ===
 logger = logging.getLogger("safu_eval")
 logger.setLevel(logging.INFO)
-
 
 def load_indicators_from_disk(symbol: str, tf: str = "15m") -> dict:
     date_str = datetime.utcnow().strftime("%Y-%m-%d")
@@ -88,7 +92,6 @@ def load_indicators_from_disk(symbol: str, tf: str = "15m") -> dict:
         logger.warning(f"[SAFU] Error loading indicators from disk for {symbol}: {e}")
         return {}
 
-
 def get_safu_score(symbol: str, entry_price: float, current_price: float) -> float:
     if entry_price == 0 or current_price == 0:
         return 0.0
@@ -122,15 +125,13 @@ def get_safu_score(symbol: str, entry_price: float, current_price: float) -> flo
 
     return round(max(0.0, score), 3)
 
-
-def load_safu_exit_model(model_path=MODEL_PATH):
+def load_safu_exit_model(model_path: Any = MODEL_PATH) -> Any:
     if not os.path.exists(model_path):
         print(f"⚠️ SAFU model not found at {model_path}")
         return None
     return joblib.load(model_path)
 
-
-def get_safu_exit_decision(trade, config, model=None):
+def get_safu_exit_decision(trade: Any, config: Any, model: Any = None) -> Any:
     """
     Evaluate whether a trade should be exited using traditional SAFU and/or ML classifier.
 

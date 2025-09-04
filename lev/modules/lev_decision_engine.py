@@ -1,5 +1,6 @@
-from __future__ import annotations
 from typing import Dict, Tuple, Optional
+
+from __future__ import annotations
 
 def _indicator_ok(ind: Dict, cfg: Dict, side: str) -> Tuple[bool, str]:
     th = cfg.get("indicator_thresholds", {})

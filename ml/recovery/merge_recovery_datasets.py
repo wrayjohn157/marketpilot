@@ -1,18 +1,21 @@
-#!/usr/bin/env python3
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from pathlib import Path
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 INPUT_DIR = Path("/home/signal/market7/ml/datasets/recovery_training")
 OUTPUT_FILE = INPUT_DIR / "merged_recovery_dataset.jsonl"
 
-def is_nonempty_jsonl(path):
+def is_nonempty_jsonl(path: Any) -> Any:
     try:
         with open(path, "r") as f:
             return any(line.strip() for line in f)
     except Exception:
         return False
 
-def merge_jsonl_files():
+def merge_jsonl_files() -> Any:
     merged = []
     files = sorted(INPUT_DIR.glob("*_recovery.jsonl"))
 

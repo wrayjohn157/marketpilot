@@ -1,13 +1,16 @@
-#!/usr/bin/env python3
-
-import argparse
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from pathlib import Path
+
 from modules.sim_core_engine import run_dca_simulation, load_config
 from sim.sandbox.utils.trade_utils import build_mock_trade
+import argparse
 
+#!/usr/bin/env python3
 
-def main():
+from
+ pathlib import Path
+
+def main() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--symbol", required=True, help="Symbol (e.g., BTCUSDT)")
     parser.add_argument(
@@ -34,7 +37,6 @@ def main():
         config_path=args.config
     )
     print(json.dumps(result, indent=2))
-
 
 if __name__ == "__main__":
     main()

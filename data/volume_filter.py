@@ -1,19 +1,23 @@
-#!/usr/bin/env python3
-import sys
-import os
-import requests
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
-from datetime import datetime
-from pathlib import Path
+import os
+import sys
+
 import redis
+import requests
+
+from config.config_loader import PATHS
+
+#!/usr/bin/env python3
+from
+ datetime import datetime
 
 # === Setup ===
 CURRENT_FILE = Path(__file__).resolve()
 PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
-
-from config.config_loader import PATHS
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
@@ -34,7 +38,7 @@ EXCLUDED_BASES = [
     "WBTC", "WETH"
 ]
 
-def fetch_volume_map():
+def fetch_volume_map() -> Any:
     url = "https://api.binance.com/api/v3/ticker/24hr"
     try:
         resp = requests.get(url, timeout=10)
@@ -44,7 +48,7 @@ def fetch_volume_map():
         logging.error(f"❌ Failed to fetch volume data: {e}")
         return {}
 
-def main():
+def main() -> Any:
     if not SYMBOL_LIST_FILE.exists():
         logging.error(f"❌ Missing symbol list: {SYMBOL_LIST_FILE}")
         return

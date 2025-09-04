@@ -1,9 +1,13 @@
-#!/usr/bin/env python3
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-import redis
 import logging
-from pathlib import Path
+
+import redis
 import yaml
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Logging setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -28,7 +32,7 @@ except Exception as e:
     logging.error(f"Redis connection error: {e}")
     exit(1)
 
-def store_to_redis():
+def store_to_redis() -> Any:
     if not INPUT_FILE.exists():
         logging.error(f"❌ Input file not found: {INPUT_FILE}")
         return

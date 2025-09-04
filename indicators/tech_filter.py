@@ -1,17 +1,21 @@
-#!/usr/bin/env python3
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import logging
 import sys
-from pathlib import Path
+
+import redis
+
+from config.config_loader import PATHS  # ✅ Use the loader
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # ✅ Inject base path so config/ can be imported when run via systemd
 CURRENT_FILE = Path(__file__).resolve()
 PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
-
-import redis
-import json
-import logging
-from datetime import datetime
-from config.config_loader import PATHS  # ✅ Use the loader
 
 # === Setup ===
 logging.basicConfig(
@@ -69,8 +73,7 @@ thresholds = {
 
 # === Functions (your originals) ===
 
-
-def evaluate(symbol, tf, ind):
+def evaluate(symbol: Any, tf: Any, ind: Any) -> Any:
     t = thresholds.get(market_condition, thresholds["neutral"]).get(tf, {})
     passed = True
     reasons = []
@@ -168,8 +171,7 @@ def evaluate(symbol, tf, ind):
 
     return passed, reasons
 
-
-def check_fork_criteria(ind):
+def check_fork_criteria(ind: Any) -> Any:
     score = 0
     reasons = []
 
@@ -198,9 +200,8 @@ def check_fork_criteria(ind):
 
     return score >= 2, reasons
 
-
 # === main() ===
-def main():
+def main() -> Any:
     approved = {}
     fork_queue = {}
     symbols = r.smembers(VOLUME_PASSED_SET)
@@ -273,9 +274,7 @@ def main():
         f"💾 Saved {len(approved)} approved | 🌀 Saved {len(fork_queue)} fork candidates"
     )
 
-
 if __name__ == "__main__":
     main()
-import sys
 
 sys.exit(0)

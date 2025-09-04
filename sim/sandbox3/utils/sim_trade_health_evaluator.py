@@ -1,8 +1,12 @@
+from pathlib import
+from typing import Dict, List, Optional, Any, Union, Tuple
+import logging
+
+import yaml
+
 "Trade Health Evaluator for SIM sandbox (uses local config)."
 
-from pathlib import Path
-import yaml
-import logging
+ Path
 
 CONFIG_PATH = Path("/home/signal/market7/sim/config/dca_config.yaml_fallback_real")
 
@@ -13,7 +17,7 @@ with open(CONFIG_PATH, "r") as file:
 
 logger = logging.getLogger(__name__)
 
-def evaluate_trade_health(trade):
+def evaluate_trade_health(trade: Any) -> Any:
     """
     Evaluate the health of a trade based on configured thresholds.
 

@@ -1,8 +1,12 @@
-#!/usr/bin/env python3
-import redis
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import os
-from datetime import datetime
+
+import redis
+
+#!/usr/bin/env python3
+from
+ datetime import datetime
 
 # Connect to Redis
 redis_client = redis.Redis(host='localhost', port=6379, db=0)

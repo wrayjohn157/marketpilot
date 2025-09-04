@@ -1,10 +1,14 @@
-#!/usr/bin/env python3
-import os
-import json
-import argparse
-from pathlib import Path
 from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import os
+
 from dateutil import parser as dtparser
+import argparse
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Paths ===
 PROJECT_ROOT = Path("/home/signal/market7").resolve()

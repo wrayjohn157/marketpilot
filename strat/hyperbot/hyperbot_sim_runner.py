@@ -1,20 +1,23 @@
-# hyperopt_sim_runner.py
-import argparse
-import os
-import subprocess
-from datetime import datetime, timedelta
+            import json
 from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+import os
+
+import argparse
+import subprocess
+
+# hyperopt_sim_runner.py
+from
+ datetime import datetime, timedelta
 
 STRATEGY_DIR = Path("/home/signal/market6/live/strat/config")
 BACKTEST_SUMMARY_BASE = Path("/home/signal/market6/backtest/data/summary")
 
-
-def daterange(start_date, end_date):
+def daterange(start_date: Any, end_date: Any) -> Any:
     for n in range(int((end_date - start_date).days) + 1):
         yield start_date + timedelta(n)
 
-
-def simulate(strategy_name, date):
+def simulate(strategy_name: Any, date: Any) -> Any:
     env = os.environ.copy()
     env["STRATEGY_NAME"] = strategy_name
     print(f"\n📆 Running strategy '{strategy_name}' for {date}...")
@@ -26,15 +29,13 @@ def simulate(strategy_name, date):
     summary_file = BACKTEST_SUMMARY_BASE / f"{date}_summary.json"
     if summary_file.exists():
         try:
-            import json
             with open(summary_file) as f:
                 return json.load(f)
         except:
             return None
     return None
 
-
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--range-start", type=str, required=True, help="Start date (YYYY-MM-DD)")
     parser.add_argument("--range-end", type=str, required=True, help="End date (YYYY-MM-DD)")
@@ -66,7 +67,6 @@ def main():
     print("\n📊 Strategy Comparison Results:")
     for strat, vals in sorted(results.items(), key=lambda x: -x[1]["avg_tp1"]):
         print(f"• {strat:25} | TP1: {vals['avg_tp1']:.2f}% | Drawdown: {vals['avg_drawdown']:.2f}%")
-
 
 if __name__ == "__main__":
     main()

@@ -1,25 +1,29 @@
-#!/usr/bin/env python3
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
 import os
 import sys
-import json
-import argparse
-from datetime import datetime
-from pathlib import Path
+
+from config.config_loader import PATHS
 from dateutil import parser as dtparser
+import argparse
+
+#!/usr/bin/env python3
+from
+ datetime import datetime
 
 # === Use dynamic path loader ===
 sys.path.append("/home/signal/market7")
-from config.config_loader import PATHS
 
 # === Helpers ===
-def load_jsonl(path):
+def load_jsonl(path: Any) -> Any:
     with open(path, "r") as f:
         return [json.loads(line) for line in f if line.strip()]
 
-def index_by_deal_id(rows):
+def index_by_deal_id(rows: Any) -> Any:
     return {r["deal_id"]: r for r in rows if "deal_id" in r}
 
-def load_btc_context(date_str):
+def load_btc_context(date_str: Any) -> Any:
     path = PATHS["btc_logs"] / date_str / "btc_snapshots.jsonl"
     if not path.exists():
         return [], []
@@ -35,7 +39,7 @@ def load_btc_context(date_str):
             continue
     return snapshots, timestamps
 
-def find_closest_btc_snapshot(ts, btc_snapshots):
+def find_closest_btc_snapshot(ts: Any, btc_snapshots: Any) -> Any:
     if not btc_snapshots:
         return {}
     delta = lambda snap: abs((snap["__dt"] - ts).total_seconds())
@@ -47,7 +51,7 @@ def find_closest_btc_snapshot(ts, btc_snapshots):
         "btc_status": closest.get("market_condition"), #"btc_status": closest.get("status"),
     }
 
-def load_latest_snapshot(symbol, deal_id):
+def load_latest_snapshot(symbol: Any, deal_id: Any) -> Any:
     path = PATHS["recovery_snapshots"] / f"{symbol}_{deal_id}.jsonl"
     if not path.exists():
         return {}
@@ -61,7 +65,7 @@ def load_latest_snapshot(symbol, deal_id):
         return {}
 
 # === Main logic ===
-def main(date_str):
+def main(date_str: Any) -> Any:
     dca_path = PATHS["dca_log"] / date_str / "dca_log.jsonl"
     enriched_path = PATHS["enriched"] / date_str / "enriched_data.jsonl"
     out_path = PATHS["dca_spend"] / f"{date_str}.jsonl" #out_path = PATHS["ml_dataset"] / "dca_spend" / f"{date_str}.jsonl"

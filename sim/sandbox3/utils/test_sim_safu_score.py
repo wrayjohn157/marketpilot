@@ -1,11 +1,15 @@
+from typing import Dict, List, Optional, Any, Union, Tuple
+
+import argparse
+import time
+
 #!/usr/bin/env python3
 
 # test_sim_safu_score.py
-import argparse
-import time
-from utils.sim_safu_utils import sim_get_safu_score
+from
+ utils.sim_safu_utils import sim_get_safu_score
 
-def main():
+def main() -> Any:
     parser = argparse.ArgumentParser()
     parser.add_argument("--ts", type=int, help="Timestamp in ms", required=True)
     parser.add_argument("--entry", type=float, help="Entry price", required=True)

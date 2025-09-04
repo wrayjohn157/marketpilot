@@ -1,7 +1,12 @@
-#!/usr/bin/env python3
-import argparse
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-from utils.sim_spend_predictor import predict_sim_spend_volume, adjust_volume
+
+from utils.sim_confidence_utils import inject_snapshot
+import argparse
+
+#!/usr/bin/env python3
+from
+ utils.sim_spend_predictor import predict_sim_spend_volume, adjust_volume
 
 parser = argparse.ArgumentParser(description="Test spend prediction using live-style snapshot features.")
 parser.add_argument("--symbol", type=str, required=True, help="Symbol to simulate (e.g., LTC).")
@@ -14,7 +19,6 @@ parser.add_argument("--tp1", type=float, default=8.0, help="TP1 shift pct.")
 
 args = parser.parse_args()
 
-from utils.sim_confidence_utils import inject_snapshot
 snapshot = inject_snapshot(symbol=args.symbol, entry_time=args.entry_time, step=args.step)
 feature_dict = snapshot.get("features", {})
 

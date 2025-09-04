@@ -1,14 +1,20 @@
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import logging
+import sys
+
+import redis
+import requests
+
+from config.config_loader import PATHS
+import time
+
 # /home/signal/market7/data/rolling_klines.py
 
 #!/usr/bin/env python3
-import time
-import json
-import redis
-import logging
-import requests
-from datetime import datetime
-from pathlib import Path
-import sys
+from
+ datetime import datetime
 
 # === Patch sys.path to reach /market7 ===
 CURRENT_FILE = Path(__file__).resolve()
@@ -16,7 +22,6 @@ PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
 # === Import central paths ===
-from config.config_loader import PATHS
 
 # === Logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -35,12 +40,12 @@ BINANCE_SYMBOLS_FILE = PATHS["binance_symbols"]
 SNAPSHOTS_BASE = PATHS["snapshots"]
 FORK_METRICS_FILE = Path("/home/signal/market7/dashboard_backend/cache/fork_metrics.json")
 
-def get_snapshot_dir():
+def get_snapshot_dir() -> Any:
     path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
     path.mkdir(parents=True, exist_ok=True)
     return path
 
-def load_active_fork_symbols():
+def load_active_fork_symbols() -> Any:
     active_symbols = set()
     try:
         if FORK_METRICS_FILE.exists():
@@ -56,7 +61,7 @@ def load_active_fork_symbols():
         logging.warning(f"⚠️ Failed to load active fork symbols: {e}")
     return active_symbols
 
-def load_symbols():
+def load_symbols() -> Any:
     filtered = set()
     active = set()
 
@@ -73,7 +78,7 @@ def load_symbols():
 
     return symbols
 
-def fetch_klines(symbol, interval, limit=150):
+def fetch_klines(symbol: Any, interval: Any, limit: Any = 150) -> Any:
     url = f"https://api.binance.com/api/v3/klines?symbol={symbol}USDT&interval={interval}&limit={limit}"
     try:
         resp = requests.get(url, timeout=10)
@@ -83,7 +88,7 @@ def fetch_klines(symbol, interval, limit=150):
         logging.warning(f"⚠️ Failed to fetch klines for {symbol} {interval}: {e}")
         return None
 
-def save_klines_to_disk(symbol, tf, data):
+def save_klines_to_disk(symbol: Any, tf: Any, data: Any) -> Any:
     snapshot_dir = get_snapshot_dir()
     filename = snapshot_dir / f"{symbol.upper()}_{tf}_klines.json"
     try:
@@ -93,7 +98,7 @@ def save_klines_to_disk(symbol, tf, data):
     except Exception as e:
         logging.error(f"❌ Failed to write klines to disk for {symbol.upper()}_{tf}: {e}")
 
-def main():
+def main() -> Any:
     logging.info("📈 Starting raw kline Redis updater...")
     while True:
         symbols = load_symbols()

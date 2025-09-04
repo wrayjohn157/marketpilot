@@ -1,19 +1,25 @@
-# /home/signal/market7/data/rolling_indicators.py
-
-#!/usr/bin/env python3
-import sys
-import os
-import time
-import json
-import redis
-import logging
-import requests
-import pandas as pd
-from pathlib import Path
 from datetime import datetime
+from typing import Dict, List, Optional, Any, Union, Tuple
+import json
+import logging
+import os
+import sys
+
 from ta.momentum import StochRSIIndicator, RSIIndicator
 from ta.trend import EMAIndicator, ADXIndicator, MACD, PSARIndicator
 from ta.volatility import AverageTrueRange
+import pandas as pd
+import redis
+import requests
+
+from config.config_loader import PATHS
+import time
+
+# /home/signal/market7/data/rolling_indicators.py
+
+#!/usr/bin/env python3
+from
+ pathlib import Path
 
 # === Patch sys.path to reach /market7 ===
 CURRENT_FILE = Path(__file__).resolve()
@@ -21,7 +27,6 @@ PROJECT_ROOT = CURRENT_FILE.parents[1]
 sys.path.append(str(PROJECT_ROOT))
 
 # === Import central paths ===
-from config.config_loader import PATHS
 
 # === Logging ===
 logging.basicConfig(
@@ -46,14 +51,12 @@ FORK_METRICS_FILE = Path(
 # === Redis ===
 r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
-
-def get_snapshot_dir():
+def get_snapshot_dir() -> Any:
     path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
     path.mkdir(parents=True, exist_ok=True)
     return path
 
-
-def fetch_klines(symbol, interval, limit=150):
+def fetch_klines(symbol: Any, interval: Any, limit: Any = 150) -> Any:
     url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
     try:
         resp = requests.get(url, timeout=10)
@@ -89,8 +92,7 @@ def fetch_klines(symbol, interval, limit=150):
         logging.warning(f"Failed to fetch klines for {symbol} {interval}: {e}")
         return None
 
-
-def compute_indicators(df):
+def compute_indicators(df: Any) -> Any:
     indicators = {}
     indicators["EMA50"] = EMAIndicator(df["close"], 50).ema_indicator().iloc[-1]
     indicators["EMA200"] = EMAIndicator(df["close"], 200).ema_indicator().iloc[-1]
@@ -130,8 +132,7 @@ def compute_indicators(df):
 
     return indicators
 
-
-def load_symbols():
+def load_symbols() -> Any:
     filtered = set()
     active = set()
 
@@ -163,8 +164,7 @@ def load_symbols():
 
     return symbols
 
-
-def save_to_disk(symbol, tf, indicators):
+def save_to_disk(symbol: Any, tf: Any, indicators: Any) -> Any:
     snapshot_dir = get_snapshot_dir()
     filename = snapshot_dir / f"{symbol.upper()}_{tf}.json"
     try:
@@ -183,8 +183,7 @@ def save_to_disk(symbol, tf, indicators):
     except Exception as e:
         logging.warning(f"⚠️ Failed to append to JSONL for {symbol.upper()}_{tf}: {e}")
 
-
-def main():
+def main() -> Any:
     logging.info("📊 Starting indicator updater...")
     while True:
         symbols = load_symbols()
@@ -210,7 +209,6 @@ def main():
                 save_to_disk(symbol, tf, indicators)
                 logging.info(f"✅ {key} indicators written to Redis")
         time.sleep(REFRESH_INTERVAL)
-
 
 if __name__ == "__main__":
     main()

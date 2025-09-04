@@ -1,15 +1,20 @@
+from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-import argparse
 import logging
+
 import pandas as pd
-from xgboost import XGBClassifier
+
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
+import argparse
 import joblib
+
+from
+ xgboost import XGBClassifier
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
-def train_model(input_path, output_path):
+def train_model(input_path: Any, output_path: Any) -> Any:
     logging.info(f"📂 Loading dataset: {input_path}")
     with open(input_path, 'r') as f:
         data = [json.loads(line) for line in f if line.strip()]
