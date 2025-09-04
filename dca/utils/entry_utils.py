@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import logging
 import requests
 import redis
 import pandas as pd
@@ -10,6 +11,8 @@ from datetime import datetime
 from pathlib import Path
 from ta.momentum import RSIIndicator
 from ta.trend import MACD, ADXIndicator
+
+logger = logging.getLogger(__name__)
 
 # === Paths ===
 CRED_PATH = Path("/home/signal/market7/config/paper_cred.json")
@@ -69,17 +72,17 @@ def get_live_3c_trades():
                     avg_price = float(deal["bought_amount"]) / float(
                         deal["bought_volume"]
                     )
-                except Exception:
+                except (ValueError, TypeError, KeyError) as e:
+                    logger.warning(f"Failed to calculate average price for deal {deal.get('id', 'unknown')}: {e}")
                     avg_price = None
 
             deal["avg_entry_price"] = float(avg_price) if avg_price else None
 
         return all_deals
 
-    except Exception as e:
-        print(f"[ERROR] Failed to fetch 3Commas live trades: {e}")
+    except (requests.RequestException, json.JSONDecodeError, KeyError) as e:
+        logger.error(f"Failed to fetch 3Commas live trades: {e}")
         return []
-        print("[DEBUG] 3C Trade Normalization Active")
 
 
 def send_dca_signal(pair, volume=15):
@@ -102,8 +105,12 @@ def send_dca_signal(pair, volume=15):
         res = requests.post(url, json=payload, timeout=10)
         res.raise_for_status()
         print(f"✅ DCA signal sent for {pair} | Volume: {volume} USDT")
+    except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+        logger.error(f"Failed to load credentials: {e}")
+    except requests.RequestException as e:
+        logger.error(f"Failed to send DCA signal for {pair}: {e}")
     except Exception as e:
-        print(f"[ERROR] Failed to send DCA signal for {pair}: {e}")
+        logger.error(f"Unexpected error sending DCA signal for {pair}: {e}")
 
 
 def get_latest_indicators(symbol, tf="15m"):
