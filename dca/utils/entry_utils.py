@@ -1,23 +1,21 @@
-from datetime import timedelta
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
-import json
-import logging
-
-from ta.momentum import RSIIndicator
-from ta.trend import MACD, ADXIndicator
-import pandas as pd
-import requests
-
 import hashlib
 import hmac
-from utils.credential_manager import get_3commas_credentials
+import json
+import logging
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+import pandas as pd
+import requests
+from ta.momentum import RSIIndicator
+from ta.trend import MACD, ADXIndicator
+
+from utils.credential_manager import get_3commas_credentials
+from utils.redis_manager import get_redis_manager
 
 #!/usr/bin/env python3
 
-from datetime import datetime
-from utils.redis_manager import get_redis_manager
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +27,7 @@ BTC_LOG_PATH = Path("/home/signal/market7/live/btc_logs")
 
 # === Redis Setup ===
 REDIS = get_redis_manager()
+
 
 # === 3Commas Trade Fetch (Paginated) ===
 def get_live_3c_trades() -> Any:
@@ -78,7 +77,9 @@ def get_live_3c_trades() -> Any:
                         deal["bought_volume"]
                     )
                 except (ValueError, TypeError, KeyError) as e:
-                    logger.warning(f"Failed to calculate average price for deal {deal.get('id', 'unknown')}: {e}")
+                    logger.warning(
+                        f"Failed to calculate average price for deal {deal.get('id', 'unknown')}: {e}"
+                    )
                     avg_price = None
 
             deal["avg_entry_price"] = float(avg_price) if avg_price else None
@@ -88,6 +89,7 @@ def get_live_3c_trades() -> Any:
     except (requests.RequestException, json.JSONDecodeError, KeyError) as e:
         logger.error(f"Failed to fetch 3Commas live trades: {e}")
         return []
+
 
 def send_dca_signal(pair: Any, volume: Any = 15) -> Any:
     try:
@@ -114,6 +116,7 @@ def send_dca_signal(pair: Any, volume: Any = 15) -> Any:
         logger.error(f"Failed to send DCA signal for {pair}: {e}")
     except Exception as e:
         logger.error(f"Unexpected error sending DCA signal for {pair}: {e}")
+
 
 def get_latest_indicators(symbol: Any, tf: Any = "15m") -> Any:
     path = (
@@ -173,6 +176,7 @@ def get_latest_indicators(symbol: Any, tf: Any = "15m") -> Any:
         print(f"[ERROR] Could not compute indicators for {symbol}: {e}")
         return {}
 
+
 def get_rsi_slope(symbol: Any, tf: Any = "15m", window: Any = 3) -> Any:
     try:
         path = (
@@ -192,6 +196,7 @@ def get_rsi_slope(symbol: Any, tf: Any = "15m", window: Any = 3) -> Any:
     except Exception as e:
         print(f"[ERROR] RSI slope error for {symbol}: {e}")
         return 0.0
+
 
 def get_macd_lift(symbol: Any, tf: Any = "15m", window: Any = 3) -> Any:
     try:
@@ -213,8 +218,8 @@ def get_macd_lift(symbol: Any, tf: Any = "15m", window: Any = 3) -> Any:
         print(f"[ERROR] MACD lift error for {symbol}: {e}")
         return 0.0
 
-def load_fork_entry_score(symbol: Any, entry_ts: Any) -> Any:
 
+def load_fork_entry_score(symbol: Any, entry_ts: Any) -> Any:
     best_match = None
     smallest_delta = float("inf")
 
@@ -229,7 +234,9 @@ def load_fork_entry_score(symbol: Any, entry_ts: Any) -> Any:
         with open(path) as f:
             for i, line in enumerate(f):
                 if i > 5000:
-                    print(f"[WARN] Aborting fork score scan for {symbol} — too many lines in {path}")
+                    print(
+                        f"[WARN] Aborting fork score scan for {symbol} — too many lines in {path}"
+                    )
                     break
                 try:
                     obj = json.loads(line)
@@ -255,7 +262,10 @@ def load_fork_entry_score(symbol: Any, entry_ts: Any) -> Any:
     print(f"[WARN] No matching entry score found for {symbol} at ts={entry_ts}")
     return None
 
-def simulate_new_avg_price(current_avg: Any, added_usdt: Any, current_price: Any) -> Any:
+
+def simulate_new_avg_price(
+    current_avg: Any, added_usdt: Any, current_price: Any
+) -> Any:
     try:
         tokens = added_usdt / current_price
         new_total_usdt = current_avg * tokens + added_usdt
@@ -264,6 +274,7 @@ def simulate_new_avg_price(current_avg: Any, added_usdt: Any, current_price: Any
     except Exception as e:
         print(f"[ERROR] Failed to simulate BE price: {e}")
         return current_avg
+
 
 def load_btc_market_condition() -> Any:
     try:
@@ -279,6 +290,7 @@ def load_btc_market_condition() -> Any:
         print(f"[WARN] Failed to load BTC condition: {e}")
         return None
 
+
 # === Redis Entry Score Utilities ===
 def save_entry_score_to_redis(deal_id: Any, score: Any) -> Any:
     try:
@@ -286,6 +298,7 @@ def save_entry_score_to_redis(deal_id: Any, score: Any) -> Any:
         REDIS.set(key, score)
     except Exception as e:
         print(f"[WARN] Failed to save entry score to Redis: {e}")
+
 
 def load_entry_score_from_redis(deal_id: Any) -> Any:
     try:

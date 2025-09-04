@@ -12,7 +12,7 @@ export default function AccountSummaryFixed() {
         setLoading(true);
         setError(null);
         const data = await apiClient.getAccountSummary();
-        
+
         if (data.error) {
           setError(data.error);
         } else {
@@ -27,7 +27,7 @@ export default function AccountSummaryFixed() {
     };
 
     fetchSummary();
-    
+
     // Refresh every 30 seconds
     const interval = setInterval(fetchSummary, 30000);
     return () => clearInterval(interval);
@@ -75,8 +75,8 @@ export default function AccountSummaryFixed() {
         <div className="text-red-400 text-sm">
           Error: {error}
         </div>
-        <button 
-          onClick={() => window.location.reload()} 
+        <button
+          onClick={() => window.location.reload()}
           className="mt-2 text-blue-400 hover:text-blue-300 text-sm"
         >
           Retry

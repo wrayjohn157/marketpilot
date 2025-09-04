@@ -12,16 +12,16 @@ elif command -v python3 &> /dev/null; then
     # Start backend
     python3 dashboard_backend/main_fixed.py &
     BACKEND_PID=$!
-    
+
     # Start frontend
     cd dashboard_frontend
     npm start &
     FRONTEND_PID=$!
-    
+
     echo "Backend PID: $BACKEND_PID"
     echo "Frontend PID: $FRONTEND_PID"
     echo "Press Ctrl+C to stop all services"
-    
+
     # Wait for interrupt
     trap "kill $BACKEND_PID $FRONTEND_PID; exit" INT
     wait

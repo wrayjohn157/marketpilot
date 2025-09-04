@@ -1,26 +1,29 @@
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union, Tuple
+import hashlib
+import hmac
 import json
 import logging
 import os
 import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-from ta.momentum import RSIIndicator
-from ta.trend import MACD
 import pandas as pd
 import requests
 import yaml
+from ta.momentum import RSIIndicator
+from ta.trend import MACD
 
-import hashlib
-import hmac
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 from utils.credential_manager import get_3commas_credentials
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs, get_config
-
-
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+
 
 # === Dynamic Paths (Market7 style) ===
 BASE_DIR = get_path("base")  # ~/market7
@@ -53,10 +56,14 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 
 def send_telegram(msg: Any) -> Any:
 if not ALERTS_ENABLED:
-        return
-    url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
+        # return
+url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
     payload = {"chat_id": TG_CHAT_ID, "text": msg, "parse_mode": "HTML"}
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 requests.post(url, json=payload, timeout=5)
 except Exception as e:
 logging.warning(f"[TG] Error: {e}")
@@ -75,19 +82,23 @@ headers = {
 "Accept": "application/json"
 }
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 resp = requests.get(BASE_URL + url_path, headers=headers, timeout=10)
 if resp.status_code != 200:
 logging.warning(f"[3C] Fetch error {resp.status_code}: {resp.text}")
-                break
-            deals = resp.json()
+                # break
+deals = resp.json()
             logging.info(f"[3C] Fetched page {page}: {len(deals)} deals")
             all_trades.extend(deals)
 if len(deals) < 100:
-                break
-            page += 1
+                # break
+page += 1
 except Exception as e:
 logging.warning(f"[3C] Fetch failed on page {page}: {e}")
-            break
+            # break
     logging.info(f"[3C] Total deals returned: {len(all_trades)}")
     return all_trades
 
@@ -99,6 +110,10 @@ logging.warning(f"[Fallback] Kline file not found: {path}")
         return {}
 
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 with open(path) as f:
 raw = json.load(f)
 
@@ -132,6 +147,10 @@ logging.warning(f"[Fallback] Error loading indicators from disk for {symbol}: {e
 def fork_safu_score(token: Any, price_pct: Any) -> Any:
 score = 1.0
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 if token["RSI14"] is not None and token["RSI14"] < 35:
 score -= WEIGHTS.get("token_rsi_below_35", 0)
 if token["MACD_diff"] is not None and token["MACD_diff"] < 0:
@@ -160,6 +179,10 @@ headers = {
 "Accept": "application/json"
 }
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 resp = requests.post(BASE_URL + url_path, headers=headers, timeout=10)
         return resp.status_code == 200
 except Exception as e:
@@ -174,15 +197,13 @@ current_price = float(trade.get("current_price") or 0)
 
 if entry_price == 0 or current_price == 0:
 logging.warning(f"[Skip] {symbol_3c} → Missing entry/current price")
-        return
-
+        # return
 price_pct = round((current_price - entry_price) / entry_price * 100, 2)
 
 indicators = load_indicators_from_disk(symbol)
 if not indicators:
 logging.warning(f"[Skip] {symbol_3c} → No indicators available")
-        return
-
+        # return
 token = {
         "price": current_price,
         "MACD_diff": indicators.get("MACD_diff"),
@@ -217,6 +238,10 @@ trades = fetch_open_trades()
 logging.info(f"[SEARCH] Checking {len(trades)} active deals (scope=active)...")
 for trade in trades:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 analyze_trade(trade)
 except Exception as e:
 logging.warning(f"[Trade] Error on {trade.get('pair')}: {e}")

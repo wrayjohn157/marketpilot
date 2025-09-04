@@ -31,7 +31,7 @@ class ApiClient {
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
       try {
         const response = await fetch(url, config);
-        
+
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
@@ -40,11 +40,11 @@ class ApiClient {
         return data;
       } catch (error) {
         console.warn(`API request attempt ${attempt} failed:`, error.message);
-        
+
         if (attempt === this.retryAttempts) {
           throw new Error(`API request failed after ${this.retryAttempts} attempts: ${error.message}`);
         }
-        
+
         // Wait before retry
         await new Promise(resolve => setTimeout(resolve, this.retryDelay * attempt));
       }

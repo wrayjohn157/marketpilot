@@ -51,7 +51,7 @@ export default function BacktestSummary() {
   return (
     <div className="p-6 space-y-6">
       <h2 className="text-2xl font-semibold mb-4">📚 Backtest Summary</h2>
-      
+
       {/* Overall Performance */}
       <Card>
         <CardHeader>
@@ -65,21 +65,21 @@ export default function BacktestSummary() {
               </div>
               <div className="text-sm text-gray-400">Total Return</div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-blue-400">
                 {summary.sharpe_ratio ? summary.sharpe_ratio.toFixed(2) : "N/A"}
               </div>
               <div className="text-sm text-gray-400">Sharpe Ratio</div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-yellow-400">
                 {summary.max_drawdown ? (summary.max_drawdown * 100).toFixed(1) + "%" : "N/A"}
               </div>
               <div className="text-sm text-gray-400">Max Drawdown</div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-purple-400">
                 {summary.win_rate ? (summary.win_rate * 100).toFixed(1) + "%" : "N/A"}
@@ -108,7 +108,7 @@ export default function BacktestSummary() {
                       {(strategy.performance * 100).toFixed(1)}%
                     </span>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                       <div className="text-gray-400">Trades</div>
@@ -157,14 +157,14 @@ export default function BacktestSummary() {
                 {summary.volatility ? (summary.volatility * 100).toFixed(2) + "%" : "N/A"}
               </div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">VaR (95%)</div>
               <div className="text-xl font-bold">
                 {summary.var_95 ? (summary.var_95 * 100).toFixed(2) + "%" : "N/A"}
               </div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Calmar Ratio</div>
               <div className="text-xl font-bold">

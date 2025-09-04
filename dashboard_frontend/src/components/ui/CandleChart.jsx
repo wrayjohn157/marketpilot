@@ -18,7 +18,7 @@ const CandleChart = ({ data, width: propWidth, height: propHeight, onCandleClick
 
   if (!data?.length) {
     return (
-      <div 
+      <div
         ref={containerRef}
         className="w-full h-96 bg-gray-900 rounded-lg flex items-center justify-center text-gray-400"
         style={{ width: dimensions.width, height: dimensions.height }}
@@ -47,7 +47,7 @@ const CandleChart = ({ data, width: propWidth, height: propHeight, onCandleClick
   };
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="w-full bg-gray-900 rounded-lg relative"
       style={{ width: dimensions.width, height: dimensions.height }}
@@ -65,7 +65,7 @@ const CandleChart = ({ data, width: propWidth, height: propHeight, onCandleClick
             strokeWidth={1}
           />
         ))}
-        
+
         {/* Candlesticks */}
         {data.map((candle, index) => {
           const x = getX(index);
@@ -75,7 +75,7 @@ const CandleChart = ({ data, width: propWidth, height: propHeight, onCandleClick
           const lowY = getY(candle.low);
           const isGreen = candle.close > candle.open;
           const isSelected = selectedIndex === index;
-          
+
           return (
             <g key={index}>
               {/* High-Low line */}
@@ -87,7 +87,7 @@ const CandleChart = ({ data, width: propWidth, height: propHeight, onCandleClick
                 stroke={isGreen ? "#10b981" : "#ef4444"}
                 strokeWidth={1}
               />
-              
+
               {/* Open-Close body */}
               <rect
                 x={x - 2}
@@ -103,15 +103,15 @@ const CandleChart = ({ data, width: propWidth, height: propHeight, onCandleClick
             </g>
           );
         })}
-        
+
         {/* DCA Markers */}
         {dcaMarkers.map((marker, index) => {
           const markerIndex = data.findIndex(d => d.time === marker.time);
           if (markerIndex === -1) return null;
-          
+
           const x = getX(markerIndex);
           const y = getY(marker.price);
-          
+
           return (
             <circle
               key={`dca-${index}`}
@@ -125,13 +125,13 @@ const CandleChart = ({ data, width: propWidth, height: propHeight, onCandleClick
           );
         })}
       </svg>
-      
+
       {/* Price labels */}
       <div className="absolute right-2 top-2 text-xs text-gray-400">
         <div>High: {maxPrice.toFixed(2)}</div>
         <div>Low: {minPrice.toFixed(2)}</div>
       </div>
-      
+
       {/* Selected candle info */}
       {selectedIndex !== null && (
         <div className="absolute bottom-2 left-2 bg-gray-800 p-2 rounded text-xs text-gray-300">

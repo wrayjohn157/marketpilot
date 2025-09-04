@@ -80,7 +80,7 @@ export default function Sidebar({ onHelpClick, onTourClick }) {
             <PlayCircle size={16} className="mr-2" />
             Take Tour
           </button>
-          
+
           <button
             onClick={() => {
               onHelpClick && onHelpClick();

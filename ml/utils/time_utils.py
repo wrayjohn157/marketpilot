@@ -1,10 +1,13 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-from
- datetime import datetime, timezone, timedelta
 
 def parse_iso(ts: str) -> datetime:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 # With fractional seconds (e.g., 2025-05-01T20:43:22.594Z)
     return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
 except ValueError:

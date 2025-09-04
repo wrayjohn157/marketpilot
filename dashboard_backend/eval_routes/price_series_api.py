@@ -1,10 +1,11 @@
 # ~/market7/dashboard_backend/eval_routes/price_series_api.py
 
-from fastapi import APIRouter, Query
-from pathlib import Path
 import json
-from utils.redis_manager import get_redis_manager, RedisKeyManager
+from pathlib import Path
 
+from fastapi import APIRouter, Query
+
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 router = APIRouter()
 

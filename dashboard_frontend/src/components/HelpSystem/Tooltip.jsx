@@ -26,9 +26,9 @@ const Tooltip = ({ content, position = 'top', children }) => {
         className="inline-block"
       >
         {children || (
-          <HelpCircle 
-            size={16} 
-            className="text-gray-400 hover:text-gray-600 cursor-help transition-colors" 
+          <HelpCircle
+            size={16}
+            className="text-gray-400 hover:text-gray-600 cursor-help transition-colors"
           />
         )}
       </div>
@@ -38,7 +38,7 @@ const Tooltip = ({ content, position = 'top', children }) => {
           className={`absolute z-50 bg-gray-800 text-white text-sm rounded-lg px-3 py-2 max-w-xs shadow-lg ${positionClasses[position]}`}
         >
           <div className="whitespace-pre-line">{content}</div>
-          
+
           {/* Arrow */}
           <div
             className={`absolute w-0 h-0 border-4 border-transparent ${arrowClasses[position]}`}

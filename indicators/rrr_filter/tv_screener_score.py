@@ -1,12 +1,12 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+
 
 # === Load path config ===
 CONFIG_FILE = Path(__file__).resolve().parents[2] / "config" / "paths_config.yaml"
@@ -26,6 +26,10 @@ if rating in ["buy", "strong_buy"]:
 
 def load_config() -> dict:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 full = yaml.safe_load(TV_CONFIG_PATH.read_text())
         return full.get("tv_screener", {})
 except Exception as e:
@@ -47,6 +51,10 @@ logging.warning("[TV] Screener file missing, skipping TV score")
         return 0.0
 
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 data = json.loads(RAW_FILE.read_text())
 except Exception as e:
 logging.warning(f"[TV] Failed to parse raw screener file: {e}")

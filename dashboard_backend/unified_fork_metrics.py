@@ -1,18 +1,23 @@
 # /market7/dashboard_backend/unified_fork_metrics.py
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import json
-import hmac
 import hashlib
-import requests
+import hmac
+import json
 from datetime import datetime, timedelta
+
+import requests
+
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 from utils.credential_manager import get_3commas_credentials
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
-from config.unified_config_manager import get_config
-
-
 
 # === Load credentials properly ===
 with open(get_path("paper_cred"), "r") as f:
@@ -22,6 +27,7 @@ API_KEY = creds["3commas_api_key"]
 API_SECRET = creds["3commas_api_secret"]
 BOT_ID = creds.get("3commas_bot_id", 16398727)
 ACCOUNT_ID = creds.get("3commas_account_id", 29085460)  # fallback
+
 
 # === Helper: Sign a request ===
 def sign_request(path: str, query: str = "") -> (str, dict):
@@ -34,13 +40,11 @@ def sign_request(path: str, query: str = "") -> (str, dict):
     signature = hmac.new(
         API_SECRET.encode("utf-8"),
         msg=message.encode("utf-8"),
-        digestmod=hashlib.sha256
+        digestmod=hashlib.sha256,
     ).hexdigest()
-    headers = {
-        "APIKEY": API_KEY,
-        "Signature": signature
-    }
+    headers = {"APIKEY": API_KEY, "Signature": signature}
     return url, headers
+
 
 # === Get Active Deals ===
 def get_active_deals(bot_id: int):
@@ -54,6 +58,7 @@ def get_active_deals(bot_id: int):
         print("[ERROR] Fetching active deals:", resp.text)
         return []
 
+
 # === Get Finished Deals ===
 def get_finished_deals(bot_id: int):
     path = "/public/api/ver1/deals"
@@ -65,6 +70,7 @@ def get_finished_deals(bot_id: int):
     else:
         print("[ERROR] Fetching finished deals:", resp.text)
         return []
+
 
 # === Calculate Open PnL & Drawdown ===
 def calculate_open_pnl(active_deals):
@@ -85,23 +91,30 @@ def calculate_open_pnl(active_deals):
             pnl_pct = (open_pnl / spent) * 100 if spent else 0
 
             entry_price = spent / coins if coins else 0
-            drawdown_pct = max(0, ((entry_price - current_price) / entry_price) * 100) if entry_price else 0
+            drawdown_pct = (
+                max(0, ((entry_price - current_price) / entry_price) * 100)
+                if entry_price
+                else 0
+            )
             drawdown_usd = max(0, (entry_price - current_price) * coins)
 
             total_open_pnl += open_pnl
-            deals_info.append({
-                "pair": pair,
-                "spent_amount": round(spent, 2),
-                "current_price": round(current_price, 6),
-                "entry_price": round(entry_price, 2),
-                "open_pnl": round(open_pnl, 2),
-                "open_pnl_pct": round(pnl_pct, 2),
-                "drawdown_pct": round(drawdown_pct, 2),
-                "drawdown_usd": round(drawdown_usd, 2)
-            })
+            deals_info.append(
+                {
+                    "pair": pair,
+                    "spent_amount": round(spent, 2),
+                    "current_price": round(current_price, 6),
+                    "entry_price": round(entry_price, 2),
+                    "open_pnl": round(open_pnl, 2),
+                    "open_pnl_pct": round(pnl_pct, 2),
+                    "drawdown_pct": round(drawdown_pct, 2),
+                    "drawdown_usd": round(drawdown_usd, 2),
+                }
+            )
         except Exception:
             continue
     return total_open_pnl, deals_info
+
 
 # === Calculate Closed Deals ===
 def calculate_closed_deals_stats(finished_deals):
@@ -114,7 +127,9 @@ def calculate_closed_deals_stats(finished_deals):
     for deal in finished_deals:
         try:
             profit = float(deal.get("final_profit", 0))
-            closed_at = datetime.fromisoformat(deal.get("closed_at", "").replace("Z", "+00:00"))
+            closed_at = datetime.fromisoformat(
+                deal.get("closed_at", "").replace("Z", "+00:00")
+            )
             total_realized_pnl += profit
             total_deals += 1
             if profit > 0:
@@ -125,6 +140,7 @@ def calculate_closed_deals_stats(finished_deals):
             continue
     win_rate = round((wins / total_deals) * 100, 1) if total_deals > 0 else 0
     return total_realized_pnl, daily_realized_pnl, total_deals, win_rate
+
 
 # === Get Multi-Pair Stats ===
 def get_multi_pair_stats(bot_id: int, account_id: int):
@@ -138,20 +154,30 @@ def get_multi_pair_stats(bot_id: int, account_id: int):
         print("[ERROR] Fetching multi-pair stats:", resp.text)
         return {}
 
+
 # === Get Fork Metrics Unified ===
 def get_fork_trade_metrics():
     active_deals = get_active_deals(BOT_ID)
     finished_deals = get_finished_deals(BOT_ID)
 
     total_open_pnl, open_deals_info = calculate_open_pnl(active_deals)
-    realized_pnl_alltime, daily_realized_pnl, total_deals, win_rate = calculate_closed_deals_stats(finished_deals)
+    (
+        realized_pnl_alltime,
+        daily_realized_pnl,
+        total_deals,
+        win_rate,
+    ) = calculate_closed_deals_stats(finished_deals)
     multi_pair_stats = get_multi_pair_stats(BOT_ID, ACCOUNT_ID)
 
     total_allocated = sum(d.get("spent_amount", 0) for d in open_deals_info)
     upnl = round(total_open_pnl, 2)
     active_count = len(open_deals_info)
-    total_pnl = multi_pair_stats.get("profits_in_usd", {}).get("overall_usd_profit", realized_pnl_alltime)
-    today_pnl = multi_pair_stats.get("profits_in_usd", {}).get("today_usd_profit", daily_realized_pnl)
+    total_pnl = multi_pair_stats.get("profits_in_usd", {}).get(
+        "overall_usd_profit", realized_pnl_alltime
+    )
+    today_pnl = multi_pair_stats.get("profits_in_usd", {}).get(
+        "today_usd_profit", daily_realized_pnl
+    )
     balance = multi_pair_stats.get("account_balance", 24957.0)
 
     return {
@@ -162,7 +188,7 @@ def get_fork_trade_metrics():
             "realized_pnl_alltime": round(realized_pnl_alltime, 2),
             "total_deals": total_deals,
             "win_rate": win_rate,
-            "active_deals": open_deals_info
+            "active_deals": open_deals_info,
         },
         "multi_pair_stats": multi_pair_stats,
         "summary": {
@@ -171,9 +197,10 @@ def get_fork_trade_metrics():
             "today_pnl": round(today_pnl, 2),
             "upnl": upnl,
             "total_pnl": round(total_pnl, 2),
-            "balance": round(balance, 2)
-        }
+            "balance": round(balance, 2),
+        },
     }
+
 
 # === Main Cache and Output Handler ===
 if __name__ == "__main__":

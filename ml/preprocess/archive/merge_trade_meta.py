@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 import json
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 # === Config Paths ===
 ENRICHED_DIR = Path("/home/signal/market7/ml/datasets/enriched/2025-05-12")
 TRADES_PATH = ENRICHED_DIR / "scrubbed_trades_fixed.jsonl"
-TV_KICKER_PATH = Path("/home/signal/market7/output/tv_history/2025-05-12/tv_kicker.jsonl")
+TV_KICKER_PATH = Path(
+    "/home/signal/market7/output/tv_history/2025-05-12/tv_kicker.jsonl"
+)
 OUTPUT_PATH = ENRICHED_DIR / "merged_trade_meta.jsonl"
 
 MATCH_WINDOW_SECONDS = 1800  # 30 minutes
+
 
 # === Load Functions ===
 def load_jsonl(path):
@@ -18,6 +21,7 @@ def load_jsonl(path):
         return []
     return [json.loads(line) for line in path.open() if line.strip()]
 
+
 def parse_any_time(ts):
     if isinstance(ts, (int, float)):
         return float(ts)
@@ -25,8 +29,10 @@ def parse_any_time(ts):
         return datetime.fromisoformat(ts.replace("Z", "+00:00")).timestamp()
     return float(ts)
 
+
 def normalize_symbol(sym):
     return sym.replace("USDT", "").upper()
+
 
 # === Load data ===
 trades = load_jsonl(TRADES_PATH)
@@ -59,7 +65,9 @@ for trade in trades:
         matched += 1
     else:
         trade["tv_boost"] = False
-        print(f"❌ TV MISS  | {trade.get('symbol')} | Δt = {min_delta:.2f}s | Entry: {trade.get('entry_time')}")
+        print(
+            f"❌ TV MISS  | {trade.get('symbol')} | Δt = {min_delta:.2f}s | Entry: {trade.get('entry_time')}"
+        )
 
     merged.append(trade)
 

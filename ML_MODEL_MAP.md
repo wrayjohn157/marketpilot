@@ -33,13 +33,13 @@ This document maps all machine learning models (`.pkl` files) in the Market7 rep
   except Exception as e:
       log.error(f"Failed to load recovery model: {e}")
       return None
-  
+
   # Feature validation
   missing_features = set(EXPECTED_FEATURES) - set(features.keys())
   if missing_features:
       log.warning(f"Missing features for recovery prediction: {missing_features}")
       return None
-  
+
   # Prediction with confidence
   try:
       prob = model.predict_proba([feature_vector])[0][1]
@@ -80,13 +80,13 @@ This document maps all machine learning models (`.pkl` files) in the Market7 rep
   except Exception as e:
       log.error(f"Failed to load confidence model: {e}")
       return None
-  
+
   # Feature validation and preprocessing
   missing_features = set(FEATURE_COLUMNS) - set(features.keys())
   if missing_features:
       log.warning(f"Missing confidence features: {missing_features}")
       return None
-  
+
   # Prediction with error handling
   try:
       confidence = model.predict_proba([feature_vector])[0][1]
@@ -115,7 +115,7 @@ This document maps all machine learning models (`.pkl` files) in the Market7 rep
       "rsi", "rsi_slope", "adx", "tp1_shift", "recovery_odds", "confidence_score",
       "zombie_tagged", "btc_rsi", "btc_macd_histogram", "btc_adx"
   ]
-  
+
   # One-hot encoding for BTC status
   BTC_STATUS_KEYS = [
       "btc_status_bullish", "btc_status_bearish", "btc_status_neutral", "btc_status_nan"
@@ -129,7 +129,7 @@ This document maps all machine learning models (`.pkl` files) in the Market7 rep
   except Exception as e:
       log.error(f"Failed to load spend model: {e}")
       return None
-  
+
   # Feature preprocessing with BTC status encoding
   feature_vector = []
   for feature in BASE_FEATURES:
@@ -137,12 +137,12 @@ This document maps all machine learning models (`.pkl` files) in the Market7 rep
           feature_vector.append(features[feature])
       else:
           feature_vector.append(0.0)
-  
+
   # Add BTC status one-hot encoding
   btc_status = features.get("btc_status", "nan")
   for status_key in BTC_STATUS_KEYS:
       feature_vector.append(1.0 if status_key.endswith(btc_status) else 0.0)
-  
+
   # Prediction with validation
   try:
       predicted_spend = model.predict([feature_vector])[0]
@@ -196,7 +196,7 @@ This document maps all machine learning models (`.pkl` files) in the Market7 rep
   except Exception as e:
       log.error(f"Failed to load SAFU model: {e}")
       return None
-  
+
   # Dynamic feature extraction
   available_features = []
   for feature_name in model.feature_names_in_:
@@ -204,7 +204,7 @@ This document maps all machine learning models (`.pkl` files) in the Market7 rep
           available_features.append(indicators[feature_name])
       else:
           available_features.append(0.0)
-  
+
   # Prediction with validation
   try:
       safu_prob = model.predict_proba([available_features])[0][1]
@@ -269,7 +269,7 @@ This document maps all machine learning models (`.pkl` files) in the Market7 rep
   # From lev/run_lev.py
   from dca.utils.recovery_odds_utils import predict_recovery_odds
   from dca.utils.recovery_confidence_utils import predict_confidence_score
-  
+
   # Used in leverage decision making
   rec_odds = predict_recovery_odds(inds) or 0.0
   conf = predict_confidence_score(inds) or 0.0

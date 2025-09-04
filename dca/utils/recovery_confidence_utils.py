@@ -1,17 +1,21 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
-
-import pandas as pd
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import joblib
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs, get_config
+import pandas as pd
 
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 
 #!/usr/bin/env python3
 
-from
- pathlib import Path
+
 
 # === Setup ===
 logging.basicConfig(level=logging.INFO)
@@ -32,6 +36,10 @@ FEATURE_COLUMNS = [
 
 # === Load Model Once ===
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 MODEL = joblib.load(str(MODEL_PATH))
 logger.info(f"[OK] Loaded confidence model from {MODEL_PATH}")
 except Exception as e:
@@ -39,12 +47,12 @@ logger.error(f"[ERROR] Failed to load confidence model: {e}")
 MODEL = None
 
 def predict_confidence_score(trade_snapshot: dict) -> float:
-    pass
-""""
-""""
+    # pass
+""""""""
+""""""""
 Predict a confidence score using the trained XGBoost regression model.
 Will auto-inject 'snapshot_*' features if available from recovery snapshots.
-""""
+""""""""
 if not isinstance(trade_snapshot, dict):
 logger.warning("[WARNING] Invalid trade_snapshot; returning 0.0")
         return 0.0
@@ -58,6 +66,10 @@ snap_file = SNAPSHOT_DIR / f"{asset}_{deal_id}.jsonl"
 
 if deal_id and asset and snap_file.exists():
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 lines = snap_file.read_text().splitlines()
 if lines:
 last = json.loads(lines[-1])
@@ -79,8 +91,12 @@ val = trade_snapshot.get(feat, 0.0)
 if isinstance(val, bool):
 val = float(val)
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 row[feat] = float(val)
-except Exception:
+# except Exception:
 row[feat] = 0.0
 
 df = pd.DataFrame([row], columns=FEATURE_COLUMNS)
@@ -90,6 +106,9 @@ logger.error("[ERROR] No confidence model loaded; prediction unavailable.")
         return 0.0
 
 try:
+        # pass
+# except Exception:
+# pass
         return round(float(MODEL.predict(df)[0]), 4)
 except Exception as e:
 logger.error(f"[ERROR] Confidence prediction failed: {e}")

@@ -1,47 +1,58 @@
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
-from xgboost import XGBClassifier
+import argparse
 import json
 import os
 
-from sklearn.preprocessing import StandardScaler
-import numpy as np
-import pandas as pd
-
-from sklearn.metrics import classification_report
-from sklearn.model_selection import train_test_split
-import argparse
-import joblib
-import matplotlib.pyplot as plt
-import shap
-
 #!/usr/bin/env python3
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import joblib
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import shap
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from xgboost import XGBClassifier
 
 # === CONFIG ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "ml/datasets"
 MODEL_DIR = PROJECT_ROOT / "ml/models"
 
+
 def load_data(path: Any) -> Any:
     with open(path, "r") as f:
         records = [json.loads(line) for line in f if line.strip()]
-    return pd.json_normalize(records, sep='.')
+    return pd.json_normalize(records, sep=".")
+
 
 def prepare_features(df: Any) -> Any:
     indicator_cols = [
-        "ind_ema50", "ind_rsi", "ind_adx", "ind_atr",
-        "ind_stoch_rsi_k", "ind_stoch_rsi_d", "ind_macd",
-        "ind_macd_signal", "ind_macd_hist", "ind_macd_hist_prev",
+        "ind_ema50",
+        "ind_rsi",
+        "ind_adx",
+        "ind_atr",
+        "ind_stoch_rsi_k",
+        "ind_stoch_rsi_d",
+        "ind_macd",
+        "ind_macd_signal",
+        "ind_macd_hist",
+        "ind_macd_hist_prev",
         "ind_macd_lift",
-        "btc_rsi", "btc_adx", "btc_macd_histogram",
-        "btc_ema_50", "btc_ema_200"
+        "btc_rsi",
+        "btc_adx",
+        "btc_macd_histogram",
+        "btc_ema_50",
+        "btc_ema_200",
     ]
 
     if "btc_market_condition" in df.columns:
-        df["btc_market_condition_num"] = df["btc_market_condition"].map({
-            "bullish": 2, "neutral": 1, "bearish": 0
-        })
+        df["btc_market_condition_num"] = df["btc_market_condition"].map(
+            {"bullish": 2, "neutral": 1, "bearish": 0}
+        )
         indicator_cols.append("btc_market_condition_num")
 
     # Detect available columns
@@ -51,7 +62,7 @@ def prepare_features(df: Any) -> Any:
         print(f"⚠️ Missing columns skipped: {missing}")
 
     for col in available_cols:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
+        df[col] = pd.to_numeric(df[col], errors="coerce")
 
     # Fallback label if not present
     if "label" not in df.columns and "pnl_pct" in df.columns:
@@ -63,8 +74,11 @@ def prepare_features(df: Any) -> Any:
     y = df_clean["label"].astype(int)
     return X, y, available_cols
 
+
 def train_model(X: Any, y: Any, feature_names: Any, shap_out_path: Any) -> Any:
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, stratify=y, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(
+        X, y, test_size=0.3, stratify=y, random_state=42
+    )
 
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
@@ -74,7 +88,7 @@ def train_model(X: Any, y: Any, feature_names: Any, shap_out_path: Any) -> Any:
         objective="binary:logistic",
         eval_metric="logloss",
         use_label_encoder=False,
-        random_state=42
+        random_state=42,
     )
     model.fit(X_train_scaled, y_train)
 
@@ -85,13 +99,16 @@ def train_model(X: Any, y: Any, feature_names: Any, shap_out_path: Any) -> Any:
     explainer = shap.Explainer(model)
     shap_values = explainer(X_val_scaled)
     plt.figure()
-    shap.summary_plot(shap_values, X_val, feature_names=feature_names, plot_type="bar", show=False)
+    shap.summary_plot(
+        shap_values, X_val, feature_names=feature_names, plot_type="bar", show=False
+    )
     plt.tight_layout()
     plt.savefig(shap_out_path)
     plt.close()
     print(f"📈 SHAP summary plot saved to: {shap_out_path}")
 
     return model, scaler
+
 
 def main() -> Any:
     parser = argparse.ArgumentParser()
@@ -125,6 +142,7 @@ def main() -> Any:
     print(f"💾 Model saved to: {model_out_path}")
     print(f"💾 Scaler saved to: {scaler_out_path}")
     print(f"🧠 Features saved to: {features_out_path}")
+
 
 if __name__ == "__main__":
     main()

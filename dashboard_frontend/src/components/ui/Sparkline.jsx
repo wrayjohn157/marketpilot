@@ -45,7 +45,7 @@ export function Sparkline({ data }) {
           <YAxis hide domain={['auto','auto']} />
 
           {/* glowing fill */}
-          <Area 
+          <Area
             type="monotone"
             dataKey="value"
             fill={`url(#${gradientId})`}
@@ -54,7 +54,7 @@ export function Sparkline({ data }) {
           />
 
           {/* thick, blurred stroke on its own layer */}
-          <Area 
+          <Area
             type="monotone"
             dataKey="value"
             stroke={color}

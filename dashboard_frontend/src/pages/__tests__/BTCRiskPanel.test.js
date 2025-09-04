@@ -15,20 +15,20 @@ describe('BTCRiskPanel', () => {
 
   it('renders loading state initially', () => {
     fetch.mockImplementation(() => new Promise(() => {})); // Never resolves
-    
+
     render(<BTCRiskPanel />);
-    
+
     expect(screen.getByText('⚠️ BTC Risk Panel')).toBeInTheDocument();
     expect(screen.getByText('Loading BTC data...')).toBeInTheDocument();
   });
 
   it('renders error state when fetch fails', async () => {
     fetch.mockRejectedValueOnce(new Error('Network error'));
-    
+
     await act(async () => {
       render(<BTCRiskPanel />);
     });
-    
+
     await waitFor(() => {
       expect(screen.getByText('Error: Network error')).toBeInTheDocument();
     });
@@ -57,9 +57,9 @@ describe('BTCRiskPanel', () => {
       ok: true,
       json: () => Promise.resolve(mockData),
     });
-    
+
     render(<BTCRiskPanel />);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Medium Risk')).toBeInTheDocument();
       expect(screen.getByText('60.0%')).toBeInTheDocument();
@@ -79,9 +79,9 @@ describe('BTCRiskPanel', () => {
       ok: true,
       json: () => Promise.resolve(highRiskData),
     });
-    
+
     const { rerender } = render(<BTCRiskPanel />);
-    
+
     await waitFor(() => {
       expect(screen.getByText('High Risk')).toBeInTheDocument();
     });
@@ -91,9 +91,9 @@ describe('BTCRiskPanel', () => {
       ok: true,
       json: () => Promise.resolve(lowRiskData),
     });
-    
+
     rerender(<BTCRiskPanel />);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Low Risk')).toBeInTheDocument();
     });
@@ -116,9 +116,9 @@ describe('BTCRiskPanel', () => {
       ok: true,
       json: () => Promise.resolve(mockData),
     });
-    
+
     render(<BTCRiskPanel />);
-    
+
     await waitFor(() => {
       expect(screen.getByText('No specific recommendations at this time')).toBeInTheDocument();
     });
@@ -126,7 +126,7 @@ describe('BTCRiskPanel', () => {
 
   it('auto-refreshes data every minute', async () => {
     jest.useFakeTimers();
-    
+
     const mockData = {
       risk_score: 0.5,
       price: 50000,
@@ -143,9 +143,9 @@ describe('BTCRiskPanel', () => {
       ok: true,
       json: () => Promise.resolve(mockData),
     });
-    
+
     render(<BTCRiskPanel />);
-    
+
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledTimes(1);
     });

@@ -1,23 +1,27 @@
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 import os
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-from ta.momentum import StochRSIIndicator, RSIIndicator
-from ta.trend import EMAIndicator, ADXIndicator, MACD, PSARIndicator
-from ta.volatility import AverageTrueRange
 import pandas as pd
 import requests
+from ta.momentum import RSIIndicator, StochRSIIndicator
+from ta.trend import MACD, ADXIndicator, EMAIndicator, PSARIndicator
+from ta.volatility import AverageTrueRange
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import time
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs, get_config
-
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+
 
 # === Config ===
 BASE_DIR = Path("/home/signal/market7")
@@ -41,6 +45,10 @@ SYMBOLS = json.load(f)
 def fetch_klines(symbol: Any, interval: Any, end_ts: Any, limit: Any = KLINE_LIMIT) -> Any:
 url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}&endTime={end_ts}"
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 r = requests.get(url, timeout=10)
 r.raise_for_status()
 df = pd.DataFrame(
@@ -75,6 +83,10 @@ logging.warning(f"[ERROR] {symbol} {interval}: {e}")
 
 def compute_indicators(df: Any) -> Any:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 indicators = {
 "EMA50": EMAIndicator(df["close"], 50).ema_indicator().iloc[-1],
 "EMA200": EMAIndicator(df["close"], 200).ema_indicator().iloc[-1],
@@ -135,7 +147,7 @@ if indicators:
 save_snapshot(symbol, tf, day.strftime("%Y-%m-%d"), indicators)
 logging.info(f"[OK] {symbol} {tf} {hour_time}")
 else:
-logging.info(f"⏭️ Skipped {symbol} {tf} {hour_time} (insufficient data)")
+logging.info(f"⏭ Skipped {symbol} {tf} {hour_time} (insufficient data)")
 time.sleep(0.1)
 day += pd.Timedelta(days=1)
 
@@ -148,10 +160,13 @@ with ThreadPoolExecutor(max_workers=max_workers) as executor:
 futures = [executor.submit(process_symbol_tf, symbol, tf) for symbol in SYMBOLS]
 for future in as_completed(futures):
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 future.result()
 except Exception as e:
 logging.error(f"Thread failed: {e}")
 
 if __name__ == "__main__":
 run_backfill()
-

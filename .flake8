@@ -1,11 +1,11 @@
 [flake8]
 max-line-length = 88
-extend-ignore = 
+extend-ignore =
     E203,  # whitespace before ':'
     E501,  # line too long (handled by black)
     W503,  # line break before binary operator
     E402,  # module level import not at top of file
-exclude = 
+exclude =
     .git,
     __pycache__,
     .venv,
@@ -19,7 +19,7 @@ exclude =
 per-file-ignores =
     __init__.py:F401
 max-complexity = 10
-select = 
+select =
     C,
     E,
     F,

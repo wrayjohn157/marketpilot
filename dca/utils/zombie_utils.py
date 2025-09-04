@@ -1,10 +1,16 @@
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
-import yaml
 from typing import Any
 
-    
-def is_zombie_trade(indicators: Any, recovery_odds: Any, score: Any) -> Any:
+import yaml
 
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
+
+
+def is_zombie_trade(indicators: Any, recovery_odds: Any, score: Any) -> Any:
     config_path = get_path("dca_config")
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
@@ -15,7 +21,9 @@ def is_zombie_trade(indicators: Any, recovery_odds: Any, score: Any) -> Any:
 
     # === Basic threshold checks ===
     if not (
-        cfg["min_drawdown_pct"] <= indicators.get("drawdown_pct", 0) <= cfg["max_drawdown_pct"]
+        cfg["min_drawdown_pct"]
+        <= indicators.get("drawdown_pct", 0)
+        <= cfg["max_drawdown_pct"]
         and score <= cfg["max_score"]
         and indicators.get("macd_lift", 1) <= cfg["max_macd_lift"]
         and indicators.get("rsi_slope", 1) <= cfg["max_rsi_slope"]

@@ -1,21 +1,31 @@
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union, Tuple
-import os, sys, json, time, redis, logging, requests, hmac, hashlib
-
-import yaml
-
-from fork.utils.entry_utils import get_entry_price, compute_score_hash
-from fork.utils.fork_entry_logger import log_fork_entry
+import hashlib
+import hmac
+import json
+import logging
+import os
 import subprocess
-from utils.credential_manager import get_3commas_credentials
-
+import sys
+import time
+from datetime import datetime
 
 #!/usr/bin/env python3
 from pathlib import Path
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
-from utils.redis_manager import get_redis_manager
-from config.unified_config_manager import get_config
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+import redis
+import requests
+import yaml
+
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
+from fork.utils.entry_utils import compute_score_hash, get_entry_price
+from fork.utils.fork_entry_logger import log_fork_entry
+from utils.credential_manager import get_3commas_credentials
+from utils.redis_manager import get_redis_manager
 
 # === Setup ===
 CURRENT_FILE = Path(__file__).resolve()
@@ -41,7 +51,9 @@ THREECOMMAS_URL = "https://app.3commas.io/trade_signal/trading_view"
 THREECOMMAS_BASE_URL = "https://api.3commas.io"
 
 # === Logging ===
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 r = get_redis_manager()
 
 # === Load Credentials ===
@@ -53,14 +65,17 @@ EMAIL_TOKEN = creds["3commas_email_token"]
 API_KEY = creds["3commas_api_key"]
 API_SECRET = creds["3commas_api_secret"]
 
+
 # === Helpers ===
 def format_pair(symbol: Any) -> Any:
     return f"USDT_{symbol.replace('USDT', '').replace('USDT_', '')}"
+
 
 def sign_payload(payload: Any, token: Any) -> Any:
     q = "&".join(f"{k}={v}" for k, v in sorted(payload.items()))
     payload["sign"] = hmac.new(token.encode(), q.encode(), hashlib.sha256).hexdigest()
     return payload
+
 
 def send_to_3c(symbol: Any, bot_id: Any) -> Any:
     payload = {
@@ -68,17 +83,24 @@ def send_to_3c(symbol: Any, bot_id: Any) -> Any:
         "bot_id": bot_id,
         "email_token": EMAIL_TOKEN,
         "delay_seconds": 0,
-        "pair": format_pair(symbol)
+        "pair": format_pair(symbol),
     }
     try:
-        res = requests.post(THREECOMMAS_URL, json=sign_payload(payload, EMAIL_TOKEN), timeout=10)
+        res = requests.post(
+            THREECOMMAS_URL, json=sign_payload(payload, EMAIL_TOKEN), timeout=10
+        )
         res.raise_for_status()
-        r.hset(SENT_KEY, f"{symbol}_{bot_id}", json.dumps({"sent": True, "timestamp": time.time()}))
+        r.hset(
+            SENT_KEY,
+            f"{symbol}_{bot_id}",
+            json.dumps({"sent": True, "timestamp": time.time()}),
+        )
         logging.info(f"✅ Sent {symbol} to 3Commas bot {bot_id}")
         return True
     except Exception as e:
         logging.error(f"❌ Failed to send {symbol} to bot {bot_id}: {e}")
         return False
+
 
 def get_active_trades() -> Any:
     try:
@@ -87,10 +109,15 @@ def get_active_trades() -> Any:
         headers = {"Apikey": API_KEY, "Signature": sig}
         res = requests.get(THREECOMMAS_BASE_URL + path, headers=headers)
         res.raise_for_status()
-        return {deal["pair"].split("_")[1] + "USDT" for deal in res.json() if deal.get("status") == "bought"}
+        return {
+            deal["pair"].split("_")[1] + "USDT"
+            for deal in res.json()
+            if deal.get("status") == "bought"
+        }
     except Exception as e:
         logging.error(f"❌ Could not fetch active trades: {e}")
         return set()
+
 
 # === BTC Status from file ===
 def get_latest_btc_status() -> Any:
@@ -108,6 +135,7 @@ def get_latest_btc_status() -> Any:
         logging.warning(f"⚠️ Failed to read BTC status from log: {e}")
         return "neutral"
 
+
 # === TV Status ===
 def check_tv_status() -> Any:
     try:
@@ -115,11 +143,12 @@ def check_tv_status() -> Any:
         enabled = cfg.get("enabled", False)
         guard = cfg.get("disable_if_btc_unhealthy", False)
         btc_status = get_latest_btc_status()
-        healthy = (btc_status == "bullish")
+        healthy = btc_status == "bullish"
         return enabled, guard, btc_status, (not guard or healthy)
     except Exception as e:
         logging.error(f"❌ Failed to parse TV Screener config: {e}")
         return False, False, "unknown", False
+
 
 # === Main ===
 def main() -> Any:
@@ -148,7 +177,9 @@ def main() -> Any:
 
     # Step 3: TV kicker logic
     tv_enabled, btc_guard, btc_status, allow_tv = check_tv_status()
-    logging.info(f"📊 TV Enabled: {'✅' if tv_enabled else '❌'} | BTC Guard: {'✅' if btc_guard else '❌'} | BTC Status: {btc_status.upper()}")
+    logging.info(
+        f"📊 TV Enabled: {'✅' if tv_enabled else '❌'} | BTC Guard: {'✅' if btc_guard else '❌'} | BTC Status: {btc_status.upper()}"
+    )
     logging.info(f"📈 TV kicker allowed: {'✅' if allow_tv else '❌'}")
 
     if tv_enabled and allow_tv:
@@ -167,6 +198,7 @@ def main() -> Any:
         logging.info("🧹 Clearing stale TV outputs...")
         FORK_TV_PATH.write_text("")
         FORK_BACKTEST_PATH.write_text("")
+
 
 if __name__ == "__main__":
     main()

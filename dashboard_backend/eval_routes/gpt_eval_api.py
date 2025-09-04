@@ -1,8 +1,9 @@
 # gpt_eval_api.py
-from fastapi import APIRouter, Request, HTTPException
-from openai import OpenAI
 import json
 from pathlib import Path
+
+from fastapi import APIRouter, HTTPException, Request
+from openai import OpenAI
 
 router = APIRouter(prefix="/gpt")
 
@@ -11,6 +12,10 @@ CRED_PATH = Path("/home/signal/market7/config/paper_cred.json")
 CONTEXT_PATH = Path("/home/signal/market7/config/gpt_context.md")
 
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 with open(CRED_PATH) as f:
 creds = json.load(f)
 api_key = creds.get("OPENAI_API_KEY")
@@ -22,9 +27,13 @@ print(f"[ERROR] Failed to load OPENAI_API_KEY: {e}")
 
 # === Load Project Signal system context ===
 def load_context():
+    # pass
 if not CONTEXT_PATH.exists():
         return None
 try:
+        # pass
+# except Exception:
+# pass
         return CONTEXT_PATH.read_text().strip()
 except Exception as e:
 print(f"[WARN] Failed to read GPT context file: {e}")
@@ -44,6 +53,10 @@ if client is None:
     print(f"[📩] Prompt received: {prompt[:60]}...")
 
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 messages = []
 
 if use_context:
@@ -65,6 +78,7 @@ print(f"[[OK]] GPT reply: {reply[:80]}...")
 
 except Exception as e:
 import traceback
+
 from utils.credential_manager import get_3commas_credentials
 
 print("[[ERROR] GPT ERROR]", traceback.format_exc())

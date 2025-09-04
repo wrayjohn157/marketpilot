@@ -1,19 +1,18 @@
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 import os
 import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
 
 from indicators.rrr_filter.run_rrr_filter import run_rrr_filter
-from utils.redis_manager import get_redis_manager, RedisKeyManager
-
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 #!/usr/bin/env python3
-from
- datetime import datetime
+
 
 # Add root to sys.path
 CURRENT_FILE = Path(__file__).resolve()
@@ -65,8 +64,7 @@ r.cleanup_expired_keys()
 
 if not APPROVED_FILE.exists():
 logging.error(f"[ERROR] Missing approved trades file: {APPROVED_FILE}")
-        return
-
+        # return
 with open(APPROVED_FILE) as f:
 symbols = json.load(f)
 
@@ -80,8 +78,7 @@ else:
 s = symbol.upper()
 if not s:
 logging.warning("[WARNING] Skipping entry with missing symbol")
-            continue
-
+            # continue
 ind_1h = get_indicator(s, "1h")
         ind_15m = get_indicator(s, "15m")
         klines = get_klines(s, "15m")
@@ -89,17 +86,20 @@ ind_1h = get_indicator(s, "1h")
 if not ind_1h:
 logging.warning(f"[WARNING] Skipping {s}: missing 1h indicators")
 skips += 1
-            continue
+            # continue
 if not ind_15m:
 logging.warning(f"[WARNING] Skipping {s}: missing 15m indicators")
 skips += 1
-            continue
+            # continue
 if len(klines) < EMA_WINDOW + 6:
 logging.warning(f"[WARNING] Skipping {s}: not enough klines ({len(klines)} candles)")
 skips += 1
-            continue
-
+            # continue
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 result = run_rrr_filter(
 s,
 klines,
@@ -113,13 +113,11 @@ ind_1h.get("ADX14"),
 except Exception as e:
 logging.error(f"[ERROR] Error scoring {s}: {e}")
 failures += 1
-            continue
-
+            # continue
 if not result:
 logging.error(f"[ERROR] No result returned for {s}")
 failures += 1
-            continue
-
+            # continue
 score = result.get("score", 0)
 if result.get("passed"):
 result.update({

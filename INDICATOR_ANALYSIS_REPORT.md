@@ -242,15 +242,15 @@ class IndicatorManager:
         self.trend_tf = "1h"
         self.entry_tf = "15m"
         self.volume_tf = "15m"
-    
+
     def get_trend_indicators(self, symbol: str) -> Dict:
         """Get trend indicators from 1h timeframe"""
         pass
-    
+
     def get_entry_indicators(self, symbol: str) -> Dict:
         """Get entry indicators from 15m timeframe"""
         pass
-    
+
     def get_volume_indicators(self, symbol: str) -> Dict:
         """Get volume indicators from 15m timeframe"""
         pass
@@ -266,7 +266,7 @@ class DecisionEngine:
             "neutral_low": 40,
             "neutral_high": 60
         }
-    
+
     def evaluate_rsi(self, rsi: float, timeframe: str) -> bool:
         """Consistent RSI evaluation"""
         if timeframe == "1h":
@@ -313,11 +313,11 @@ class IndicatorValidator:
     @staticmethod
     def validate_rsi(rsi: float) -> bool:
         return 0 <= rsi <= 100
-    
+
     @staticmethod
     def validate_macd(macd: float, signal: float) -> bool:
         return abs(macd - signal) < 1.0  # Reasonable range
-    
+
     @staticmethod
     def validate_adx(adx: float) -> bool:
         return 0 <= adx <= 100

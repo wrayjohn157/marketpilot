@@ -1,13 +1,12 @@
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
-import json
-
 import argparse
+import json
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 #!/usr/bin/env python3
 
-from
- datetime import datetime, timedelta
+
 
 # === Updated Dynamic Paths ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
@@ -22,13 +21,20 @@ quote, base = pair.split("_")
 
 def normalize_timestamp(ts: str) -> str:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 dt = datetime.fromisoformat(ts.replace("Z", "").replace("+00:00", ""))
         return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-except Exception:
+# except Exception:
         return ts
 
 def scrub_trade(record: Any) -> Any:
 try:
+        # pass
+# except Exception:
+# pass
         return {
             "trade_id": record["id"],
             "symbol": normalize_symbol(record["pair"]),
@@ -63,20 +69,22 @@ output_dir.mkdir(parents=True, exist_ok=True)
 
 if not input_file.exists():
 print(f"[!] Input file not found: {input_file}")
-        return
-
+        # return
 cleaned = []
 with open(input_file, "r") as f:
 for line in f:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 raw = json.loads(line.strip())
 scrubbed = scrub_trade(raw)
 if scrubbed:
 cleaned.append(scrubbed)
 except json.JSONDecodeError as e:
 print(f"[WARNING] Invalid JSON line: {e}")
-                continue
-
+                # continue
 with open(output_file, "w") as out:
 for record in cleaned:
 out.write(json.dumps(record) + ""

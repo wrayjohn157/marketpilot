@@ -1,9 +1,9 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+
 
 # === Configuration ===
 PROJECT_ROOT = Path("/home/signal/market7").resolve()
@@ -13,13 +13,13 @@ INPUT_DIR = ML_BASE / "datasets/recovery_training"
 OUTPUT_FILE = ML_BASE / "datasets/recovery_training_conf_merged.jsonl"
 
 def merge_confidence_files(input_dir: Path, output_file: Path) -> int:
-    pass
-""""
-""""
+    # pass
+""""""""
+""""""""
 Concatenate all daily confidence-scored JSONL files into a single merged dataset.
 Files should match the pattern *_confscored.jsonl in the input directory.
 Returns the total number of rows merged.
-""""
+""""""""
 total = 0
 # Ensure output directory exists
 output_file.parent.mkdir(parents=True, exist_ok=True)

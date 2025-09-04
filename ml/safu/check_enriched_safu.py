@@ -1,11 +1,11 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import os
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 #!/usr/bin/env python3
 
-from
- pathlib import Path
+
 
 BASE_DIR = Path("/home/signal/market7/ml/datasets/enriched")
 found_any = False
@@ -17,11 +17,15 @@ count = 0
 with file_path.open() as f:
 for line in f:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 obj = json.loads(line)
 if "safu_score" in obj and obj["safu_score"] is not None:
 count += 1
 except json.JSONDecodeError:
-                    continue
+                    # continue
 if count > 0:
 found_any = True
 print(f"[OK] {subdir.name}: {count} records with safu_score")

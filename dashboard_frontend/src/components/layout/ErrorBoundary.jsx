@@ -16,7 +16,7 @@ class ErrorBoundary extends React.Component {
       error: error,
       errorInfo: errorInfo
     });
-    
+
     // Log error to monitoring service
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
@@ -34,11 +34,11 @@ class ErrorBoundary extends React.Component {
               <AlertTriangle className="w-8 h-8 text-red-400" />
               <h2 className="text-xl font-semibold text-white">Something went wrong</h2>
             </div>
-            
+
             <p className="text-gray-300 mb-6">
               We're sorry, but something unexpected happened. Please try refreshing the page.
             </p>
-            
+
             <div className="flex gap-3">
               <button
                 onClick={this.handleRetry}
@@ -47,7 +47,7 @@ class ErrorBoundary extends React.Component {
                 <RefreshCw className="w-4 h-4" />
                 Try Again
               </button>
-              
+
               <button
                 onClick={() => window.location.reload()}
                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
@@ -55,7 +55,7 @@ class ErrorBoundary extends React.Component {
                 Refresh Page
               </button>
             </div>
-            
+
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="mt-6">
                 <summary className="text-sm text-gray-400 cursor-pointer hover:text-gray-300">

@@ -1,20 +1,24 @@
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 import os
+import re
 import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 import yaml
 
-import re
-
 #!/usr/bin/env python3
 from ta.momentum import RSIIndicator, StochRSIIndicator
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
 
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 
 # === Setup ===
 CURRENT_FILE = Path(__file__).resolve()
@@ -33,8 +37,9 @@ SNAPSHOT_BASE = get_path("snapshots")
 REDIS_SET = "queues:fork_rrr_passed"
 REDIS_FINAL_TRADES = "FORK_FINAL_TRADES"
 
-from utils.redis_manager import get_redis_manager
 from config.unified_config_manager import get_config
+from utils.redis_manager import get_redis_manager
+
 r = get_redis_manager()
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
@@ -47,6 +52,7 @@ MIN_SCORE = config.get("min_score", 0.73)
 WEIGHTS = config.get("weights", {})
 OPTIONS = config.get("options", {})
 
+
 def extract_float(val: Any) -> Any:
     if val is None:
         return 0.0
@@ -57,12 +63,16 @@ def extract_float(val: Any) -> Any:
         s_clean = s.replace("np.float64(", "").replace(")", "")
         return float(s_clean)
     except:
-        match = re.search(r"[-+]?\
+        match = re.search(
+            r"[-+]?\
 d*\
 .\
 d+|\
-d+", s)
+d+",
+            s,
+        )
         return float(match.group()) if match else 0.0
+
 
 def btc_sentiment_multiplier() -> Any:
     price = extract_float(r.get_cache("indicators:BTC:1h:latest_close"))
@@ -79,6 +89,7 @@ def btc_sentiment_multiplier() -> Any:
     if rsi < 35:
         mult -= 0.05
     return max(0.8, min(mult, 1.2))
+
 
 def compute_stoch_slope(symbol: Any) -> Any:
     today = datetime.utcnow().strftime("%Y-%m-%d")
@@ -102,6 +113,7 @@ def compute_stoch_slope(symbol: Any) -> Any:
         logging.warning(f"[WARN] Failed to compute stoch slope for {symbol}: {e}")
     return 0.0, None
 
+
 def load_kline_volumes(symbol: Any) -> Any:
     today = datetime.utcnow().strftime("%Y-%m-%d")
     filepath = SNAPSHOT_BASE / today / f"{symbol.upper()}_15m_klines.json"
@@ -116,6 +128,7 @@ def load_kline_volumes(symbol: Any) -> Any:
         return volumes[-1], sum(volumes[:-1]) / (len(volumes) - 1)
     except:
         return None, None
+
 
 def compute_subscores(symbol: Any) -> Any:
     data = r.get_cache(f"{symbol.upper()}_1h")
@@ -207,12 +220,17 @@ def compute_subscores(symbol: Any) -> Any:
 
     return adjusted, subscores, mult, raw_indicators
 
+
 def write_to_history_log(entry: Any, date_str: Any) -> Any:
     path = FORK_HISTORY_BASE / date_str / "fork_scores.jsonl"
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "a") as f:
-        f.write(json.dumps(entry) + "\
-n")
+        f.write(
+            json.dumps(entry)
+            + "\
+n"
+        )
+
 
 def main() -> Any:
     if not FORK_INPUT_FILE.exists():
@@ -246,7 +264,7 @@ def main() -> Any:
             "score_hash": "_".join([f"{k}:{subs[k]}" for k in subs]),
             "score_components": subs,
             "btc_multiplier": mult,
-            "entry_price": price, #"entry_price": extract_float(r.get_cache(f"{sym.upper()}_1h_latest_close")),
+            "entry_price": price,  # "entry_price": extract_float(r.get_cache(f"{sym.upper()}_1h_latest_close")),
             "raw_indicators": raw_indicators,
             "passed": passed,
             "source": "fork_score_filter",
@@ -273,9 +291,12 @@ def main() -> Any:
                 "timestamp": now_ts,
                 "ts_iso": ts_iso,
             }
-            r.store_trade_data({\
-"symbol\
-": sym})
+            r.store_trade_data(
+                {
+                    "symbol\
+": sym
+                }
+            )
             r.store_trade_data(trade)
             results.append(trade)
 
@@ -286,9 +307,14 @@ def main() -> Any:
             f"    • {k.replace('_',' ').title():25}: {'✅' if subs[k] >= 1 else '❌' if subs[k] == 0 else f'{subs[k]:.3f}'}"
             for k in subs
         ]
-        logging.info("\
-n" + "\
-n".join(log_lines))
+        logging.info(
+            "\
+n"
+            + "\
+n".join(
+                log_lines
+            )
+        )
 
     with open(OUTPUT_FILE, "w") as f:
         json.dump(results, f, indent=2)
@@ -297,6 +323,7 @@ n".join(log_lines))
 
     logging.info(f"📂 Saved {len(results)} trades to {OUTPUT_FILE}")
     logging.info(f"📊 Backtest candidates saved to {BACKTEST_CANDIDATES_FILE}")
+
 
 if __name__ == "__main__":
     main()

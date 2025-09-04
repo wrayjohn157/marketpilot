@@ -1,31 +1,32 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import os
-
-
-#!/usr/bin/env python3
-from
- datetime import datetime
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # Connect to Redis
 from utils.redis_manager import get_redis_manager
+
+#!/usr/bin/env python3
+
+
+
 redis_client = get_redis_manager()
 
 def store_klines(symbol: str, timeframe: str, klines: list):
-    pass
-""""
-""""
+    # pass
+""""""""
+""""""""
 Stores the latest klines in Redis for a given symbol and timeframe.
-""""
+""""""""
 key = f"klines:{symbol}:{timeframe}"
 redis_client.set(key, json.dumps(klines))
 
 def get_klines(symbol: str, timeframe: str):
-    pass
-""""
-""""
+    # pass
+""""""""
+""""""""
 Retrieves klines from Redis for a given symbol and timeframe.
-""""
+""""""""
 key = f"klines:{symbol}:{timeframe}"
 data = redis_client.get(key)
 if data:
@@ -33,11 +34,11 @@ if data:
     return []
 
 def last_kline_timestamp(symbol: str, timeframe: str):
-    pass
-""""
-""""
+    # pass
+""""""""
+""""""""
 Returns the timestamp of the latest stored kline (if available).
-""""
+""""""""
 klines = get_klines(symbol, timeframe)
 if klines:
         return int(klines[-1][0])

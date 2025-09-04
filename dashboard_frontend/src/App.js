@@ -47,7 +47,7 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gray-950 text-white">
         <div className="md:flex">
-          <Sidebar 
+          <Sidebar
             onHelpClick={() => setShowHelpModal(true)}
             onTourClick={() => setShowOnboardingTour(true)}
           />
@@ -74,13 +74,13 @@ function App() {
         </div>
 
         {/* Help System */}
-        <HelpModal 
-          isOpen={showHelpModal} 
-          onClose={() => setShowHelpModal(false)} 
+        <HelpModal
+          isOpen={showHelpModal}
+          onClose={() => setShowHelpModal(false)}
         />
-        
-        <OnboardingTour 
-          isOpen={showOnboardingTour} 
+
+        <OnboardingTour
+          isOpen={showOnboardingTour}
           onClose={() => setShowOnboardingTour(false)}
           onComplete={handleTourComplete}
         />

@@ -10,7 +10,7 @@
 
 ### **2. DEPLOYMENT GAPS** ❌
 - **Empty Dockerfile**: 0 bytes
-- **Empty nginx.conf**: 0 bytes  
+- **Empty nginx.conf**: 0 bytes
 - **Empty README.md**: 0 bytes
 - **Hardcoded proxy**: `"proxy": "http://161.97.148.148:8000"`
 - **Missing environment variables**

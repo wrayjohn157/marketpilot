@@ -1,11 +1,12 @@
 """Pytest configuration and shared fixtures."""
 
-import pytest
 import json
 import tempfile
 from pathlib import Path
-from typing import Dict, Any
-from unittest.mock import Mock, MagicMock
+from typing import Any, Dict
+from unittest.mock import MagicMock, Mock
+
+import pytest
 
 from core.fork_scorer_refactored import ForkScorer, ForkScoreResult
 from dca.core.dca_engine import DCAEngine
@@ -24,7 +25,7 @@ def sample_config() -> Dict[str, Any]:
         },
         "min_score": 0.7,
         "btc_multiplier": 1.0,
-        "name": "test_strategy"
+        "name": "test_strategy",
     }
 
 
@@ -36,7 +37,7 @@ def sample_indicators() -> Dict[str, Any]:
         "rsi_recovery": 0.7,
         "ema_price_reclaim": 1.0,
         "btc_trend": 0.8,
-        "volume_spike": 1.2
+        "volume_spike": 1.2,
     }
 
 
@@ -53,7 +54,7 @@ def sample_trade_data() -> Dict[str, Any]:
         "avg_entry_price": 40000.0,
         "current_price": 42000.0,
         "profit": 50.0,
-        "profit_percentage": 5.0
+        "profit_percentage": 5.0,
     }
 
 
@@ -112,10 +113,10 @@ def sample_fork_candidates():
             "score_components": {
                 "macd_histogram": 0.15,
                 "rsi_recovery": 0.28,
-                "ema_price_reclaim": 0.42
+                "ema_price_reclaim": 0.42,
             },
             "passed": True,
-            "reason": "passed"
+            "reason": "passed",
         },
         {
             "symbol": "USDT_ETH",
@@ -124,11 +125,11 @@ def sample_fork_candidates():
             "score_components": {
                 "macd_histogram": 0.12,
                 "rsi_recovery": 0.20,
-                "ema_price_reclaim": 0.33
+                "ema_price_reclaim": 0.33,
             },
             "passed": False,
-            "reason": "below threshold"
-        }
+            "reason": "below threshold",
+        },
     ]
 
 
@@ -140,5 +141,5 @@ def sample_credentials():
         "3commas_bot_id2": "67890",
         "3commas_email_token": "test_token",
         "3commas_api_key": "test_api_key",
-        "3commas_api_secret": "test_api_secret"
+        "3commas_api_secret": "test_api_secret",
     }

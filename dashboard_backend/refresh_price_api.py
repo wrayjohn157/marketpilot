@@ -1,21 +1,24 @@
 # /market7/dashboard_backend/refresh_price_api.py
 
-from fastapi import APIRouter
-import json
-import hmac
 import hashlib
-import requests
-from pathlib import Path
+import hmac
+import json
 from datetime import datetime
+from pathlib import Path
+
+import requests
+from fastapi import APIRouter
+
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 
 # === Correct import root ===
 from utils.credential_manager import get_3commas_credentials
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
-from utils.redis_manager import get_redis_manager, RedisKeyManager
-from config.unified_config_manager import get_config
-
-
-
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 router = APIRouter()
 
@@ -25,6 +28,7 @@ with open(get_path("paper_cred"), "r") as f:
 
 API_KEY = creds["3commas_api_key"]
 API_SECRET = creds["3commas_api_secret"]
+
 
 # === Helper to sign requests ===
 def sign_request(path: str, query: str = ""):
@@ -38,14 +42,12 @@ def sign_request(path: str, query: str = ""):
     signature = hmac.new(
         API_SECRET.encode("utf-8"),
         msg=message.encode("utf-8"),
-        digestmod=hashlib.sha256
+        digestmod=hashlib.sha256,
     ).hexdigest()
 
-    headers = {
-        "APIKEY": API_KEY,
-        "Signature": signature
-    }
+    headers = {"APIKEY": API_KEY, "Signature": signature}
     return url, headers
+
 
 # === Endpoint to pull live deal info and enrich it ===
 @router.get_cache("/refresh-price/{deal_id}")
@@ -56,22 +58,27 @@ def refresh_price(deal_id: int):
     try:
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
-            return {"error": f"3Commas error {response.status_code}", "message": response.text}
+            return {
+                "error": f"3Commas error {response.status_code}",
+                "message": response.text,
+            }
 
         deal_data = response.json()
         current_price = float(deal_data.get("current_price", 0))
         entry_price = (
-            deal_data.get("avg_entry_price") or
-            deal_data.get("bought_average") or
-            deal_data.get("base_order_average_price") or
-            deal_data.get("initial_price") or
-            0
+            deal_data.get("avg_entry_price")
+            or deal_data.get("bought_average")
+            or deal_data.get("base_order_average_price")
+            or deal_data.get("initial_price")
+            or 0
         )
 
         # Optional: patch in DCA log details
         latest = {}
         today = datetime.utcnow().strftime("%Y-%m-%d")
-        dca_log_path = get_path("live_logs").parent / "dca" / "logs" / today / "dca_log.jsonl"
+        dca_log_path = (
+            get_path("live_logs").parent / "dca" / "logs" / today / "dca_log.jsonl"
+        )
 
         if dca_log_path.exists():
             with open(dca_log_path, "r") as f:
@@ -91,7 +98,7 @@ def refresh_price(deal_id: int):
             "open_pnl": float(deal_data.get("actual_profit", 0)),
             "pnl_pct": float(deal_data.get("actual_profit_percentage", 0)),
             "updated_at": deal_data.get("updated_at"),
-            **latest  # ✅ patch in DCA log if found
+            **latest,  # ✅ patch in DCA log if found
         }
 
     except Exception as e:

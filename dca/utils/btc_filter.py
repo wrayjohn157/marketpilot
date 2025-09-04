@@ -1,14 +1,19 @@
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs, get_config
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 
 #!/usr/bin/env python3
 
-from
- pathlib import Path
+
 
 # === Dynamic Paths ===
 BASE_DIR = get_path("base")  # /home/signal/market7
@@ -23,6 +28,10 @@ logging.warning(f"[BTC] Snapshot file missing: {filepath}")
         return None
 
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 with open(filepath, "r") as f:
 lines = f.readlines()
 if not lines:

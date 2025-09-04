@@ -1,18 +1,22 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+
 
 INPUT_DIR = Path("/home/signal/market7/ml/datasets/recovery_training")
 OUTPUT_FILE = INPUT_DIR / "merged_recovery_dataset.jsonl"
 
 def is_nonempty_jsonl(path: Any) -> Any:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 with open(path, "r") as f:
             return any(line.strip() for line in f)
-except Exception:
+# except Exception:
         return False
 
 def merge_jsonl_files() -> Any:
@@ -23,13 +27,16 @@ print(f"[SEARCH] Found {len(files)} candidate files.")
 for file in files:
 if not is_nonempty_jsonl(file):
 print(f"[WARNING] Skipping empty file: {file.name}")
-            continue
-
+            # continue
 with open(file, "r") as f:
 for line in f:
 line = line.strip()
 if line:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 json.loads(line)  # validate JSON
 merged.append(line)
 except json.JSONDecodeError:

@@ -1,17 +1,22 @@
 # /dashboard_backend/config_routes/safu_config_api.py
 
-from fastapi import APIRouter, HTTPException
 from pathlib import Path
+
 import yaml
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
-from utils.redis_manager import get_redis_manager, RedisKeyManager
-from config.unified_config_manager import get_config
+from fastapi import APIRouter, HTTPException
 
-
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 CONFIG_PATH = get_path("fork_safu_config")
 
 router = APIRouter()
+
 
 # === Helpers ===
 def load_config():
@@ -20,15 +25,19 @@ def load_config():
     with open(CONFIG_PATH, "r") as f:
         return yaml.safe_load(f)
 
+
 def save_config(data):
     with open(CONFIG_PATH, "w") as f:
         yaml.dump(data, f, sort_keys=False)
 
+
 # === Routes ===
+
 
 @router.get_cache("/safu")
 def read_safu_config():
     return load_config()
+
 
 @router.post("/safu")
 def update_safu_config(patch: dict):

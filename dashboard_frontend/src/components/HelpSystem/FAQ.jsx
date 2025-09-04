@@ -158,7 +158,7 @@ const FAQ = () => {
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
         <p className="text-gray-600 mb-6">
-          Find answers to common questions about Market7. Can't find what you're looking for? 
+          Find answers to common questions about Market7. Can't find what you're looking for?
           <a href="mailto:support@market7.local" className="text-blue-600 hover:text-blue-800 ml-1">
             Contact our support team
           </a>.
@@ -182,12 +182,12 @@ const FAQ = () => {
             <div className="p-6 border-b border-gray-200">
               <h3 className="text-xl font-semibold text-gray-900">{category.category}</h3>
             </div>
-            
+
             <div className="divide-y divide-gray-200">
               {category.questions.map((item, questionIndex) => {
                 const key = `${categoryIndex}-${questionIndex}`;
                 const isOpen = openItems.has(key);
-                
+
                 return (
                   <div key={questionIndex} className="p-6">
                     <button
@@ -203,7 +203,7 @@ const FAQ = () => {
                         <ChevronDown className="text-gray-500 flex-shrink-0" size={20} />
                       )}
                     </button>
-                    
+
                     {isOpen && (
                       <div className="mt-4 pl-2">
                         <p className="text-gray-600 whitespace-pre-line leading-relaxed">

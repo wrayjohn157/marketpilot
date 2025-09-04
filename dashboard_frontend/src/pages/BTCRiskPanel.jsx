@@ -58,7 +58,7 @@ export default function BTCRiskPanel() {
   return (
     <div className="p-6 space-y-6">
       <h2 className="text-2xl font-semibold mb-4">⚠️ BTC Risk Panel</h2>
-      
+
       {/* Risk Overview */}
       <Card>
         <CardHeader>
@@ -97,7 +97,7 @@ export default function BTCRiskPanel() {
                 {(btcData?.price_change_24h || 0).toFixed(2)}% (24h)
               </div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">RSI</div>
               <div className="text-xl font-bold">{btcData?.rsi?.toFixed(1) || "N/A"}</div>
@@ -105,7 +105,7 @@ export default function BTCRiskPanel() {
                 {btcData?.rsi > 70 ? "Overbought" : btcData?.rsi < 30 ? "Oversold" : "Neutral"}
               </div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">MACD</div>
               <div className="text-xl font-bold">{btcData?.macd?.toFixed(4) || "N/A"}</div>
@@ -113,7 +113,7 @@ export default function BTCRiskPanel() {
                 {btcData?.macd > 0 ? "Bullish" : "Bearish"}
               </div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Volume</div>
               <div className="text-xl font-bold">
@@ -121,18 +121,18 @@ export default function BTCRiskPanel() {
               </div>
               <div className="text-sm text-gray-400">24h Volume</div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Fear & Greed</div>
               <div className="text-xl font-bold">{btcData?.fear_greed_index || "N/A"}</div>
               <div className="text-sm text-gray-400">
-                {btcData?.fear_greed_index > 75 ? "Extreme Greed" : 
+                {btcData?.fear_greed_index > 75 ? "Extreme Greed" :
                  btcData?.fear_greed_index > 55 ? "Greed" :
                  btcData?.fear_greed_index > 45 ? "Neutral" :
                  btcData?.fear_greed_index > 25 ? "Fear" : "Extreme Fear"}
               </div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Market Cap</div>
               <div className="text-xl font-bold">

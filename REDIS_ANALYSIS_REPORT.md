@@ -299,7 +299,7 @@ class RedisKeys:
     LOCKS = "locks:{resource}"
     QUEUES = "queues:{name}"
     CACHE = "cache:{key}"
-    
+
     @staticmethod
     def indicator(symbol: str, timeframe: str) -> str:
         return f"indicators:{symbol.upper()}:{timeframe}"
@@ -311,17 +311,17 @@ class RedisKeys:
 class RedisDataManager:
     def __init__(self, redis_client):
         self.redis = redis_client
-    
+
     def store_indicators(self, symbol: str, timeframe: str, indicators: dict):
         # Use Hash instead of JSON string
         key = RedisKeys.indicator(symbol, timeframe)
         self.redis.hset(key, mapping=indicators)
         self.redis.expire(key, 3600)  # 1 hour TTL
-    
+
     def get_indicators(self, symbol: str, timeframe: str) -> dict:
         key = RedisKeys.indicator(symbol, timeframe)
         return self.redis.hgetall(key)
-    
+
     def store_trade_queue(self, trades: list):
         # Use List with TTL
         key = "queues:trades"

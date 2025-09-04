@@ -142,7 +142,7 @@ if br_filter.get("enabled", False):  # DUPLICATE!
 ```python
 # Three different step guards that conflict:
 # 1. step_repeat_guard
-# 2. step_progress_guard  
+# 2. step_progress_guard
 # 3. trailing_step_guard
 
 # They all check similar conditions but with different thresholds!

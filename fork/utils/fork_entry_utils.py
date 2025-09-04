@@ -1,23 +1,25 @@
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
+import hashlib
+import hmac
 import json
+import time
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 
-import hashlib
-import hmac
-import time
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 from utils.credential_manager import get_3commas_credentials
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
 from utils.redis_manager import get_redis_manager
-from config.unified_config_manager import get_config
-
-
 
 # /home/signal/market7/fork/utils/fork_entry_utils.py
 
-from
- datetime import datetime
+
 
 # Paths
 SNAPSHOT_BASE = get_path("snapshots")
@@ -63,8 +65,7 @@ candle_ts = kline[0] // 1000
 if candle_ts <= entry_ts:
 fallback_price = float(kline[4])
 else:
-            break
-
+            # break
     return fallback_price
 
 def save_daily_entry(entry: Any) -> Any:
@@ -90,6 +91,10 @@ json.dump(registry, f, indent=2)
 
 def get_live_3c_symbols() -> Any:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 with open(CRED_PATH, "r") as f:
 creds = json.load(f)
 

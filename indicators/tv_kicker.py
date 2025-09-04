@@ -1,18 +1,21 @@
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
 
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs, get_config
-
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 
 #!/usr/bin/env python3
- Path
-
+ # Path
 CURRENT_FILE = Path(__file__).resolve()
 PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
@@ -31,6 +34,10 @@ CONFIG_PATH = get_path("tv_screener_config")
 
 # === Load Config ===
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 config = yaml.safe_load(CONFIG_PATH.read_text())["tv_screener"]
 TV_SCORE_WEIGHTS = config["weights"]
 MIN_PASS_SCORE = config["score_threshold"]
@@ -47,6 +54,7 @@ MIN_PASS_SCORE = 0.73
 
 # === Loaders ===
 def load_candidates(path: Path):
+    # pass
 if not path.exists():
 logging.error(f"[ERROR] Missing input file: {path}")
         return []
@@ -55,6 +63,9 @@ first_char = f.read(1)
 f.seek(0)
 if first_char == "[":
 try:
+                # pass
+# except Exception:
+# pass
                 return json.load(f)
 except Exception as e:
 logging.error(f"[ERROR] Failed to parse JSON array: {e}")
@@ -63,16 +74,25 @@ else:
 entries = []
 for line in f:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 entries.append(json.loads(line.strip()))
 except Exception as e:
 logging.warning(f"[WARNING] Skipping bad line: {e}")
             return entries
 
 def load_tv_tags(path: Path):
+    # pass
 if not path.exists():
 logging.warning(f"[WARNING] TV screener file not found: {path}")
         return {}
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 with open(path) as f:
 tv_data = json.load(f)
             return {k.upper(): v.get("15m", "neutral") for k, v in tv_data.items()}

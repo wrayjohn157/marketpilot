@@ -3,10 +3,12 @@
 Test script for Market7 monitoring setup
 """
 
-import requests
-import time
 import json
+import time
 from datetime import datetime
+
+import requests
+
 
 def test_service(url, service_name, expected_status=200):
     """Test if a service is responding"""
@@ -22,38 +24,34 @@ def test_service(url, service_name, expected_status=200):
         print(f"❌ {service_name}: ERROR - {e}")
         return False
 
+
 def test_grafana_dashboards(base_url, admin_password):
     """Test Grafana dashboards"""
     try:
         # Login to Grafana
         session = requests.Session()
-        login_data = {
-            "user": "admin",
-            "password": admin_password
-        }
-        
+        login_data = {"user": "admin", "password": admin_password}
+
         response = session.post(f"{base_url}/login", json=login_data)
         if response.status_code != 200:
             print("❌ Grafana: Login failed")
             return False
-        
+
         # Test dashboard access
-        dashboards = [
-            "market7-overview",
-            "market7-trading"
-        ]
-        
+        dashboards = ["market7-overview", "market7-trading"]
+
         for dashboard in dashboards:
             response = session.get(f"{base_url}/api/dashboards/uid/{dashboard}")
             if response.status_code == 200:
                 print(f"✅ Grafana Dashboard {dashboard}: OK")
             else:
                 print(f"❌ Grafana Dashboard {dashboard}: FAILED")
-        
+
         return True
     except Exception as e:
         print(f"❌ Grafana Dashboard Test: ERROR - {e}")
         return False
+
 
 def test_prometheus_targets(base_url):
     """Test Prometheus targets"""
@@ -61,13 +59,13 @@ def test_prometheus_targets(base_url):
         response = requests.get(f"{base_url}/api/v1/targets")
         if response.status_code == 200:
             data = response.json()
-            targets = data.get('data', {}).get('activeTargets', [])
-            
+            targets = data.get("data", {}).get("activeTargets", [])
+
             print(f"📊 Prometheus Targets ({len(targets)} total):")
             for target in targets:
-                status = "✅" if target['health'] == 'up' else "❌"
+                status = "✅" if target["health"] == "up" else "❌"
                 print(f"  {status} {target['job']}: {target['scrapeUrl']}")
-            
+
             return True
         else:
             print(f"❌ Prometheus Targets: FAILED ({response.status_code})")
@@ -75,6 +73,7 @@ def test_prometheus_targets(base_url):
     except Exception as e:
         print(f"❌ Prometheus Targets: ERROR - {e}")
         return False
+
 
 def test_alertmanager_config(base_url):
     """Test Alertmanager configuration"""
@@ -93,50 +92,51 @@ def test_alertmanager_config(base_url):
         print(f"❌ Alertmanager: ERROR - {e}")
         return False
 
+
 def main():
     """Main test function"""
     print("🧪 Testing Market7 Monitoring Stack")
     print("=" * 50)
-    
+
     # Configuration
     services = {
         "Grafana": "http://localhost:3001",
         "Prometheus": "http://localhost:9090",
         "Alertmanager": "http://localhost:9093",
-        "Traefik": "http://localhost:8080"
+        "Traefik": "http://localhost:8080",
     }
-    
+
     results = {}
-    
+
     # Test basic service availability
     print("\n🔍 Testing Service Availability:")
     for service, url in services.items():
         results[service] = test_service(url, service)
-    
+
     # Test Prometheus targets
     print("\n📊 Testing Prometheus Targets:")
     if results.get("Prometheus"):
         test_prometheus_targets(services["Prometheus"])
-    
+
     # Test Alertmanager
     print("\n🔔 Testing Alertmanager:")
     if results.get("Alertmanager"):
         test_alertmanager_config(services["Alertmanager"])
-    
+
     # Test Grafana dashboards
     print("\n📈 Testing Grafana Dashboards:")
     if results.get("Grafana"):
         test_grafana_dashboards(services["Grafana"], "admin123")
-    
+
     # Summary
     print("\n📋 Test Summary:")
     print("=" * 50)
-    
+
     total_services = len(services)
     working_services = sum(1 for result in results.values() if result)
-    
+
     print(f"Services Working: {working_services}/{total_services}")
-    
+
     if working_services == total_services:
         print("🎉 All services are working correctly!")
         print("\n🌐 Access URLs:")
@@ -153,6 +153,7 @@ def main():
         print("     docker-compose -f docker-compose.monitoring.yml logs")
         print("  3. Restart services:")
         print("     docker-compose -f docker-compose.monitoring.yml restart")
+
 
 if __name__ == "__main__":
     main()

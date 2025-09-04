@@ -1,12 +1,15 @@
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Tuple
-import json
 
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 from indicators.fork_score_filter import compute_subscores
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
-from config.unified_config_manager import get_config
-
 
 #!/usr/bin/env python3
 
@@ -14,11 +17,12 @@ from config.unified_config_manager import get_config
 BASE_DIR = get_path("base")  # /market7
 FORK_HISTORY_BASE = get_path("fork_history")
 
+
 # === Entry Score Loader ===
 def load_fork_entry_score(symbol: str, entry_ts: int) -> Optional[float]:
     """
     Return fork score closest to the trade entry timestamp from fork history.
-    Both timestamps are in milliseconds. Only records with a timestamp <= entry_ts 
+    Both timestamps are in milliseconds. Only records with a timestamp <= entry_ts
     are considered, and the record with the smallest delta (entry_ts - record_ts) is returned.
     """
     date_str = datetime.utcfromtimestamp(entry_ts / 1000).strftime("%Y-%m-%d")
@@ -28,7 +32,7 @@ def load_fork_entry_score(symbol: str, entry_ts: int) -> Optional[float]:
 
     best_match = None
     smallest_delta = float("inf")
-    
+
     with open(path, "r") as f:
         for line in f:
             try:
@@ -53,6 +57,7 @@ def load_fork_entry_score(symbol: str, entry_ts: int) -> Optional[float]:
 
     print(f"[WARN] No matching entry score found for {symbol} at ts={entry_ts}")
     return None
+
 
 # === Recent Score Loader ===
 def load_recent_score(symbol: str, now_ts: int) -> Optional[Tuple[float, int]]:
@@ -88,6 +93,7 @@ def load_recent_score(symbol: str, now_ts: int) -> Optional[Tuple[float, int]]:
     if best:
         return best["score"], best_record_ts
     return None
+
 
 # === Fallback Fork Scorer ===
 def compute_fork_score(symbol: str) -> Optional[float]:

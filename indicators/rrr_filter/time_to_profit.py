@@ -1,13 +1,14 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import numpy as np
 
 #!/usr/bin/env python3
 
- numpy as np
 
 def analyze_time_to_tp1(klines: Any, tp1_pct: Any = 0.5, max_candles: Any = 12) -> Any:
-    pass
-""""
-""""
+    # pass
+""""""""
+""""""""
 Analyze the average speed of hitting TP1 (target profit 1) after trade entry.
 
 Args:
@@ -17,7 +18,7 @@ max_candles (int): Maximum candles to evaluate after entry.
 
 Returns:
 float: Average time-to-TP1 score (1.0 = fast hit, 0.5 = slow hit, 0.0 = miss).
-""""
+""""""""
 results = []
 
 for i in range(len(klines) - max_candles):
@@ -29,8 +30,7 @@ for j in range(1, max_candles + 1):
 high_price = float(klines[i + j][2])
 if high_price >= tp_target:
 hit_score = 1.0 if j <= 6 else 0.5
-                break
-
+                # break
 results.append(hit_score)
 
 time_to_tp1 = round(np.mean(results), 3) if results else 0.0

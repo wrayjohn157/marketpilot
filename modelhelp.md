@@ -12,7 +12,7 @@ This document outlines paid and free options for outsourcing the training of ML 
 - **Deliverables:** XGBoost or PyTorch/Sklearn models, notebook, exportable `.pkl` files
 - **Tips:** Filter for skills like `AutoML`, `XGBoost`, `cryptocurrency`, `model deployment`
 
-**Sample Title:**  
+**Sample Title:**
 *“Train XGBoost Confidence Model Using Crypto Trading Logs (JSONL Format)”*
 
 ---

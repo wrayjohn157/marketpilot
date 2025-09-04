@@ -1,21 +1,23 @@
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 import os
 import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
-from utils.redis_manager import get_redis_manager, RedisKeyManager
-from config.unified_config_manager import get_config
-
-
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 #!/usr/bin/env python3
-from
- datetime import datetime
+
 
 # === Setup ===
 CURRENT_FILE = Path(__file__).resolve()
@@ -44,6 +46,10 @@ EXCLUDED_BASES = [
 def fetch_volume_map() -> Any:
 url = "https://api.binance.com/api/v3/ticker/24hr"
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 resp = requests.get(url, timeout=10)
 resp.raise_for_status()
         return {item["symbol"]: float(item["quoteVolume"]) for item in resp.json()}
@@ -54,8 +60,7 @@ logging.error(f"[ERROR] Failed to fetch volume data: {e}")
 def main() -> Any:
 if not SYMBOL_LIST_FILE.exists():
 logging.error(f"[ERROR] Missing symbol list: {SYMBOL_LIST_FILE}")
-        return
-
+        # return
 with open(SYMBOL_LIST_FILE, "r") as f:
 all_symbols = json.load(f)
 
@@ -65,16 +70,15 @@ qualified = []
 for base in all_symbols:
 if base in EXCLUDED_BASES:
 logging.info(f"[BLOCKED] Skipping {base}: excluded base token")
-            continue
-
+            # continue
 full_symbol = f"{base}USDT"
         vol = volume_map.get(full_symbol)
 if vol and vol >= MIN_VOLUME_USDT:
 redis_key = f"{base}_15m_klines"
 if not r.get_cache(redis_key) is not None:
 logging.warning(f"⛔ Skipping {base}: Redis key '{redis_key}' not found.")
-                continue
-            qualified.append(base)
+                # continue
+qualified.append(base)
 else:
 logging.warning(f"⛔ Skipping {base}: volume {vol} below threshold")
 

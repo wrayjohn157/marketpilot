@@ -1,13 +1,13 @@
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union, Tuple
+import argparse
 import json
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from dateutil import parser as dtparser
-import argparse
 
 # build_recovery_dataset.py
-from
- pathlib import Path
+
 
 # === Input directories ===
 ENRICHED_DIR = Path("/home/signal/market7/ml/datasets/enriched")
@@ -35,23 +35,29 @@ def extract_trends(snapshots: Any) -> Any:
 times, dd_vals, score_vals, rsi_vals = [], [], [], []
 for snap in snapshots:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 dt = dtparser.parse(snap.get("timestamp"))
 dd = snap.get("drawdown_pct")
 score = snap.get("current_score")
 rsi = snap.get("rsi")
 if dd is None or score is None or rsi is None:
-                continue
-            times.append(dt)
+                # continue
+times.append(dt)
             dd_vals.append(dd)
             score_vals.append(score)
             rsi_vals.append(rsi)
 except:
-            continue
-
+            # continue
 if not times:
         return {k: 0.0 for k in REQUIRED_MODEL_FEATURES if k.startswith("snapshot_")}
 
 try:
+        # pass
+# except Exception:
+# pass
         return {
             "snapshot_score_trend": score_vals[-1] - score_vals[0],
             "snapshot_rsi_trend": rsi_vals[-1] - rsi_vals[0],
@@ -88,12 +94,15 @@ snapshot_file = SNAPSHOT_DIR / f"{symbol}_{deal_id}.jsonl"
 snapshots = load_jsonl(snapshot_file)
 if not snapshots:
 print("[WARNING] No snapshots found.")
-                continue
-
+                # continue
 latest = snapshots[-1]
             dca = dca_logs.get((full_symbol, deal_id), {})
 
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 safu_score = dca.get("safu_score", 0)
 health_status = dca.get("health_status")
 is_zombie = (safu_score is not None and safu_score >= 0.5 and health_status == "Zombie")
@@ -130,8 +139,7 @@ record.update(extract_trends(snapshots))
 missing = [k for k in REQUIRED_MODEL_FEATURES if k not in record or record[k] is None]
 if missing:
 print(f"[WARNING] Missing fields: {missing} → Skipped.")
-                continue
-
+                # continue
 fout.write(json.dumps(record) + ""
     n")"
 

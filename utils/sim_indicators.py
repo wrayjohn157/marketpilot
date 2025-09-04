@@ -1,6 +1,6 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 import ta
@@ -8,15 +8,14 @@ import ta
 # sim_indicators.py
 
 
- os
-
+ # os
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 def load_klines_from_disk(symbol: str, tf: str, date_str: str) -> pd.DataFrame:
 filepath = f"/home/signal/market7/data/snapshots/{date_str}/{symbol}_{tf}_klines.json"
 if not os.path.exists(filepath):
         raise FileNotFoundError(f"Snapshot file not found: {filepath}")
-    
+
 with open(filepath, "r") as f:
 klines = json.load(f)
 
@@ -84,6 +83,10 @@ macd = compute_macd_full(df)
 indicators.update(macd)
 
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 stoch_rsi = ta.momentum.StochRSIIndicator(df["close"], window=14, smooth1=3, smooth2=3)
 indicators["StochRSI_K"] = stoch_rsi.stochrsi_k().iloc[-1]
 indicators["StochRSI_D"] = stoch_rsi.stochrsi_d().iloc[-1]

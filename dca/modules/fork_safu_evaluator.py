@@ -1,22 +1,25 @@
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 import os
-
-from ta.momentum import RSIIndicator
-from ta.trend import MACD
-import numpy as np
-import pandas as pd
-import yaml
-
-import joblib
+from datetime import datetime
 
 #!/usr/bin/env python3
 from pathlib import Path
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
-from config.unified_config_manager import get_config
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+import joblib
+import numpy as np
+import pandas as pd
+import yaml
+from ta.momentum import RSIIndicator
+from ta.trend import MACD
+
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 
 # === Paths ===
 BASE_DIR = get_path("base")
@@ -33,6 +36,7 @@ MIN_SCORE = safu_cfg.get("min_score", 0.4)
 # === Logging ===
 logger = logging.getLogger("safu_eval")
 logger.setLevel(logging.INFO)
+
 
 def load_indicators_from_disk(symbol: str, tf: str = "15m") -> dict:
     date_str = datetime.utcnow().strftime("%Y-%m-%d")
@@ -94,6 +98,7 @@ def load_indicators_from_disk(symbol: str, tf: str = "15m") -> dict:
         logger.warning(f"[SAFU] Error loading indicators from disk for {symbol}: {e}")
         return {}
 
+
 def get_safu_score(symbol: str, entry_price: float, current_price: float) -> float:
     if entry_price == 0 or current_price == 0:
         return 0.0
@@ -127,11 +132,13 @@ def get_safu_score(symbol: str, entry_price: float, current_price: float) -> flo
 
     return round(max(0.0, score), 3)
 
+
 def load_safu_exit_model(model_path: Any = MODEL_PATH) -> Any:
     if not os.path.exists(model_path):
         print(f"⚠️ SAFU model not found at {model_path}")
         return None
     return joblib.load(model_path)
+
 
 def get_safu_exit_decision(trade: Any, config: Any, model: Any = None) -> Any:
     """

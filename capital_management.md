@@ -146,4 +146,3 @@ This document outlines proposed strategies to manage capital risk in trades wher
 
 ## ✅ Next Review
 Revisit these ideas after next batch of failed/fragile trades. Consider if PnL delta between *Hold vs Partial Exit* is meaningful enough to automate decision logic.
-

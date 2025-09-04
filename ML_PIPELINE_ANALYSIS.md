@@ -182,11 +182,11 @@ class MLPipeline:
         self.feature_store = FeatureStore(tenant_id)
         self.model_registry = ModelRegistry(tenant_id)
         self.monitor = ModelMonitor(tenant_id)
-    
+
     def train_model(self, model_type: str, config: Dict):
         # Unified training pipeline
         pass
-    
+
     def serve_model(self, model_id: str, features: Dict):
         # Model serving with monitoring
         pass
@@ -200,11 +200,11 @@ class DataManager:
         self.storage = TenantStorage(tenant_id)
         self.validator = DataValidator()
         self.monitor = DataQualityMonitor()
-    
+
     def pull_data(self, source: str, config: Dict):
         # Multi-source data pulling
         pass
-    
+
     def validate_data(self, data: pd.DataFrame):
         # Comprehensive data validation
         pass
@@ -217,11 +217,11 @@ class FeatureStore:
         self.tenant_id = tenant_id
         self.storage = FeatureStorage(tenant_id)
         self.registry = FeatureRegistry()
-    
+
     def get_features(self, entity_id: str, features: List[str]):
         # Feature retrieval with caching
         pass
-    
+
     def compute_features(self, data: pd.DataFrame):
         # Feature computation pipeline
         pass
@@ -234,11 +234,11 @@ class ModelRegistry:
         self.tenant_id = tenant_id
         self.storage = ModelStorage(tenant_id)
         self.monitor = ModelMonitor(tenant_id)
-    
+
     def register_model(self, model: Any, metadata: Dict):
         # Model registration with versioning
         pass
-    
+
     def get_model(self, model_id: str, version: str = "latest"):
         # Model retrieval with versioning
         pass
@@ -252,7 +252,7 @@ class ModelServer:
         self.registry = ModelRegistry(tenant_id)
         self.cache = PredictionCache()
         self.monitor = ServingMonitor()
-    
+
     def predict(self, model_id: str, features: Dict):
         # Model prediction with caching and monitoring
         pass

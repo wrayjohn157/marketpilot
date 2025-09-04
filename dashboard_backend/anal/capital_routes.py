@@ -1,14 +1,19 @@
 # dashboard_backend/analytics/capital_routes.py
-from fastapi import APIRouter, Query
-from datetime import datetime, timezone, timedelta
-from typing import Optional, List, Dict
-from .capital_utils import (
-from utils.redis_manager import get_redis_manager, RedisKeyManager
+from datetime import datetime, timedelta, timezone
+from typing import Dict, List, Optional
 
-load_closed_trades,
-load_logs_grouped,
-compute_trade_metrics,
-parse_dt)
+from fastapi import APIRouter, Query
+
+from .capital_utils import (  # from
+    RedisKeyManager,
+    compute_trade_metrics,
+    get_redis_manager,
+    import,
+    load_closed_trades,
+    load_logs_grouped,
+    parse_dt,
+    utils.redis_manager,
+)
 
 router = APIRouter(prefix="/analytics/capital", tags=["Capital Analytics"])
 UTC = timezone.utc
@@ -46,8 +51,8 @@ out = []
 for deal_id, curve in logs.items():
 # Skip trades that started before real trading began
 if curve and curve[0].t < REAL_TRADING_START:
-            continue
-        symbol = "UNKNOWN"
+            # continue
+symbol = "UNKNOWN"
 if deal_id in closed:
 symbol = closed[deal_id].symbol
 elif curve and hasattr(curve[0], "symbol") and getattr(curve[0], "symbol", None):
@@ -61,10 +66,10 @@ curve=curve,
 close=closed.get(deal_id),
 now=now)
 if status == "closed" and metrics.get("status") != "closed":
-            continue
+            # continue
 if status == "open" and metrics.get("status") != "open":
-            continue
-        out.append(metrics)
+            # continue
+out.append(metrics)
 
 # sort newest closed first (or by start for open)
 out.sort(key=lambda x: (x.get("close_time") or x.get("entry_time")), reverse=True)
@@ -73,6 +78,7 @@ out.sort(key=lambda x: (x.get("close_time") or x.get("entry_time")), reverse=Tru
 
     @router.get_cache("/trades/{deal_id}")
 def trade_detail(deal_id: int):
+    # pass
 # default to 45d window; this is just to find logs around the deal
 now = datetime.now(UTC)
 s = now - timedelta(days=45)
@@ -109,16 +115,16 @@ while cursor <= now:
 total_cap = 0.0
 for did, curve in logs.items():
 if did in closed:
-                continue
+                # continue
 if curve and curve[0].t < REAL_TRADING_START:
-                continue
-            # find last point <= cursor
+                # continue
+# find last point <= cursor
 last = None
 for p in curve:
 if p.t <= cursor:
 last = p
 else:
-                    break
+                    # break
 if last:
 total_cap += last.spent
 capital_series.append([cursor.isoformat(), round(total_cap, 2)])
@@ -127,10 +133,10 @@ cursor += timedelta(minutes=interval_minutes)
 # current snapshot per open deal
 for did, curve in logs.items():
 if did in closed:
-            continue
+            # continue
 if curve and curve[0].t < REAL_TRADING_START:
-            continue
-        # Determine symbol from curve[0] if possible
+            # continue
+# Determine symbol from curve[0] if possible
 if curve and hasattr(curve[0], "symbol") and getattr(curve[0], "symbol", None):
 symbol = curve[0].symbol
 else:

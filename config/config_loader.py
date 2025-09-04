@@ -1,7 +1,9 @@
 # /market7/config/config_loader.py
 
-import yaml
 from pathlib import Path
+
+import yaml
+
 from config.unified_config_manager import get_path
 
 # === Load paths_config.yaml ===
@@ -20,4 +22,6 @@ for key, value in raw_config.items():
 required_keys = {"base", "snapshots", "fork_history", "btc_logs", "live_logs", "models"}
 missing = required_keys - get_path("keys")()
 if missing:
-    raise ValueError(f"[ERROR] Missing required path(s) in paths_config.yaml: {missing}")
+    raise ValueError(
+        f"[ERROR] Missing required path(s) in paths_config.yaml: {missing}"
+    )

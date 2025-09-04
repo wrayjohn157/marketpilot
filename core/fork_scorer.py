@@ -1,10 +1,12 @@
-from typing import Dict, Any
-
 import math
+from typing import Any, Dict
 
 # /market7/core/fork_scorer.py
 
-def score_fork(symbol: str, timestamp: int, indicators: Dict[str, Any], config: Dict[str, Any]) -> Dict[str, Any]:
+
+def score_fork(
+    symbol: str, timestamp: int, indicators: Dict[str, Any], config: Dict[str, Any]
+) -> Dict[str, Any]:
     """
     Computes fork score for a given symbol and indicator snapshot.
 
@@ -42,14 +44,18 @@ def score_fork(symbol: str, timestamp: int, indicators: Dict[str, Any], config: 
         "score": round(total_score, 4),
         "score_components": score_components,
         "passed": passed,
-        "reason": reason
+        "reason": reason,
     }
 
-def score_fork_with_strategy(symbol: str, timestamp: int, indicators: Dict[str, Any], strategy: Dict[str, Any]) -> Dict[str, Any]:
+
+def score_fork_with_strategy(
+    symbol: str, timestamp: int, indicators: Dict[str, Any], strategy: Dict[str, Any]
+) -> Dict[str, Any]:
     result = score_fork(symbol, timestamp, indicators, strategy)
     result["btc_multiplier"] = strategy.get("btc_multiplier", 1.0)
     result["source"] = strategy.get("name", "unknown")
     return result
+
 
 if __name__ == "__main__":
     example_indicators = {
@@ -64,7 +70,7 @@ if __name__ == "__main__":
             "rsi_recovery": 0.4,
             "ema_price_reclaim": 0.3,
         },
-        "min_score": 0.7
+        "min_score": 0.7,
     }
 
     result = score_fork("USDT_ABC", 1714678900000, example_indicators, example_config)

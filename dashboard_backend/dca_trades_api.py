@@ -1,10 +1,12 @@
 # /home/signal/market7/dashboard_backend/dca_trades_api.py
 
+import json
+from pathlib import Path
+
 from fastapi import APIRouter
+
 from core.redis_utils import redis_client
 from dca.utils.entry_utils import get_live_3c_trades
-from pathlib import Path
-import json
 
 router = APIRouter()
 
@@ -78,21 +80,21 @@ def get_dca_trades_active():
     return enriched
 
 
-# === Panic sell endpoint for 3Commas integration ===
-import requests
-import hmac
 import hashlib
+import hmac
+import json
 import os
-from fastapi import HTTPException
-from pydantic import BaseModel
 
 # === Load 3Commas API credentials ===
 from pathlib import Path
-import json
+
+# === Panic sell endpoint for 3Commas integration ===
+import requests
+from fastapi import HTTPException
+from pydantic import BaseModel
+
 from utils.credential_manager import get_3commas_credentials
-from utils.redis_manager import get_redis_manager, RedisKeyManager
-
-
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 CRED_PATH = Path("/home/signal/market7/config/paper_cred.json")
 with open(CRED_PATH) as f:
@@ -112,7 +114,7 @@ def panic_sell(deal_id: int):
     headers = {
         "ApiKey": API_KEY,
         "Signature": generate_signature(path),
-        "Accept": "application/json"
+        "Accept": "application/json",
     }
     try:
         res = requests.post(BASE_URL + path, headers=headers, timeout=10)
@@ -126,7 +128,7 @@ def fetch_final_trade_info(deal_id: int):
     headers = {
         "ApiKey": API_KEY,
         "Signature": generate_signature(path),
-        "Accept": "application/json"
+        "Accept": "application/json",
     }
     try:
         res = requests.get(BASE_URL + path, headers=headers, timeout=10)
@@ -148,7 +150,7 @@ def is_deal_active(deal_id: int):
     headers = {
         "ApiKey": API_KEY,
         "Signature": generate_signature(path),
-        "Accept": "application/json"
+        "Accept": "application/json",
     }
     try:
         res = requests.get(BASE_URL + path, headers=headers, timeout=10)
@@ -167,7 +169,9 @@ class PanicSellRequest(BaseModel):
 @router.post("/panic-sell")
 def trigger_panic_sell(payload: PanicSellRequest):
     if not is_deal_active(payload.deal_id):
-        raise HTTPException(status_code=400, detail="Deal is already closed or inactive.")
+        raise HTTPException(
+            status_code=400, detail="Deal is already closed or inactive."
+        )
     res = panic_sell(payload.deal_id)
     if res and res.status_code in [200, 201]:
         final_info = fetch_final_trade_info(payload.deal_id)
@@ -175,16 +179,19 @@ def trigger_panic_sell(payload: PanicSellRequest):
             "status": "success",
             "deal_id": payload.deal_id,
             "final": final_info,
-            "3c_status_code": res.status_code
+            "3c_status_code": res.status_code,
         }
     else:
         msg = res.text if res else "No response from 3Commas"
         raise HTTPException(status_code=500, detail=f"Panic sell failed: {msg}")
 
+
 @router.get_cache("/panic-sell/{deal_id}")
 def trigger_panic_sell_get(deal_id: int):
     if not is_deal_active(deal_id):
-        raise HTTPException(status_code=400, detail="Deal is already closed or inactive.")
+        raise HTTPException(
+            status_code=400, detail="Deal is already closed or inactive."
+        )
     res = panic_sell(deal_id)
     if res and res.status_code in [200, 201]:
         final_info = fetch_final_trade_info(deal_id)
@@ -192,7 +199,7 @@ def trigger_panic_sell_get(deal_id: int):
             "status": "success",
             "deal_id": deal_id,
             "final": final_info,
-            "3c_status_code": res.status_code
+            "3c_status_code": res.status_code,
         }
     else:
         msg = res.text if res else "No response from 3Commas"

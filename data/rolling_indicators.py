@@ -1,23 +1,28 @@
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 import os
 import sys
-
-from ta.momentum import StochRSIIndicator, RSIIndicator
-from ta.trend import EMAIndicator, ADXIndicator, MACD, PSARIndicator
-from ta.volatility import AverageTrueRange
-import pandas as pd
-import requests
-
 import time
-
-# /home/signal/market7/data/rolling_indicators.py
+from datetime import datetime
 
 #!/usr/bin/env python3
 from pathlib import Path
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import pandas as pd
+import requests
+from ta.momentum import RSIIndicator, StochRSIIndicator
+from ta.trend import MACD, ADXIndicator, EMAIndicator, PSARIndicator
+from ta.volatility import AverageTrueRange
+
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
+
+# /home/signal/market7/data/rolling_indicators.py
 
 
 # === Patch sys.path to reach /market7 ===
@@ -47,15 +52,19 @@ FORK_METRICS_FILE = Path(
     "/home/signal/market7/dashboard_backend/cache/fork_metrics.json"
 )
 
+from config.unified_config_manager import get_config
+
 # === Redis ===
 from utils.redis_manager import get_redis_manager
-from config.unified_config_manager import get_config
+
 r = get_redis_manager()
+
 
 def get_snapshot_dir() -> Any:
     path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
     path.mkdir(parents=True, exist_ok=True)
     return path
+
 
 def fetch_klines(symbol: Any, interval: Any, limit: Any = 150) -> Any:
     url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
@@ -92,6 +101,7 @@ def fetch_klines(symbol: Any, interval: Any, limit: Any = 150) -> Any:
     except Exception as e:
         logging.warning(f"Failed to fetch klines for {symbol} {interval}: {e}")
         return None
+
 
 def compute_indicators(df: Any) -> Any:
     indicators = {}
@@ -133,6 +143,7 @@ def compute_indicators(df: Any) -> Any:
 
     return indicators
 
+
 def load_symbols() -> Any:
     filtered = set()
     active = set()
@@ -165,6 +176,7 @@ def load_symbols() -> Any:
 
     return symbols
 
+
 def save_to_disk(symbol: Any, tf: Any, indicators: Any) -> Any:
     snapshot_dir = get_snapshot_dir()
     filename = snapshot_dir / f"{symbol.upper()}_{tf}.json"
@@ -184,6 +196,7 @@ def save_to_disk(symbol: Any, tf: Any, indicators: Any) -> Any:
     except Exception as e:
         logging.warning(f"⚠️ Failed to append to JSONL for {symbol.upper()}_{tf}: {e}")
 
+
 def main() -> Any:
     logging.info("📊 Starting indicator updater...")
     while True:
@@ -199,9 +212,17 @@ def main() -> Any:
                 r.store_indicators(key, indicators)
 
                 try:
-                    r.set_cache(f"indicators:{symbol.upper()}:{tf}:RSI14", indicators["RSI14"])
-                    r.set_cache(f"indicators:{symbol.upper()}:{tf}:StochRSI_K", indicators["StochRSI_K"])
-                    r.set_cache(f"indicators:{symbol.upper()}:{tf}:StochRSI_D", indicators["StochRSI_D"])
+                    r.set_cache(
+                        f"indicators:{symbol.upper()}:{tf}:RSI14", indicators["RSI14"]
+                    )
+                    r.set_cache(
+                        f"indicators:{symbol.upper()}:{tf}:StochRSI_K",
+                        indicators["StochRSI_K"],
+                    )
+                    r.set_cache(
+                        f"indicators:{symbol.upper()}:{tf}:StochRSI_D",
+                        indicators["StochRSI_D"],
+                    )
                 except Exception as e:
                     logging.warning(
                         f"⚠️ Failed to write individual indicators for {symbol}: {e}"
@@ -210,6 +231,7 @@ def main() -> Any:
                 save_to_disk(symbol, tf, indicators)
                 logging.info(f"✅ {key} indicators written to Redis")
         time.sleep(REFRESH_INTERVAL)
+
 
 if __name__ == "__main__":
     main()

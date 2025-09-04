@@ -1,16 +1,19 @@
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 import sys
-
-
-from config.config_loader import PATHS  # ✅ Use the loader
+from datetime import datetime
 
 #!/usr/bin/env python3
 from pathlib import Path
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+from config.config_loader import PATHS  # ✅ Use the loader
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 
 # ✅ Inject base path so config/ can be imported when run via systemd
 CURRENT_FILE = Path(__file__).resolve()
@@ -21,8 +24,9 @@ sys.path.append(str(PROJECT_ROOT))
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
-from utils.redis_manager import get_redis_manager
 from config.unified_config_manager import get_config
+from utils.redis_manager import get_redis_manager
+
 r = get_redis_manager()
 
 # === Load paths dynamically ===
@@ -74,6 +78,7 @@ thresholds = {
 }
 
 # === Functions (your originals) ===
+
 
 def evaluate(symbol: Any, tf: Any, ind: Any) -> Any:
     t = thresholds.get(market_condition, thresholds["neutral"]).get(tf, {})
@@ -173,6 +178,7 @@ def evaluate(symbol: Any, tf: Any, ind: Any) -> Any:
 
     return passed, reasons
 
+
 def check_fork_criteria(ind: Any) -> Any:
     score = 0
     reasons = []
@@ -201,6 +207,7 @@ def check_fork_criteria(ind: Any) -> Any:
         reasons.append(f"Stoch_K oversold ({stoch_k:.2f})")
 
     return score >= 2, reasons
+
 
 # === main() ===
 def main() -> Any:
@@ -275,6 +282,7 @@ def main() -> Any:
     logging.info(
         f"💾 Saved {len(approved)} approved | 🌀 Saved {len(fork_queue)} fork candidates"
     )
+
 
 if __name__ == "__main__":
     main()

@@ -233,7 +233,7 @@ ON CONFLICT (key) DO NOTHING;
 
 -- Create views for common queries
 CREATE OR REPLACE VIEW trading.active_positions AS
-SELECT 
+SELECT
     p.*,
     t.symbol,
     t.side,
@@ -247,7 +247,7 @@ JOIN trading.trades t ON p.id = t.position_id
 WHERE p.status = 'open';
 
 CREATE OR REPLACE VIEW ml.active_models AS
-SELECT 
+SELECT
     m.*,
     tr.status as training_status,
     tr.validation_accuracy,
@@ -257,19 +257,19 @@ LEFT JOIN ml.training_runs tr ON m.id = tr.model_id
 WHERE m.is_active = TRUE;
 
 CREATE OR REPLACE VIEW monitoring.system_health AS
-SELECT 
+SELECT
     hc.service_name,
     hc.status,
     hc.response_time_ms,
     hc.timestamp,
-    CASE 
+    CASE
         WHEN hc.timestamp > NOW() - INTERVAL '5 minutes' THEN 'recent'
         ELSE 'stale'
     END as data_freshness
 FROM monitoring.health_checks hc
 WHERE hc.timestamp = (
-    SELECT MAX(timestamp) 
-    FROM monitoring.health_checks hc2 
+    SELECT MAX(timestamp)
+    FROM monitoring.health_checks hc2
     WHERE hc2.service_name = hc.service_name
 );
 

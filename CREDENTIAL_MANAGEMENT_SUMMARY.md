@@ -24,7 +24,7 @@ The Market7 codebase had **multiple credential management issues**:
 
 **Supported Credential Types:**
 - **3Commas API**: Trading bot credentials
-- **Binance API**: Exchange credentials  
+- **Binance API**: Exchange credentials
 - **OpenAI API**: AI service credentials
 - **Redis**: Database credentials
 - **Custom**: Extensible for new credential types

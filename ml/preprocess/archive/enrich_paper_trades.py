@@ -1,42 +1,48 @@
 #!/usr/bin/env python3
-import json
 import argparse
+import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from utils.redis_manager import get_redis_manager, RedisKeyManager
 
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 # ─── CONFIG ────────────────────────────────────────────────────────────────
-PROJECT_ROOT       = Path(__file__).resolve().parents[2]
-PAPER_BASE         = PROJECT_ROOT / "ml/datasets/scrubbed_paper"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PAPER_BASE = PROJECT_ROOT / "ml/datasets/scrubbed_paper"
 SCRUBBED_FORK_BASE = PROJECT_ROOT / "ml/datasets/fork_pulls"
-RAW_FORK_BASE      = PROJECT_ROOT / "output/fork_history"
-TV_BASE            = PROJECT_ROOT / "output/tv_history"
-BTC_BASE           = PROJECT_ROOT / "dashboard_backend/btc_logs"
-OUT_BASE           = PROJECT_ROOT / "ml/datasets/enriched"
+RAW_FORK_BASE = PROJECT_ROOT / "output/fork_history"
+TV_BASE = PROJECT_ROOT / "output/tv_history"
+BTC_BASE = PROJECT_ROOT / "dashboard_backend/btc_logs"
+OUT_BASE = PROJECT_ROOT / "ml/datasets/enriched"
 
-FORK_GRACE_S = 1800   # 30 minutes
-BTC_GRACE_S  = 3600   # 1 hour
+FORK_GRACE_S = 1800  # 30 minutes
+BTC_GRACE_S = 3600  # 1 hour
+
 
 # ─── HELPERS ───────────────────────────────────────────────────────────────
 def normalize(sym: str) -> str:
     s = sym.upper().strip()
     return s[:-4] if s.endswith("USDT") and len(s) > 4 else s
 
+
 def parse_iso(z: str) -> datetime:
     return datetime.strptime(z, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
 
+
 def load_jsonl(path: Path):
-    if not path.exists(): return []
+    if not path.exists():
+        return []
     with open(path) as f:
         return [json.loads(l) for l in f if l.strip()]
 
+
 def close_enough(ts_ms, target_dt, grace_s):
     try:
-        dt = datetime.fromtimestamp(int(ts_ms)/1000, tz=timezone.utc)
+        dt = datetime.fromtimestamp(int(ts_ms) / 1000, tz=timezone.utc)
         return abs((dt - target_dt).total_seconds()) <= grace_s
     except:
         return False
+
 
 def find_fork_record(symbol, entry_dt, days_back=14):
     base = normalize(symbol)
@@ -46,49 +52,64 @@ def find_fork_record(symbol, entry_dt, days_back=14):
         # 1) Scrubbed fork scores
         p1 = SCRUBBED_FORK_BASE / day / "scrubbed_fork_scores.jsonl"
         for r in load_jsonl(p1):
-            if "timestamp" not in r: continue
-            if normalize(r.get_cache("symbol", "")) == base and close_enough(r["timestamp"], entry_dt, FORK_GRACE_S):
+            if "timestamp" not in r:
+                continue
+            if normalize(r.get_cache("symbol", "")) == base and close_enough(
+                r["timestamp"], entry_dt, FORK_GRACE_S
+            ):
                 return r
 
         # 2) Raw fork history
         p2 = RAW_FORK_BASE / day / "fork_scores.jsonl"
         raw = load_jsonl(p2)
         for r in raw:
-            if "timestamp" not in r: continue
-            if normalize(r.get_cache("symbol", "")) == base and close_enough(r["timestamp"], entry_dt, FORK_GRACE_S):
+            if "timestamp" not in r:
+                continue
+            if normalize(r.get_cache("symbol", "")) == base and close_enough(
+                r["timestamp"], entry_dt, FORK_GRACE_S
+            ):
                 return r
 
         # 3) TV kicker fallback
         p3 = TV_BASE / day / "tv_kicker.jsonl"
         for t in load_jsonl(p3):
-            if not t.get("pass"): continue
-            if normalize(t.get("symbol", "")) != base: continue
-            if "timestamp" not in t: continue
+            if not t.get("pass"):
+                continue
+            if normalize(t.get("symbol", "")) != base:
+                continue
+            if "timestamp" not in t:
+                continue
             if not close_enough(t["timestamp"], entry_dt, FORK_GRACE_S):
                 continue
             # merge onto raw fork entry
             for r in raw:
-                if "timestamp" not in r: continue
-                if normalize(r.get_cache("symbol", "")) != base: continue
+                if "timestamp" not in r:
+                    continue
+                if normalize(r.get_cache("symbol", "")) != base:
+                    continue
                 if not close_enough(r["timestamp"], entry_dt, FORK_GRACE_S):
                     continue
                 merged = dict(r)
-                merged.update({
-                    "tv_kicker_applied": True,
-                    "tv_tag": t.get("tv_tag"),
-                    "tv_kicker": t.get("tv_kicker"),
-                    "adjusted_score": t.get("adjusted_score"),
-                    "tv_ts": t.get("timestamp"),
-                    "tv_ts_iso": t.get("ts_iso")
-                })
+                merged.update(
+                    {
+                        "tv_kicker_applied": True,
+                        "tv_tag": t.get("tv_tag"),
+                        "tv_kicker": t.get("tv_kicker"),
+                        "adjusted_score": t.get("adjusted_score"),
+                        "tv_ts": t.get("timestamp"),
+                        "tv_ts_iso": t.get("ts_iso"),
+                    }
+                )
                 return merged
     return None
+
 
 def find_btc_snapshot(day, target_dt):
     snaps = load_jsonl(BTC_BASE / day / "btc_snapshots.jsonl")
     best, bd = None, 1e9
     for s in snaps:
-        if "ts_iso" not in s: continue
+        if "ts_iso" not in s:
+            continue
         try:
             dt = datetime.fromisoformat(s["ts_iso"].replace("Z", "+00:00"))
             diff = abs((dt - target_dt).total_seconds())
@@ -97,6 +118,7 @@ def find_btc_snapshot(day, target_dt):
         except:
             continue
     return best
+
 
 # ─── MAIN ─────────────────────────────────────────────────────────────────
 def main():
@@ -132,14 +154,16 @@ def main():
         btc_e = find_btc_snapshot(e_dt.strftime("%Y-%m-%d"), e_dt)
         btc_x = find_btc_snapshot(x_dt.strftime("%Y-%m-%d"), x_dt)
 
-        enriched.append({
-            **t,
-            "deal_id": t["trade_id"],
-            "fork_score": fork,
-            "btc_entry": btc_e,
-            "btc_exit": btc_x,
-            "duration_min": round(abs((x_dt - e_dt).total_seconds()) / 60, 2)
-        })
+        enriched.append(
+            {
+                **t,
+                "deal_id": t["trade_id"],
+                "fork_score": fork,
+                "btc_entry": btc_e,
+                "btc_exit": btc_x,
+                "duration_min": round(abs((x_dt - e_dt).total_seconds()) / 60, 2),
+            }
+        )
 
     with open(out_dir / "enriched_data.jsonl", "w") as f:
         for r in enriched:
@@ -150,6 +174,7 @@ def main():
 
     print(f"[DONE] enriched {len(enriched)} trades")
     print(f"[WARN] {len(unmatched)} unmatched → {out_dir/'unmatched_trades.jsonl'}")
+
 
 if __name__ == "__main__":
     main()

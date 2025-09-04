@@ -44,7 +44,7 @@ FORK_HISTORY_BASE = Path(PATHS["fork_history_path"])  # OLD
 
 #### **New Systems Not Integrated**
 - **`smart_dca_core.py`**: Only used in test files
-- **`unified_trading_pipeline.py`**: Only used in test files  
+- **`unified_trading_pipeline.py`**: Only used in test files
 - **`unified_ml_pipeline.py`**: Only used in test files
 - **`unified_indicator_system.py`**: Only used in test files
 

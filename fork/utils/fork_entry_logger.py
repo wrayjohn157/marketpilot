@@ -1,10 +1,9 @@
-from datetime import
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
+
 import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
- datetime
-
+ # datetime
 # No need for this anymore:
 # from fork.utils.entry_utils import save_daily_entry
 
@@ -12,7 +11,7 @@ import json
 FORK_HISTORY_BASE = Path("/home/signal/market7/output/fork_history")
 
 def log_fork_entry(entry: dict):
-    pass
+    # pass
 """Logs a new fork entry into /output/fork_history/{DATE}/fork_scores.jsonl"""
 """Logs a new fork entry into /output/fork_history/{DATE}/fork_scores.jsonl"""
 now = datetime.utcnow()

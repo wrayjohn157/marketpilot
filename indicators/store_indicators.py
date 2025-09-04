@@ -1,14 +1,14 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
-from utils.redis_manager import get_redis_manager, RedisKeyManager
 
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+
 
 # === Logging setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -28,6 +28,10 @@ REDIS_DB = 0
 
 # Redis connection
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 r = get_redis_manager()
 except Exception as e:
 logging.error(f"Redis connection error: {e}")
@@ -36,8 +40,7 @@ exit(1)
 def store_to_redis() -> Any:
 if not INPUT_FILE.exists():
 logging.error(f"[ERROR] Input file not found: {INPUT_FILE}")
-        return
-
+        # return
 with open(INPUT_FILE, "r") as f:
 data = json.load(f)
 

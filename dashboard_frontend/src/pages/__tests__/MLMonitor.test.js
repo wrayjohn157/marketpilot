@@ -45,18 +45,18 @@ describe('MLMonitor', () => {
 
   it('renders loading state initially', () => {
     fetch.mockImplementation(() => new Promise(() => {})); // Never resolves
-    
+
     render(<MLMonitor />);
-    
+
     expect(screen.getByText('🤖 ML Monitor')).toBeInTheDocument();
     expect(screen.getByText('Loading ML status...')).toBeInTheDocument();
   });
 
   it('renders error state when fetch fails', async () => {
     fetch.mockRejectedValueOnce(new Error('Network error'));
-    
+
     render(<MLMonitor />);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Error: Network error')).toBeInTheDocument();
     });
@@ -94,9 +94,9 @@ describe('MLMonitor', () => {
       ok: true,
       json: () => Promise.resolve(mockData),
     });
-    
+
     render(<MLMonitor />);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Test Model')).toBeInTheDocument();
       expect(screen.getByText('active')).toBeInTheDocument();
@@ -121,9 +121,9 @@ describe('MLMonitor', () => {
       ok: true,
       json: () => Promise.resolve(mockData),
     });
-    
+
     render(<MLMonitor />);
-    
+
     await waitFor(() => {
       expect(screen.getByText('No recent predictions available')).toBeInTheDocument();
     });
@@ -131,7 +131,7 @@ describe('MLMonitor', () => {
 
   it('auto-refreshes data every 30 seconds', async () => {
     jest.useFakeTimers();
-    
+
     const mockData = {
       models: [],
       predictions: [],
@@ -142,9 +142,9 @@ describe('MLMonitor', () => {
       ok: true,
       json: () => Promise.resolve(mockData),
     });
-    
+
     render(<MLMonitor />);
-    
+
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledTimes(1);
     });

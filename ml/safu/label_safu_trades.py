@@ -1,9 +1,7 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import os
-
-from
- pathlib import Path
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # CONFIGURE THESE PATHS
 input_path = "/home/signal/market7/ml/datasets/safu_merged/2025-05-21/enriched_with_safu.jsonl"

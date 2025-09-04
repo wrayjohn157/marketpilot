@@ -26,7 +26,7 @@ describe('ErrorBoundary', () => {
         <ThrowError shouldThrow={false} />
       </ErrorBoundary>
     );
-    
+
     expect(screen.getByText('No error')).toBeInTheDocument();
   });
 
@@ -36,7 +36,7 @@ describe('ErrorBoundary', () => {
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
-    
+
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     expect(screen.getByText('Try Again')).toBeInTheDocument();
     expect(screen.getByText('Refresh Page')).toBeInTheDocument();
@@ -45,15 +45,15 @@ describe('ErrorBoundary', () => {
   it('shows error details in development mode', () => {
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
-    
+
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
-    
+
     expect(screen.getByText('Error Details (Development)')).toBeInTheDocument();
-    
+
     process.env.NODE_ENV = originalEnv;
   });
 });

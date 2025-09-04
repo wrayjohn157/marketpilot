@@ -53,7 +53,7 @@ export default function MLMonitor() {
   return (
     <div className="p-6 space-y-6">
       <h2 className="text-2xl font-semibold mb-4">🤖 ML Monitor</h2>
-      
+
       {/* Model Status */}
       <Card>
         <CardHeader>

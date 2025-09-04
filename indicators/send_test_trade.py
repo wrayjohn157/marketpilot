@@ -1,10 +1,9 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 #!/usr/bin/env python3
 
- requests
-
+ # requests
 BOT_ID = 16017224
 EMAIL_TOKEN = "aa5bba08-4875-41bc-91a0-5e0bb66c72b0"
 PAIR = "USDT_BTC"
@@ -26,7 +25,7 @@ print(f"[DEBUG] HTTP {response.status_code}")
 print(f"[DEBUG] Raw response: {response.text}")
 
 if response.status_code == 200:
-print("[OK] Trade signal accepted.")
+# print("[OK] Trade signal accepted.")
 elif response.status_code == 204:
 print("[WARNING] No response content. Check if deal was created on the bot.")
 else:

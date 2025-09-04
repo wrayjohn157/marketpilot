@@ -1,18 +1,19 @@
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 import os
-
-
+from datetime import datetime
 
 #!/usr/bin/env python3
 from pathlib import Path
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
-from utils.redis_manager import get_redis_manager, RedisKeyManager
-from config.unified_config_manager import get_config
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 # === CONFIG ===
 
@@ -21,19 +22,22 @@ INDICATOR_WEIGHTS = {
     "RSI14": 0.2,
     "StochRSI_K": 0.15,
     "ADX14": 0.25,
-    "EMA50": 0.2
+    "EMA50": 0.2,
 }
 MIN_SCORE = 0.65
 
 FORK_INPUT_FILE = str(get_path("base") / "output" / "fork_candidates.json")
 FINAL_OUTPUT_FILE = get_path("final_fork_rrr_trades")
-BACKTEST_CANDIDATES_FILE = str(get_path("base") / "output" / "fork_backtest_candidates.json")
+BACKTEST_CANDIDATES_FILE = str(
+    get_path("base") / "output" / "fork_backtest_candidates.json"
+)
 FORK_HISTORY_BASE = get_path("fork_history")
 SNAPSHOT_BASE = get_path("snapshots")
 
 REDIS_SET = "queues:fork_score_approved"
 REDIS_FINAL_TRADES = "fork_score:final"
 r = get_redis_manager()
+
 
 # ===== FUNCTIONS =====
 def score_from_indicators(indicators: Any) -> Any:
@@ -46,6 +50,7 @@ def score_from_indicators(indicators: Any) -> Any:
             total_weight += weight
     return round(score / total_weight, 4) if total_weight > 0 else 0
 
+
 def load_snapshot_indicators(symbol: Any, date_str: Any) -> Any:
     filename = f"{symbol.upper()}_15m.json"
     path = SNAPSHOT_BASE / date_str / filename
@@ -57,12 +62,14 @@ def load_snapshot_indicators(symbol: Any, date_str: Any) -> Any:
     except:
         return None
 
+
 def write_to_history_log(entry: Any, date_str: Any) -> Any:
     out_dir = FORK_HISTORY_BASE / date_str
     out_dir.mkdir(parents=True, exist_ok=True)
     log_path = out_dir / "fork_scores.jsonl"
     with open(log_path, "a") as f:
         f.write(json.dumps(entry) + "\n")
+
 
 # ===== MAIN =====
 def main() -> Any:
@@ -105,11 +112,13 @@ def main() -> Any:
             ema50 = indicators.get("EMA50", 0)
 
             subscores = {
-                "macd_histogram": 1.0 if macd_hist > macd_prev and macd_hist > 0 else 0.0,
+                "macd_histogram": 1.0
+                if macd_hist > macd_prev and macd_hist > 0
+                else 0.0,
                 "rsi_recovery": 1.0 if rsi > 35 else 0.0,
                 "stoch_rsi_cross": 1.0 if (k > d and k < 50) else 0.0,
                 "adx_rising": min(adx / 20, 1.0) if adx > 10 else 0.0,
-                "ema_price_reclaim": 1.0 if price > ema50 else 0.0
+                "ema_price_reclaim": 1.0 if price > ema50 else 0.0,
             }
 
             hash_parts = [f"{k}:{v}" for k, v in subscores.items()]
@@ -118,9 +127,9 @@ def main() -> Any:
 
         score_hash = "_".join(hash_parts)
 
-        passed = (
-            score >= MIN_SCORE and
-            (subscores.get("rsi_recovery") == 1.0 or subscores.get("stoch_rsi_cross") == 1.0)
+        passed = score >= MIN_SCORE and (
+            subscores.get("rsi_recovery") == 1.0
+            or subscores.get("stoch_rsi_cross") == 1.0
         )
 
         # Log for backtesting
@@ -128,7 +137,7 @@ def main() -> Any:
             "symbol": symbol.upper(),
             "score": score,
             "timestamp": now_ts,
-            "indicators": subscores
+            "indicators": subscores,
         }
         all_backtest_candidates.append(trade_entry)
 
@@ -139,7 +148,7 @@ def main() -> Any:
                 "score": score,
                 "meta": subscores,
                 "score_hash": score_hash,
-                "timestamp": now_ts
+                "timestamp": now_ts,
             }
             r.store_trade_data({"symbol": symbol})
             r.store_trade_data(trade)
@@ -159,7 +168,7 @@ def main() -> Any:
             "indicators": indicators,
             "passed": passed,
             "source": "fork_score_filter",
-            "scored_at": now_iso
+            "scored_at": now_iso,
         }
         write_to_history_log(persistent_log, today_str)
 
@@ -171,6 +180,7 @@ def main() -> Any:
 
     logging.info(f"💾 Saved {len(results)} trades to {FINAL_OUTPUT_FILE}")
     logging.info(f"📊 Backtest candidates saved to {BACKTEST_CANDIDATES_FILE}")
+
 
 if __name__ == "__main__":
     main()

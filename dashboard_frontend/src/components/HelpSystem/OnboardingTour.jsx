@@ -90,7 +90,7 @@ const OnboardingTour = ({ isOpen, onClose, onComplete }) => {
     <div className="fixed inset-0 z-50">
       {/* Overlay */}
       <div className="absolute inset-0 bg-black bg-opacity-50" />
-      
+
       {/* Highlight */}
       {currentStepData.target && (
         <div className="absolute inset-0 pointer-events-none">

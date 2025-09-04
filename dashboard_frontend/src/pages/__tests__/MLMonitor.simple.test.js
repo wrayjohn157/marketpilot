@@ -12,17 +12,17 @@ describe('MLMonitor', () => {
 
   it('renders ML Monitor title', () => {
     fetch.mockImplementation(() => new Promise(() => {})); // Never resolves
-    
+
     render(<MLMonitor />);
-    
+
     expect(screen.getByText('🤖 ML Monitor')).toBeInTheDocument();
   });
 
   it('renders loading state initially', () => {
     fetch.mockImplementation(() => new Promise(() => {})); // Never resolves
-    
+
     render(<MLMonitor />);
-    
+
     expect(screen.getByText('Loading ML status...')).toBeInTheDocument();
   });
 });

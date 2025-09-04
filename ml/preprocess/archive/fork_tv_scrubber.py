@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import json
 import argparse
+import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -15,11 +15,14 @@ OUTPUT_DIR = PROJECT_ROOT / "ml/datasets/enriched"
 
 # === Helpers ===
 
+
 def parse_iso(ts: str) -> datetime:
     return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
 
+
 def time_diff_seconds(dt1: datetime, dt2: datetime) -> float:
     return abs((dt1 - dt2).total_seconds())
+
 
 def load_jsonl(path: Path) -> list:
     if not path.exists():
@@ -27,9 +30,10 @@ def load_jsonl(path: Path) -> list:
     with open(path, "r") as f:
         return [json.loads(line.strip()) for line in f if line.strip()]
 
+
 def find_nearest_snapshot(snapshots: list, target_dt: datetime, max_diff: int) -> dict:
     best = None
-    best_diff = float('inf')
+    best_diff = float("inf")
     for snap in snapshots:
         if "ts_iso" not in snap:
             continue
@@ -42,6 +46,7 @@ def find_nearest_snapshot(snapshots: list, target_dt: datetime, max_diff: int) -
             best = snap
             best_diff = diff
     return best
+
 
 def find_fork_score(symbol: str, entry_dt: datetime, fork_grace=3600) -> dict:
     date_str = entry_dt.strftime("%Y-%m-%d")
@@ -64,12 +69,13 @@ def find_fork_score(symbol: str, entry_dt: datetime, fork_grace=3600) -> dict:
             best_diff = diff
     return best
 
+
 def find_tv_boosted_fork(symbol: str, entry_dt: datetime, fork_grace=3600) -> dict:
     date_str = entry_dt.strftime("%Y-%m-%d")
     tv_file = TV_KICKER_BASE / date_str / "tv_kicker.jsonl"
     tv_scores = load_jsonl(tv_file)
     best = None
-    best_diff = float('inf')
+    best_diff = float("inf")
     for record in tv_scores:
         if not record.get("pass"):
             continue
@@ -99,7 +105,9 @@ def find_tv_boosted_fork(symbol: str, entry_dt: datetime, fork_grace=3600) -> di
                     continue
     return None
 
+
 # === Main ===
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -136,9 +144,15 @@ def main():
         enriched_entry = trade.copy()
         enriched_entry["deal_id"] = trade.get("trade_id")
         enriched_entry["fork_score"] = fork_score
-        enriched_entry["btc_entry"] = find_nearest_snapshot(btc_snaps, entry_dt, btc_grace)
-        enriched_entry["btc_exit"] = find_nearest_snapshot(btc_snaps, exit_dt, btc_grace)
-        enriched_entry["duration_minutes"] = round(time_diff_seconds(exit_dt, entry_dt) / 60, 2)
+        enriched_entry["btc_entry"] = find_nearest_snapshot(
+            btc_snaps, entry_dt, btc_grace
+        )
+        enriched_entry["btc_exit"] = find_nearest_snapshot(
+            btc_snaps, exit_dt, btc_grace
+        )
+        enriched_entry["duration_minutes"] = round(
+            time_diff_seconds(exit_dt, entry_dt) / 60, 2
+        )
 
         if fork_score:
             enriched.append(enriched_entry)
@@ -156,7 +170,10 @@ def main():
         for rec in unmatched:
             f.write(json.dumps(rec) + "\n")
 
-    print(f"[DONE] Enriched {len(enriched)} trades, {len(unmatched)} unmatched → {out_folder}")
+    print(
+        f"[DONE] Enriched {len(enriched)} trades, {len(unmatched)} unmatched → {out_folder}"
+    )
+
 
 if __name__ == "__main__":
     main()

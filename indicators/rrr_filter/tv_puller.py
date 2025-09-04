@@ -1,13 +1,13 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 import yaml
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+
 
 # === Setup ===
 CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "paths_config.yaml"
@@ -42,11 +42,11 @@ out = {}
 for row in data:
 parts = row.get("s", "").split(":", 1)
 if len(parts) != 2:
-            continue
-        _, pair = parts
+            # continue
+_, pair = parts
 if not pair.endswith("USDT"):
-            continue
-        symbol = pair[:-4]  # Strip "USDT"
+            # continue
+symbol = pair[:-4]  # Strip "USDT"
         raw_rating = row.get("d", [None])[0]
         out[symbol.upper()] = {timeframe: RATING_MAP.get(raw_rating, "Neutral")}
 
@@ -55,12 +55,16 @@ if not pair.endswith("USDT"):
 def main() -> Any:
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 ratings = fetch_tv_recommendations()
 OUTPUT.parent.mkdir(parents=True, exist_ok=True)
 with open(OUTPUT, "w") as f:
 json.dump(ratings, f, indent=2)
 logging.info(f"[OK] Wrote {len(ratings)} symbols to {OUTPUT}")
-except Exception:
+# except Exception:
 logging.exception("[ERROR] Failed to fetch TV screener data")
 
 if __name__ == "__main__":

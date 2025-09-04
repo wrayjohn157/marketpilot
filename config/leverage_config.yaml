@@ -56,7 +56,7 @@ require_recovery_odds: true
 min_recovery_probability: 0.5
 
 # Tv / Fork Tie-in
-fork_file: /home/signal/market7/output/final_fork_rrr_trades.json 
+fork_file: /home/signal/market7/output/final_fork_rrr_trades.json
 tv_file: /home/signal/market7/output/fork_tv_adjusted.jsonl
 fork_gate: true         # default true (can disable with --no-fork-gate)
 tv_gate: true           # default true (can disable with --no-tv-gate)
@@ -68,4 +68,3 @@ tv_bear: ["sell"]
 # Operations
 dry_run: true                    # start in dry-run; flip to false when ready
 log_verbose: true
-

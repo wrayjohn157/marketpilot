@@ -1,20 +1,23 @@
 # /market7/dashboard_backend/threecommas_metrics.py
 
-import json
-import hmac
 import hashlib
-import requests
+import hmac
+import json
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-import sys
+
+import requests
 
 # === Config Loader ===
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # Up to /market7
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 from utils.credential_manager import get_3commas_credentials
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
-from config.unified_config_manager import get_config
-
-
 
 # === Load credentials ===
 with open(get_path("paper_cred"), "r") as f:
@@ -24,6 +27,7 @@ API_KEY = creds["3commas_api_key"]
 API_SECRET = creds["3commas_api_secret"]
 BOT_ID = creds.get("3commas_bot_id", 16017224)
 ACCOUNT_ID = creds.get("3commas_account_id", 32994602)  # fallback paper trading ID
+
 
 # === Helper: Sign a request ===
 def sign_request(path: str, query: str = "") -> (str, dict):
@@ -37,14 +41,12 @@ def sign_request(path: str, query: str = "") -> (str, dict):
     signature = hmac.new(
         API_SECRET.encode("utf-8"),
         msg=message.encode("utf-8"),
-        digestmod=hashlib.sha256
+        digestmod=hashlib.sha256,
     ).hexdigest()
 
-    headers = {
-        "APIKEY": API_KEY,
-        "Signature": signature
-    }
+    headers = {"APIKEY": API_KEY, "Signature": signature}
     return url, headers
+
 
 # === Pull Active Deals ===
 def get_active_deals(bot_id: int):
@@ -58,6 +60,7 @@ def get_active_deals(bot_id: int):
         print("Error fetching active deals:", resp.text)
         return []
 
+
 # === Pull Finished Deals ===
 def get_finished_deals(bot_id: int):
     path = "/public/api/ver1/deals"
@@ -69,6 +72,7 @@ def get_finished_deals(bot_id: int):
     else:
         print("Error fetching finished deals:", resp.text)
         return []
+
 
 # === Open PnL Calculator ===
 def calculate_open_pnl(active_deals):
@@ -86,23 +90,34 @@ def calculate_open_pnl(active_deals):
             pnl_pct = (open_pnl / spent_amount) * 100 if spent_amount else 0
 
             entry_price = spent_amount / coins_bought if coins_bought else 0
-            drawdown_pct = ((entry_price - current_price) / entry_price) * 100 if current_price < entry_price else 0.0
-            drawdown_usd = (entry_price - current_price) * coins_bought if current_price < entry_price else 0.0
+            drawdown_pct = (
+                ((entry_price - current_price) / entry_price) * 100
+                if current_price < entry_price
+                else 0.0
+            )
+            drawdown_usd = (
+                (entry_price - current_price) * coins_bought
+                if current_price < entry_price
+                else 0.0
+            )
 
             total_open_pnl += open_pnl
-            deals_info.append({
-                "pair": pair,
-                "spent_amount": round(spent_amount, 2),
-                "current_price": round(current_price, 6),
-                "entry_price": round(entry_price, 2),
-                "open_pnl": round(open_pnl, 2),
-                "open_pnl_pct": round(pnl_pct, 2),
-                "drawdown_pct": round(drawdown_pct, 2),
-                "drawdown_usd": round(drawdown_usd, 2)
-            })
+            deals_info.append(
+                {
+                    "pair": pair,
+                    "spent_amount": round(spent_amount, 2),
+                    "current_price": round(current_price, 6),
+                    "entry_price": round(entry_price, 2),
+                    "open_pnl": round(open_pnl, 2),
+                    "open_pnl_pct": round(pnl_pct, 2),
+                    "drawdown_pct": round(drawdown_pct, 2),
+                    "drawdown_usd": round(drawdown_usd, 2),
+                }
+            )
         except Exception:
             continue
     return total_open_pnl, deals_info
+
 
 # === Closed Deals Calculator ===
 def calculate_closed_deals_stats(finished_deals):
@@ -132,6 +147,7 @@ def calculate_closed_deals_stats(finished_deals):
     win_rate = round((wins / total_deals) * 100, 1) if total_deals else 0
     return total_realized_pnl, daily_realized_pnl, total_deals, win_rate
 
+
 # === Get Multi Pair Stats ===
 def get_multi_pair_stats(bot_id: int, account_id: int):
     path = "/public/api/ver1/bots/stats"
@@ -144,13 +160,19 @@ def get_multi_pair_stats(bot_id: int, account_id: int):
         print("Error fetching multi-pair stats:", resp.text)
         return {}
 
+
 # === Main Exported Function ===
 def get_3commas_metrics():
     active_deals = get_active_deals(BOT_ID)
     finished_deals = get_finished_deals(BOT_ID)
 
     total_open_pnl, open_deals_info = calculate_open_pnl(active_deals)
-    realized_pnl_alltime, daily_realized_pnl, total_deals, win_rate = calculate_closed_deals_stats(finished_deals)
+    (
+        realized_pnl_alltime,
+        daily_realized_pnl,
+        total_deals,
+        win_rate,
+    ) = calculate_closed_deals_stats(finished_deals)
     multi_pair_stats = get_multi_pair_stats(BOT_ID, ACCOUNT_ID)
 
     return {
@@ -161,10 +183,11 @@ def get_3commas_metrics():
             "realized_pnl_alltime": round(realized_pnl_alltime, 2),
             "total_deals": total_deals,
             "win_rate": win_rate,
-            "active_deals": open_deals_info
+            "active_deals": open_deals_info,
         },
-        "multi_pair_stats": multi_pair_stats
+        "multi_pair_stats": multi_pair_stats,
     }
+
 
 if __name__ == "__main__":
     print(json.dumps(get_3commas_metrics(), indent=2))

@@ -20,7 +20,7 @@ ml_dataset_base: /workspace/live/ml_dataset/
 tv_screener_config_path: /workspace/config/tv_screener_config.yaml
 filtered_pairs_path: /workspace/data/filtered_pairs.json
 kline_snapshots: /workspace/data/snapshots
-fork_trade_candidates_path: /workspace/output/fork_trade_candidates.json  
+fork_trade_candidates_path: /workspace/output/fork_trade_candidates.json
 final_forked_trades: /workspace/output/final_forked_trades.json
 binance_symbols: /workspace/data/binance_symbols.json
 dca_config: /workspace/config/dca_config.yaml

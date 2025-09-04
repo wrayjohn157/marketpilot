@@ -33,13 +33,13 @@ model_training:
       learning_rate: 0.1
       random_state: 42
       objective: "reg:squarederror"
-  
+
   validation:
     test_split: 0.2
     validation_split: 0.2
     cross_validation_folds: 5
     stratify: true
-  
+
   feature_engineering:
     enable_technical_indicators: true
     enable_interaction_features: true
@@ -74,7 +74,7 @@ model_types:
       - "recall"
       - "f1_score"
       - "auc"
-  
+
   recovery_odds:
     type: "binary_classification"
     target_column: "recovery_label"
@@ -97,7 +97,7 @@ model_types:
       - "recall"
       - "f1_score"
       - "auc"
-  
+
   confidence_score:
     type: "regression"
     target_column: "confidence_score_ml"
@@ -124,7 +124,7 @@ model_types:
       - "mse"
       - "mae"
       - "rmse"
-  
+
   dca_spend:
     type: "regression"
     target_column: "volume_sent"
@@ -153,7 +153,7 @@ model_types:
       - "mse"
       - "mae"
       - "rmse"
-  
+
   trade_success:
     type: "binary_classification"
     target_column: "label"
@@ -209,12 +209,12 @@ feature_engineering:
       window: 14
       strong_trend_threshold: 25
       weak_trend_threshold: 20
-  
+
   interaction_features:
     enabled: true
     max_interactions: 5
     correlation_threshold: 0.8
-  
+
   polynomial_features:
     enabled: false
     max_degree: 2
@@ -243,7 +243,7 @@ monitoring:
   enable_alerting: true
   metrics_interval: 300
   log_level: "INFO"
-  
+
   model_performance:
     track_accuracy: true
     track_latency: true
@@ -252,7 +252,7 @@ monitoring:
       accuracy_drop: 0.1
       latency_increase: 2.0
       error_rate: 0.05
-  
+
   data_drift:
     enabled: true
     detection_method: "statistical"
@@ -287,7 +287,7 @@ api:
   max_requests_per_minute: 100
   authentication_required: true
   cors_enabled: true
-  
+
   endpoints:
     train: "/train"
     predict: "/predict"
@@ -302,7 +302,7 @@ logging:
   file: "logs/ml_pipeline.log"
   max_size: "10MB"
   backup_count: 5
-  
+
   structured_logging: true
   log_predictions: true
   log_training_metrics: true

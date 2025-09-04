@@ -1,18 +1,20 @@
 # /dashboard_backend/eval_routes/dca_eval_api.py
 
-from fastapi import APIRouter
-from utils.log_reader import load_latest_dca_logs
-from datetime import datetime
-
 import sys
+from datetime import datetime
 from pathlib import Path
+
+from fastapi import APIRouter
+
+from utils.log_reader import load_latest_dca_logs
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from dca.utils.entry_utils import get_live_3c_trades
-from utils.redis_manager import get_redis_manager, RedisKeyManager
-
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 router = APIRouter()
+
 
 @router.get_cache("/dca-evals")
 def get_dca_evaluations():

@@ -1,19 +1,20 @@
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import os
-from config.unified_config_manager import get_path
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+from config.unified_config_manager import get_path
 
 # /home/signal/market7/fork/utils/entry_utils.py
 
-from
- pathlib import Path
+
 
 KLINE_BASE = Path(get_path("kline_snapshots"))
 
 # === Save a daily entry (optional for registry or logs) ===
 def save_daily_entry(entry: dict):
+    # pass
 date_str = datetime.utcfromtimestamp(entry["entry_time"]).strftime("%Y-%m-%d")
 daily_folder = KLINE_BASE.parent / "fork_entry_logs" / date_str
 daily_folder.mkdir(parents=True, exist_ok=True)
@@ -45,4 +46,3 @@ if not indicators:
         return ""
     parts = [f"{k}:{v}" for k, v in sorted(indicators.items())]
     return "_".join(parts)
-

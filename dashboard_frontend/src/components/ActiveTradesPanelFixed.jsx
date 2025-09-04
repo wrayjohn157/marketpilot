@@ -15,7 +15,7 @@ export default function ActiveTradesPanelFixed() {
         setLoading(true);
         setError(null);
         const data = await apiClient.getActiveTrades();
-        
+
         if (data.error) {
           setError(data.error);
         } else {
@@ -30,7 +30,7 @@ export default function ActiveTradesPanelFixed() {
     };
 
     fetchTrades();
-    
+
     // Refresh every 30 seconds
     const interval = setInterval(fetchTrades, 30000);
     return () => clearInterval(interval);
@@ -92,8 +92,8 @@ export default function ActiveTradesPanelFixed() {
         <div className="text-red-400 mb-4">
           Error loading trades: {error}
         </div>
-        <button 
-          onClick={() => window.location.reload()} 
+        <button
+          onClick={() => window.location.reload()}
           className="text-blue-400 hover:text-blue-300"
         >
           Retry

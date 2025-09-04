@@ -116,9 +116,9 @@ describe('usePaginatedData', () => {
       json: () => Promise.resolve(mockData),
     });
 
-    const apiCall = (page, pageSize) => 
+    const apiCall = (page, pageSize) =>
       fetch(`/api/test?page=${page}&size=${pageSize}`).then(res => res.json());
-    
+
     const { result } = renderHook(() => usePaginatedData(apiCall, 1, 10));
 
     await waitFor(() => {
@@ -138,7 +138,7 @@ describe('usePaginatedData', () => {
       data: [{ id: 3 }, { id: 4 }],
       hasMore: false,
     };
-    
+
     fetch
       .mockResolvedValueOnce({
         json: () => Promise.resolve(mockData1),
@@ -147,9 +147,9 @@ describe('usePaginatedData', () => {
         json: () => Promise.resolve(mockData2),
       });
 
-    const apiCall = (page, pageSize) => 
+    const apiCall = (page, pageSize) =>
       fetch(`/api/test?page=${page}&size=${pageSize}`).then(res => res.json());
-    
+
     const { result } = renderHook(() => usePaginatedData(apiCall, 1, 10));
 
     await waitFor(() => {

@@ -1,17 +1,16 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
+import math
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
 
-import math
-
 #!/usr/bin/env python3
-""""
+""""""""
 Trade Health Evaluator for DCA module (config-aware).
-""""
+""""""""
 
-from
- pathlib import Path
+
+ from pathlib import Path
 
 # === Load config ===
 CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "dca_config.yaml"
@@ -48,9 +47,9 @@ thresholds = HEALTH_CONFIG.get("indicator_thresholds", defaults["indicator_thres
 health_thresholds = HEALTH_CONFIG.get("health_thresholds", defaults["health_thresholds"])
 
 def evaluate_trade_health(trade: Any) -> Any:
-    pass
-""""
-""""
+    # pass
+""""""""
+""""""""
 Evaluate the health of a trade based on recovery odds, confidence, SAFU, decay, and indicators.
 
 Args:
@@ -58,7 +57,7 @@ trade (dict): Trade features dictionary.
 
 Returns:
 dict: { "health_score": float, "health_status": str }
-""""
+""""""""
 recovery_odds = trade.get("recovery_odds", 0)
 confidence_score = trade.get("confidence_score", 0)
 safu_score = trade.get("safu_score", 0)

@@ -49,8 +49,8 @@ export default function ScanReview() {
   }
 
   const scans = scanData?.scans || [];
-  const filteredScans = selectedFilter === 'all' 
-    ? scans 
+  const filteredScans = selectedFilter === 'all'
+    ? scans
     : scans.filter(scan => scan.status === selectedFilter);
 
   const getStatusColor = (status) => {
@@ -65,7 +65,7 @@ export default function ScanReview() {
   return (
     <div className="p-6 space-y-6">
       <h2 className="text-2xl font-semibold mb-4">📈 Market Scan Review</h2>
-      
+
       {/* Scan Summary */}
       <Card>
         <CardHeader>
@@ -79,21 +79,21 @@ export default function ScanReview() {
               </div>
               <div className="text-sm text-gray-400">Total Scans</div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-400">
                 {scans.filter(s => s.status === 'bullish').length}
               </div>
               <div className="text-sm text-gray-400">Bullish</div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-red-400">
                 {scans.filter(s => s.status === 'bearish').length}
               </div>
               <div className="text-sm text-gray-400">Bearish</div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-yellow-400">
                 {scans.filter(s => s.status === 'neutral').length}
@@ -149,7 +149,7 @@ export default function ScanReview() {
                       {new Date(scan.timestamp).toLocaleString()}
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                     <div>
                       <div className="text-gray-400">Price</div>
@@ -172,7 +172,7 @@ export default function ScanReview() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {scan.indicators && (
                     <div className="mt-3 pt-3 border-t border-gray-700">
                       <div className="text-sm text-gray-400 mb-2">Key Indicators:</div>
@@ -185,7 +185,7 @@ export default function ScanReview() {
                       </div>
                     </div>
                   )}
-                  
+
                   {scan.notes && (
                     <div className="mt-3 pt-3 border-t border-gray-700">
                       <div className="text-sm text-gray-400">{scan.notes}</div>
@@ -215,14 +215,14 @@ export default function ScanReview() {
                 {scanData?.stats?.avg_score ? scanData.stats.avg_score.toFixed(2) : "N/A"}
               </div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Success Rate</div>
               <div className="text-xl font-bold">
                 {scanData?.stats?.success_rate ? (scanData.stats.success_rate * 100).toFixed(1) + "%" : "N/A"}
               </div>
             </div>
-            
+
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Last Updated</div>
               <div className="text-xl font-bold">

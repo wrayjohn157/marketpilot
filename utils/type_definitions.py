@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Any, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 """Type definitions for Market7 trading system."""
 

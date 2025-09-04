@@ -528,7 +528,7 @@ class MyCustomStrategy(BaseStrategy):
     def analyze(self, data):
         # Custom analysis logic
         return analysis_result
-    
+
     def execute(self, signal):
         # Custom execution logic
         return execution_result

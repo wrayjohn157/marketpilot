@@ -243,18 +243,18 @@ import hashlib
 
 def make_3commas_request(path):
     creds = get_3commas_credentials()
-    
+
     signature = hmac.new(
         creds["3commas_api_secret"].encode(),
         path.encode(),
         hashlib.sha256
     ).hexdigest()
-    
+
     headers = {
         "Apikey": creds["3commas_api_key"],
         "Signature": signature
     }
-    
+
     response = requests.get(f"https://api.3commas.io{path}", headers=headers)
     return response.json()
 

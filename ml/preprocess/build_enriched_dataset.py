@@ -1,15 +1,15 @@
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Union, Tuple
+import argparse
 import json
 import os
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from dateutil import parser as dateparser
-import argparse
 
 #!/usr/bin/env python3
 
-from
- pathlib import Path
+
 
 # === Config Root Paths ===
 SCRUBBED_DIR = Path("/home/signal/market7/ml/datasets/scrubbed_paper")
@@ -34,10 +34,10 @@ n")"
 def find_fork(symbol: Any, ts: Any, forks: Any) -> Any:
 for fork in forks:
 if not isinstance(fork, dict):
-            continue
+            # continue
 if fork.get("symbol") != symbol or "ts_iso" not in fork:
-            continue
-        fork_time = dateparser.parse(fork["ts_iso"])
+            # continue
+fork_time = dateparser.parse(fork["ts_iso"])
 if abs((ts - fork_time).total_seconds()) <= 60:
             return fork
     return None
@@ -45,10 +45,10 @@ if abs((ts - fork_time).total_seconds()) <= 60:
 def find_tv(symbol: Any, ts: Any, tvs: Any) -> Any:
 for tv in tvs:
 if not isinstance(tv, dict):
-            continue
+            # continue
 if tv.get("symbol") != symbol or not tv.get("pass") or "ts_iso" not in tv:
-            continue
-        tv_time = dateparser.parse(tv["ts_iso"])
+            # continue
+tv_time = dateparser.parse(tv["ts_iso"])
 if abs((ts - tv_time).total_seconds()) <= 30:
             return tv
     return None
@@ -58,8 +58,8 @@ closest = None
 min_delta = float("inf")
 for snap in btc_snaps:
 if not isinstance(snap, dict) or "ts_iso" not in snap:
-            continue
-        snap_time = dateparser.parse(snap["ts_iso"])
+            # continue
+snap_time = dateparser.parse(snap["ts_iso"])
         delta = abs((snap_time - ts).total_seconds())
 if delta < min_delta:
 closest = snap
@@ -97,6 +97,7 @@ if fork or tv:
     return None, None
 
 def run(date_str: str):
+    # pass
 scrubbed_path = SCRUBBED_DIR / date_str / "scrubbed_trades.jsonl"
 btc_path = BTC_DIR / date_str / "btc_snapshots.jsonl"
 output_path = OUTPUT_BASE / date_str / "enriched_data.jsonl"
@@ -121,7 +122,7 @@ fork, tv = try_load_fork_tv(symbol, trade["entry_time"], fork_cache, tv_cache)
 if not fork and tv:
 tv_ts = dateparser.parse(tv["ts_iso"])
 fallback_day = tv_ts.strftime("%Y-%m-%d")
-print(f"↩️  Trying fallback fork match from TV time: {tv['ts_iso']}")
+print(f"↩  Trying fallback fork match from TV time: {tv['ts_iso']}")
 if fallback_day not in fork_cache:
 fork_cache[fallback_day] = load_jsonl(FORK_DIR / fallback_day / "fork_scores.jsonl")
 fork = find_fork(symbol, tv_ts, fork_cache[fallback_day])

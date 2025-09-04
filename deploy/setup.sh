@@ -58,7 +58,7 @@ detect_os() {
 # Check system requirements
 check_requirements() {
     log "Checking system requirements..."
-    
+
     # Check Python version
     if command -v python3 &> /dev/null; then
         PYTHON_VER=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
@@ -70,7 +70,7 @@ check_requirements() {
     else
         error "Python3 not found. Please install Python 3.8+"
     fi
-    
+
     # Check available memory
     if [[ "$OS" == "linux" ]]; then
         MEMORY_GB=$(free -g | awk '/^Mem:/{print $2}')
@@ -80,7 +80,7 @@ check_requirements() {
             success "Memory: ${MEMORY_GB}GB"
         fi
     fi
-    
+
     # Check disk space
     DISK_SPACE=$(df -BG . | awk 'NR==2{print $4}' | sed 's/G//')
     if [ $DISK_SPACE -lt 5 ]; then
@@ -93,7 +93,7 @@ check_requirements() {
 # Install system dependencies
 install_system_deps() {
     log "Installing system dependencies..."
-    
+
     case $OS in
         "debian")
             sudo apt-get update
@@ -134,37 +134,37 @@ install_system_deps() {
             warning "Unknown OS. Please install dependencies manually."
             ;;
     esac
-    
+
     success "System dependencies installed"
 }
 
 # Create virtual environment
 create_venv() {
     log "Creating Python virtual environment..."
-    
+
     if [ -d "$VENV_NAME" ]; then
         warning "Virtual environment already exists. Removing..."
         rm -rf $VENV_NAME
     fi
-    
+
     python3 -m venv $VENV_NAME
     source $VENV_NAME/bin/activate
-    
+
     # Upgrade pip
     pip install --upgrade pip setuptools wheel
-    
+
     success "Virtual environment created"
 }
 
 # Install Python dependencies
 install_python_deps() {
     log "Installing Python dependencies..."
-    
+
     source $VENV_NAME/bin/activate
-    
+
     # Install from requirements.txt
     pip install -r requirements.txt
-    
+
     # Install additional production dependencies
     pip install \
         gunicorn \
@@ -172,17 +172,17 @@ install_python_deps() {
         psutil \
         prometheus-client \
         sentry-sdk
-    
+
     success "Python dependencies installed"
 }
 
 # Setup configuration
 setup_config() {
     log "Setting up configuration..."
-    
+
     # Create environment-specific configs
     mkdir -p config/environments
-    
+
     # Create development config
     cat > config/environments/development.yaml << EOF
 environment: development
@@ -243,7 +243,7 @@ EOF
 # Setup directories
 setup_directories() {
     log "Setting up project directories..."
-    
+
     # Create necessary directories
     mkdir -p {logs,data,models,cache,backups,output}
     mkdir -p logs/{trading,ml,indicators,dca}
@@ -252,18 +252,18 @@ setup_directories() {
     mkdir -p cache/{indicators,ml,redis}
     mkdir -p backups/{config,models,data}
     mkdir -p output/{trades,reports,logs}
-    
+
     # Set permissions
     chmod 755 logs data models cache backups output
     chmod 755 logs/* data/* models/* cache/* backups/* output/*
-    
+
     success "Project directories created"
 }
 
 # Setup services
 setup_services() {
     log "Setting up system services..."
-    
+
     # Create systemd service files
     sudo tee /etc/systemd/system/market7-trading.service > /dev/null << EOF
 [Unit]
@@ -292,17 +292,17 @@ EOF
         sudo systemctl enable redis
         sudo systemctl start redis
     fi
-    
+
     # Reload systemd
     sudo systemctl daemon-reload
-    
+
     success "System services configured"
 }
 
 # Setup monitoring
 setup_monitoring() {
     log "Setting up monitoring..."
-    
+
     # Create health check script
     cat > health_check.py << 'EOF'
 #!/usr/bin/env python3
@@ -317,16 +317,16 @@ def health_check():
         # Check Redis
         redis_manager = get_redis_manager()
         redis_healthy = redis_manager.ping()
-        
+
         # Check config
         config_healthy = True
         try:
             get_config("unified_pipeline_config")
         except:
             config_healthy = False
-        
+
         status = "healthy" if redis_healthy and config_healthy else "unhealthy"
-        
+
         return {
             "status": status,
             "timestamp": datetime.utcnow().isoformat(),
@@ -349,16 +349,16 @@ if __name__ == "__main__":
 EOF
 
     chmod +x health_check.py
-    
+
     success "Monitoring setup complete"
 }
 
 # Validate installation
 validate_installation() {
     log "Validating installation..."
-    
+
     source $VENV_NAME/bin/activate
-    
+
     # Test imports
     python3 -c "
 import sys
@@ -371,7 +371,7 @@ except Exception as e:
     print(f'❌ Import failed: {e}')
     sys.exit(1)
 "
-    
+
     # Test configuration
     python3 -c "
 from config.unified_config_manager import get_config
@@ -382,7 +382,7 @@ except Exception as e:
     print(f'❌ Configuration failed: {e}')
     sys.exit(1)
 "
-    
+
     # Test Redis connection
     python3 -c "
 from utils.redis_manager import get_redis_manager
@@ -397,7 +397,7 @@ except Exception as e:
     print(f'❌ Redis connection failed: {e}')
     sys.exit(1)
 "
-    
+
     success "Installation validation passed"
 }
 
@@ -405,37 +405,37 @@ except Exception as e:
 main() {
     log "🚀 Starting Market7 deployment setup..."
     log "=========================================="
-    
+
     # Detect OS
     detect_os
-    
+
     # Check requirements
     check_requirements
-    
+
     # Install system dependencies
     install_system_deps
-    
+
     # Create virtual environment
     create_venv
-    
+
     # Install Python dependencies
     install_python_deps
-    
+
     # Setup configuration
     setup_config
-    
+
     # Setup directories
     setup_directories
-    
+
     # Setup services
     setup_services
-    
+
     # Setup monitoring
     setup_monitoring
-    
+
     # Validate installation
     validate_installation
-    
+
     log "=========================================="
     success "🎉 Market7 deployment setup complete!"
     log ""

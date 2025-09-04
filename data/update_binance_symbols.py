@@ -1,11 +1,11 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+
 
 # [OK] Binance API Endpoint
 BINANCE_API_URL = "https://api.binance.com/api/v3/exchangeInfo"
@@ -48,7 +48,7 @@ n[FOLDER] Tradable pairs saved to {OUTPUT_FILE}")"
 # [OK] Run Script
 if __name__ == "__main__":
 print(""
-n🔹 Fetching tradable USDT pairs from Binance...\
+n[INFO] Fetching tradable USDT pairs from Binance...\
 n")"
 tradable_symbols = fetch_usdt_pairs()
 print(f"[OK] Found {len(tradable_symbols)} tradable pairs."

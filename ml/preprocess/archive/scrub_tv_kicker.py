@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-import json
 import argparse
-from pathlib import Path
-
+import json
 from datetime import datetime, timezone
+from pathlib import Path
 
 # === CONFIG PATHS ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -12,8 +11,8 @@ TV_HISTORY_BASE = PROJECT_ROOT / "output/tv_history"
 OUTPUT_BASE = PROJECT_ROOT / "ml/datasets/passed_forks"
 
 # === SETTINGS ===
-TIME_DELTA_MS = 15_000     # 15 seconds
-SCORE_DELTA = 0.0001       # Allowable float drift
+TIME_DELTA_MS = 15_000  # 15 seconds
+SCORE_DELTA = 0.0001  # Allowable float drift
 
 
 def load_jsonl(path):
@@ -50,7 +49,9 @@ def match_tv_boosted(tv_entry, fork_records):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Merge fork history with TV-kicker boosts.")
+    parser = argparse.ArgumentParser(
+        description="Merge fork history with TV-kicker boosts."
+    )
     parser.add_argument("--date", required=True, help="Target date in YYYY-MM-DD (UTC)")
     args = parser.parse_args()
     date_str = args.date
@@ -77,14 +78,16 @@ def main():
         matched = match_tv_boosted(tv, forks)
         if matched:
             enriched = dict(matched)
-            enriched.update({
-                "tv_kicker_applied": True,
-                "adjusted_score": tv.get("adjusted_score"),
-                "tv_tag": tv.get("tv_tag"),
-                "tv_kicker": tv.get("tv_kicker"),
-                "tv_ts": tv.get("timestamp"),
-                "tv_ts_iso": tv.get("ts_iso"),
-            })
+            enriched.update(
+                {
+                    "tv_kicker_applied": True,
+                    "adjusted_score": tv.get("adjusted_score"),
+                    "tv_tag": tv.get("tv_tag"),
+                    "tv_kicker": tv.get("tv_kicker"),
+                    "tv_ts": tv.get("timestamp"),
+                    "tv_ts_iso": tv.get("ts_iso"),
+                }
+            )
             matched_tv.append(enriched)
         else:
             unmatched_tv.append(tv)

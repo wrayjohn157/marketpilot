@@ -1,21 +1,22 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
+import argparse
 import json
 import logging
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+import joblib
 import pandas as pd
-
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
-import argparse
-import joblib
-
 from xgboost import XGBClassifier
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
 
 def train_model(input_path: Any, output_path: Any) -> Any:
     logging.info(f"📂 Loading dataset: {input_path}")
-    with open(input_path, 'r') as f:
+    with open(input_path, "r") as f:
         data = [json.loads(line) for line in f if line.strip()]
 
     df = pd.DataFrame(data)
@@ -33,7 +34,9 @@ def train_model(input_path: Any, output_path: Any) -> Any:
     # Label distribution
     pos_count = sum(y == 1)
     neg_count = sum(y == 0)
-    logging.info(f"📊 Label distribution → Recovered: {pos_count}, Not recovered: {neg_count}")
+    logging.info(
+        f"📊 Label distribution → Recovered: {pos_count}, Not recovered: {neg_count}"
+    )
 
     # Rebalance class weights
     scale_pos_weight = (neg_count / pos_count) if pos_count > 0 else 1.0
@@ -51,24 +54,33 @@ def train_model(input_path: Any, output_path: Any) -> Any:
         objective="binary:logistic",
         scale_pos_weight=scale_pos_weight,
         use_label_encoder=False,
-        eval_metric="logloss"
+        eval_metric="logloss",
     )
     model.fit(X_train, y_train)
 
     # Evaluate
     logging.info("🧪 Evaluating model...")
     y_pred = model.predict(X_test)
-    print("\n📊 Classification Report:\n", classification_report(y_test, y_pred, digits=3))
+    print(
+        "\n📊 Classification Report:\n", classification_report(y_test, y_pred, digits=3)
+    )
     print("📉 Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
 
     # Save model
     joblib.dump(model, output_path)
     logging.info(f"✅ Model saved to: {output_path}")
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", required=True, help="Path to merged recovery dataset (JSONL)")
-    parser.add_argument("--output", default="/home/signal/market7/ml/models/xgb_recovery_model.pkl", help="Output path")
+    parser.add_argument(
+        "--input", required=True, help="Path to merged recovery dataset (JSONL)"
+    )
+    parser.add_argument(
+        "--output",
+        default="/home/signal/market7/ml/models/xgb_recovery_model.pkl",
+        help="Output path",
+    )
     args = parser.parse_args()
 
     train_model(args.input, args.output)

@@ -1,22 +1,25 @@
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 import sys
+import time
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 
-import time
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 from utils.redis_manager import get_redis_manager
-from config.unified_config_manager import get_config
-
 
 # /home/signal/market7/data/rolling_klines.py
 
 #!/usr/bin/env python3
-from
- datetime import datetime
+
 
 # === Patch sys.path to reach /market7 ===
 CURRENT_FILE = Path(__file__).resolve()
@@ -50,6 +53,10 @@ path.mkdir(parents=True, exist_ok=True)
 def load_active_fork_symbols() -> Any:
 active_symbols = set()
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 if FORK_METRICS_FILE.exists():
 with open(FORK_METRICS_FILE, "r") as f:
 data = json.load(f)
@@ -83,6 +90,10 @@ logging.warning("[WARNING] No symbols found from filtered_pairs.json or active f
 def fetch_klines(symbol: Any, interval: Any, limit: Any = 150) -> Any:
 url = f"https://api.binance.com/api/v3/klines?symbol={symbol}USDT&interval={interval}&limit={limit}"
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 resp = requests.get(url, timeout=10)
 resp.raise_for_status()
         return resp.json()
@@ -94,6 +105,10 @@ def save_klines_to_disk(symbol: Any, tf: Any, data: Any) -> Any:
 snapshot_dir = get_snapshot_dir()
 filename = snapshot_dir / f"{symbol.upper()}_{tf}_klines.json"
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 with open(filename, "w") as f:
 json.dump(data, f)
 logging.info(f"[FOLDER] Saved {symbol.upper()}_{tf}_klines.json to disk")
@@ -106,16 +121,19 @@ while True:
 symbols = load_symbols()
 if not symbols:
 time.sleep(REFRESH_INTERVAL)
-            continue
-
+            # continue
 for symbol in symbols:
 full_symbol = symbol.upper()
 for tf in TIMEFRAMES:
 data = fetch_klines(full_symbol, tf, limit=KLINE_LIMIT)
 if data is None or len(data) < 100:
-                    continue
-                redis_key = f"{full_symbol}_{tf}_klines"
+                    # continue
+redis_key = f"{full_symbol}_{tf}_klines"
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 r.cleanup_expired_keys()
 r.rpush(redis_key, *[json.dumps(entry) for entry in data])
 r.ltrim(redis_key, -KLINE_LIMIT, -1)

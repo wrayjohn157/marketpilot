@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 import json
-import requests
-import pandas as pd
-import numpy as np
+import logging
 from datetime import datetime
 from pathlib import Path
-import logging
-from utils.redis_manager import get_redis_manager, RedisKeyManager
 
+import numpy as np
+import pandas as pd
+import requests
+
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 # === Setup ===
 logging.basicConfig(level=logging.INFO)
@@ -22,16 +23,30 @@ BINANCE_URL_15M = f"https://api.binance.com/api/v3/klines?symbol={SYMBOL}&interv
 # Initialize Redis connection
 r = get_redis_manager()
 
+
 # === Fetch Klines from Binance ===
 def get_binance_klines(url):
     try:
         res = requests.get(url, timeout=10)
         res.raise_for_status()
         data = res.json()
-        df = pd.DataFrame(data, columns=[
-            "open_time", "open", "high", "low", "close", "volume",
-            "close_time", "qav", "num_trades", "taker_base_vol", "taker_quote_vol", "ignore"
-        ])
+        df = pd.DataFrame(
+            data,
+            columns=[
+                "open_time",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",
+                "close_time",
+                "qav",
+                "num_trades",
+                "taker_base_vol",
+                "taker_quote_vol",
+                "ignore",
+            ],
+        )
         df["timestamp"] = df["open_time"] // 1000
         df["close"] = df["close"].astype(float)
         df["high"] = df["high"].astype(float)
@@ -42,9 +57,11 @@ def get_binance_klines(url):
         logging.error(f"[ERROR] Failed to fetch Binance klines: {e}")
         return None
 
+
 # === Indicator Calculations ===
 def compute_ema(df, period):
     return df["close"].ewm(span=period, adjust=False).mean()
+
 
 def compute_rsi(df, period=14):
     delta = df["close"].diff()
@@ -55,12 +72,14 @@ def compute_rsi(df, period=14):
     rs = avg_gain / avg_loss
     return 100 - (100 / (1 + rs))
 
+
 def compute_macd_histogram(df):
     ema_fast = df["close"].ewm(span=12, adjust=False).mean()
     ema_slow = df["close"].ewm(span=26, adjust=False).mean()
     macd_line = ema_fast - ema_slow
     signal_line = macd_line.ewm(span=9, adjust=False).mean()
     return macd_line - signal_line
+
 
 def compute_adx(df, period=14):
     high = df["high"]
@@ -84,10 +103,12 @@ def compute_adx(df, period=14):
     adx = dx.rolling(window=period).mean()
     return adx
 
+
 def compute_vwap_signal(df):
     tp = (df["high"] + df["low"] + df["close"]) / 3
     vwap = (tp * df["volume"]).cumsum() / df["volume"].cumsum()
     return "above" if df["close"].iloc[-1] > vwap.iloc[-1] else "below"
+
 
 # === Market Classification Logic (optional for logging) ===
 def determine_market_condition(ema50, ema200, rsi, macd_hist, adx, vwap_sig):
@@ -101,6 +122,7 @@ def determine_market_condition(ema50, ema200, rsi, macd_hist, adx, vwap_sig):
         return "bearish"
     else:
         return "neutral"
+
 
 # === Run + Save Snapshot & Push to Redis ===
 def log_btc_snapshot():
@@ -122,23 +144,25 @@ def log_btc_snapshot():
 
     # Compute 15-minute indicator for RSI:
     rsi_15m = compute_rsi(df_15m).iloc[-1]
-    
+
     # (Optional additional 15m indicators for logging)
     ema50_15m = compute_ema(df_15m, 50).iloc[-1]
     ema200_15m = compute_ema(df_15m, 200).iloc[-1]
     macd_hist_15m = compute_macd_histogram(df_15m).iloc[-1]
     adx_15m = compute_adx(df_15m).iloc[-1]
     vwap_sig_15m = compute_vwap_signal(df_15m)
-    
-    market_condition = determine_market_condition(ema50_15m, ema200_15m, rsi_15m, macd_hist_15m, adx_15m, vwap_sig_15m)
-    
+
+    market_condition = determine_market_condition(
+        ema50_15m, ema200_15m, rsi_15m, macd_hist_15m, adx_15m, vwap_sig_15m
+    )
+
     # Prepare snapshot for file logging:
     ts = int(datetime.utcnow().timestamp())
     ts_iso = datetime.utcfromtimestamp(ts).strftime("%Y-%m-%dT%H:%M:%SZ")
     day = datetime.utcnow().strftime("%Y-%m-%d")
     folder = SAVE_BASE / day
     folder.mkdir(parents=True, exist_ok=True)
-    
+
     snapshot = {
         "timestamp": ts,
         "ts_iso": ts_iso,
@@ -148,22 +172,23 @@ def log_btc_snapshot():
         "macd_histogram": round(macd_hist_15m, 6),
         "adx": round(adx_15m, 2),
         "vwap_signal": vwap_sig_15m,
-        "market_condition": market_condition
+        "market_condition": market_condition,
     }
-    
+
     file_path = folder / "btc_snapshots.jsonl"
     with open(file_path, "a") as f:
         f.write(json.dumps(snapshot) + "\n")
-    
+
     # Push the required BTC indicators to Redis for fork_scorer:
     r.set_cache("indicators:BTC:1h:latest_close", latest_close_1h)
     r.set_cache("indicators:BTC:1h:EMA50", round(ema50_1h, 2))
     r.set_cache("indicators:BTC:1h:ADX14", round(adx_1h, 2))
     r.set_cache("indicators:BTC:15m:RSI14", round(rsi_15m, 2))
     r.set_cache("cache:btc_condition", market_condition)
-    
+
     print(f"✅ Logged BTC snapshot @ {ts_iso}")
     print(f"📁 Snapshot saved to: {file_path}")
+
 
 if __name__ == "__main__":
     log_btc_snapshot()

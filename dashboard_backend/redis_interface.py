@@ -4,7 +4,9 @@ import json
 
 # === Redis connection ===
 from utils.redis_manager import get_redis_manager
+
 r = get_redis_manager()
+
 
 def get_active_trades() -> list[dict]:
     """

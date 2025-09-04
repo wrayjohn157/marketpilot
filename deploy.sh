@@ -34,7 +34,7 @@ error() {
 # Detect environment
 detect_environment() {
     log "🔍 Detecting deployment environment..."
-    
+
     # Check for Docker
     if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; then
         DOCKER_AVAILABLE=true
@@ -43,7 +43,7 @@ detect_environment() {
         DOCKER_AVAILABLE=false
         log "Docker not available"
     fi
-    
+
     # Check for Kubernetes
     if command -v kubectl &> /dev/null && kubectl cluster-info &> /dev/null; then
         KUBERNETES_AVAILABLE=true
@@ -52,7 +52,7 @@ detect_environment() {
         KUBERNETES_AVAILABLE=false
         log "Kubernetes not available"
     fi
-    
+
     # Check for systemd
     if command -v systemctl &> /dev/null; then
         SYSTEMD_AVAILABLE=true
@@ -61,7 +61,7 @@ detect_environment() {
         SYSTEMD_AVAILABLE=false
         log "Systemd not available"
     fi
-    
+
     # Determine best deployment method
     if [ "$KUBERNETES_AVAILABLE" = true ]; then
         DEPLOYMENT_METHOD="kubernetes"
@@ -81,12 +81,12 @@ detect_environment() {
 # Deploy with Docker Compose
 deploy_docker() {
     log "🐳 Deploying with Docker Compose..."
-    
+
     # Check if docker-compose.yml exists
     if [ ! -f "deploy/docker-compose.yml" ]; then
         error "docker-compose.yml not found"
     fi
-    
+
     # Copy environment template if .env doesn't exist
     if [ ! -f ".env" ]; then
         log "Creating .env file from template..."
@@ -94,15 +94,15 @@ deploy_docker() {
         warning "Please edit .env file with your configuration before continuing"
         read -p "Press Enter to continue after editing .env..."
     fi
-    
+
     # Start services
     log "Starting Docker Compose services..."
     docker-compose -f deploy/docker-compose.yml up -d
-    
+
     # Wait for services to be ready
     log "Waiting for services to be ready..."
     sleep 30
-    
+
     # Check health
     if curl -f http://localhost:8000/health &> /dev/null; then
         success "Docker Compose deployment successful"
@@ -114,12 +114,12 @@ deploy_docker() {
 # Deploy with Kubernetes
 deploy_kubernetes() {
     log "☸️  Deploying with Kubernetes..."
-    
+
     # Check if kubectl is configured
     if ! kubectl cluster-info &> /dev/null; then
         error "Kubernetes cluster not accessible"
     fi
-    
+
     # Apply configurations
     log "Applying Kubernetes configurations..."
     kubectl apply -f deploy/kubernetes/namespace.yaml
@@ -129,11 +129,11 @@ deploy_kubernetes() {
     kubectl apply -f deploy/kubernetes/deployment.yaml
     kubectl apply -f deploy/kubernetes/service.yaml
     kubectl apply -f deploy/kubernetes/ingress.yaml
-    
+
     # Wait for deployments
     log "Waiting for deployments to be ready..."
     kubectl wait --for=condition=available --timeout=300s deployment/market7-trading -n market7
-    
+
     # Check status
     kubectl get pods -n market7
     success "Kubernetes deployment successful"
@@ -142,7 +142,7 @@ deploy_kubernetes() {
 # Deploy natively
 deploy_native() {
     log "🖥️  Deploying natively..."
-    
+
     # Run setup script
     if [ -f "deploy/setup.sh" ]; then
         log "Running setup script..."
@@ -151,12 +151,12 @@ deploy_native() {
     else
         error "Setup script not found"
     fi
-    
+
     # Start services
     log "Starting systemd services..."
     sudo systemctl start market7-trading
     sudo systemctl enable market7-trading
-    
+
     # Check status
     if systemctl is-active --quiet market7-trading; then
         success "Native deployment successful"
@@ -168,7 +168,7 @@ deploy_native() {
 # Deploy manually
 deploy_manual() {
     log "🔧 Manual deployment instructions..."
-    
+
     echo "Since no automated deployment method is available, please follow these steps:"
     echo ""
     echo "1. Install Python 3.8+ and pip"
@@ -186,7 +186,7 @@ deploy_manual() {
 show_status() {
     log "📊 Deployment Status"
     echo "=================="
-    
+
     case $DEPLOYMENT_METHOD in
         "docker")
             echo "🐳 Docker Compose Services:"
@@ -216,12 +216,12 @@ show_status() {
 main() {
     log "🚀 Market7 Universal Deployment Script"
     log "====================================="
-    
+
     # Parse command line arguments
     case "${1:-deploy}" in
         "deploy")
             detect_environment
-            
+
             case $DEPLOYMENT_METHOD in
                 "docker")
                     deploy_docker

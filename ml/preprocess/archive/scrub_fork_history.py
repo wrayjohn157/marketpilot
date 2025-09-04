@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
-import json
 import argparse
+import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
 from config.unified_config_manager import get_path
 
 # === Updated Dynamic Paths ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
 FORK_HISTORY_BASE = PROJECT_ROOT / "output/fork_history"
 SCRUBBED_BASE = PROJECT_ROOT / "ml/datasets/fork_pulls"
+
 
 # === Paths ===
 def get_paths(date_str):
@@ -17,12 +19,14 @@ def get_paths(date_str):
     output_file = output_dir / "scrubbed_fork_scores.jsonl"
     return input_path, output_dir, output_file
 
+
 # === Helpers ===
 def clean_symbol(symbol: str) -> str:
     sym = symbol.strip().upper()
     if not sym.endswith("USDT"):
         sym += "USDT"
     return sym
+
 
 def to_utc_z(ts) -> str:
     """Convert timestamp (epoch or ISO) into ISO UTC Zulu format."""
@@ -38,6 +42,7 @@ def to_utc_z(ts) -> str:
     except Exception:
         pass
     return ts  # fallback
+
 
 def process_record(record: dict) -> dict:
     if record.get("passed") is False:
@@ -70,10 +75,15 @@ def process_record(record: dict) -> dict:
 
     return record
 
+
 # === Main ===
 def main():
-    parser = argparse.ArgumentParser(description="Scrub and unify fork scores timestamps and symbols.")
-    parser.add_argument("--date", type=str, help="Date in YYYY-MM-DD format. Defaults to yesterday.")
+    parser = argparse.ArgumentParser(
+        description="Scrub and unify fork scores timestamps and symbols."
+    )
+    parser.add_argument(
+        "--date", type=str, help="Date in YYYY-MM-DD format. Defaults to yesterday."
+    )
     args = parser.parse_args()
 
     date_str = args.date or (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
@@ -99,6 +109,7 @@ def main():
                 print(f"[DEBUG] Raw line: {line.strip()}")
 
     print(f"[DONE] Processed {cleaned_count} records into: {output_file}")
+
 
 if __name__ == "__main__":
     main()

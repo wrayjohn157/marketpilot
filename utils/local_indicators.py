@@ -1,34 +1,49 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import logging
-
-import requests
-import ta
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 #!/usr/bin/env python3
 import pandas as pd
+import requests
+import ta
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
-def fetch_binance_klines(symbol: Any = "BTCUSDT", interval: Any = "1h", limit: Any = 251) -> Any:
+
+def fetch_binance_klines(
+    symbol: Any = "BTCUSDT", interval: Any = "1h", limit: Any = 251
+) -> Any:
     url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
-        df = pd.DataFrame(data, columns=[
-            "open_time", "open", "high", "low", "close", "volume",
-            "close_time", "quote_asset_volume", "num_trades",
-            "taker_buy_base_asset_volume", "taker_buy_quote_asset_volume", "ignore"
-        ])
-        df["open"] = pd.to_numeric(df["open"], errors='coerce')
-        df["high"] = pd.to_numeric(df["high"], errors='coerce')
-        df["low"] = pd.to_numeric(df["low"], errors='coerce')
-        df["close"] = pd.to_numeric(df["close"], errors='coerce')
-        df["volume"] = pd.to_numeric(df["volume"], errors='coerce')
+        df = pd.DataFrame(
+            data,
+            columns=[
+                "open_time",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",
+                "close_time",
+                "quote_asset_volume",
+                "num_trades",
+                "taker_buy_base_asset_volume",
+                "taker_buy_quote_asset_volume",
+                "ignore",
+            ],
+        )
+        df["open"] = pd.to_numeric(df["open"], errors="coerce")
+        df["high"] = pd.to_numeric(df["high"], errors="coerce")
+        df["low"] = pd.to_numeric(df["low"], errors="coerce")
+        df["close"] = pd.to_numeric(df["close"], errors="coerce")
+        df["volume"] = pd.to_numeric(df["volume"], errors="coerce")
         return df
     except Exception as e:
         logging.error(f"Error fetching klines: {e}")
         return None
+
 
 def compute_ema(df: Any, period: Any = 50) -> Any:
     try:
@@ -38,6 +53,7 @@ def compute_ema(df: Any, period: Any = 50) -> Any:
         logging.error(f"Error computing EMA({period}): {e}")
         return None
 
+
 def compute_rsi(df: Any, period: Any = 14) -> Any:
     try:
         rsi_indicator = ta.momentum.RSIIndicator(close=df["close"], window=period)
@@ -46,13 +62,17 @@ def compute_rsi(df: Any, period: Any = 14) -> Any:
         logging.error(f"Error computing RSI({period}): {e}")
         return None
 
+
 def compute_adx(df: Any, period: Any = 14) -> Any:
     try:
-        adx_indicator = ta.trend.ADXIndicator(high=df["high"], low=df["low"], close=df["close"], window=period)
+        adx_indicator = ta.trend.ADXIndicator(
+            high=df["high"], low=df["low"], close=df["close"], window=period
+        )
         return adx_indicator.adx().iloc[-1]
     except Exception as e:
         logging.error(f"Error computing ADX({period}): {e}")
         return None
+
 
 def compute_qqe(df: Any, rsi_period: Any = 14, smoothing: Any = 5) -> Any:
     try:
@@ -64,6 +84,7 @@ def compute_qqe(df: Any, rsi_period: Any = 14, smoothing: Any = 5) -> Any:
         logging.error(f"Error computing QQE: {e}")
         return None
 
+
 def compute_psar(df: Any, step: Any = 0.02, max_step: Any = 0.2) -> Any:
     try:
         psar_indicator = ta.trend.PSARIndicator(
@@ -71,25 +92,24 @@ def compute_psar(df: Any, step: Any = 0.02, max_step: Any = 0.2) -> Any:
             low=df["low"],
             close=df["close"],
             step=step,
-            max_step=max_step
+            max_step=max_step,
         )
         return psar_indicator.psar().iloc[-1]
     except Exception as e:
         logging.error(f"Error computing PSAR: {e}")
         return None
 
+
 def compute_atr(df: Any, period: Any = 14) -> Any:
     try:
         atr_indicator = ta.volatility.AverageTrueRange(
-            high=df["high"],
-            low=df["low"],
-            close=df["close"],
-            window=period
+            high=df["high"], low=df["low"], close=df["close"], window=period
         )
         return atr_indicator.average_true_range().iloc[-1]
     except Exception as e:
         logging.error(f"Error computing ATR({period}): {e}")
         return None
+
 
 def compute_vwap(df: Any) -> Any:
     try:
@@ -102,9 +122,12 @@ def compute_vwap(df: Any) -> Any:
         logging.error(f"Error computing VWAP: {e}")
         return None
 
+
 def compute_macd_full(df: Any, fast: Any = 12, slow: Any = 26, signal: Any = 9) -> Any:
     try:
-        macd_indicator = ta.trend.MACD(close=df["close"], window_fast=fast, window_slow=slow, window_sign=signal)
+        macd_indicator = ta.trend.MACD(
+            close=df["close"], window_fast=fast, window_slow=slow, window_sign=signal
+        )
         macd_line = macd_indicator.macd()
         signal_line = macd_indicator.macd_signal()
         hist = macd_indicator.macd_diff()
@@ -113,11 +136,12 @@ def compute_macd_full(df: Any, fast: Any = 12, slow: Any = 26, signal: Any = 9) 
             "MACD_signal": signal_line.iloc[-1],
             "MACD_lift": macd_line.iloc[-1] - macd_line.iloc[-2],
             "MACD_Histogram": hist.iloc[-1],
-            "MACD_Histogram_Prev": hist.iloc[-2]
+            "MACD_Histogram_Prev": hist.iloc[-2],
         }
     except Exception as e:
         logging.error(f"Error computing MACD: {e}")
         return None
+
 
 def compute_all_indicators(df: Any) -> Any:
     indicators = {}
@@ -136,7 +160,9 @@ def compute_all_indicators(df: Any) -> Any:
         indicators.update(macd)
 
     try:
-        stoch_rsi = ta.momentum.StochRSIIndicator(df["close"], window=14, smooth1=3, smooth2=3)
+        stoch_rsi = ta.momentum.StochRSIIndicator(
+            df["close"], window=14, smooth1=3, smooth2=3
+        )
         indicators["StochRSI_K"] = stoch_rsi.stochrsi_k().iloc[-1]
         indicators["StochRSI_D"] = stoch_rsi.stochrsi_d().iloc[-1]
     except Exception as e:
@@ -144,6 +170,7 @@ def compute_all_indicators(df: Any) -> Any:
 
     indicators["latest_close"] = df["close"].iloc[-1]
     return indicators
+
 
 if __name__ == "__main__":
     df = fetch_binance_klines()

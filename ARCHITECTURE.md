@@ -65,7 +65,7 @@ Market7 is an intelligent crypto trading pipeline that combines fork filtering, 
   - **DCA Spend Models** (`/ml/dca_spend`): DCA volume optimization
   - **Recovery Models** (`/ml/recovery`): Recovery probability prediction
   - **SAFU Models** (`/ml/safu`): Exit decision models
-- **Data Processing**: 
+- **Data Processing**:
   - Feature engineering
   - Dataset building
   - Model training pipelines

@@ -1,13 +1,14 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+from indicators.rrr_filter.scorer import score_trade
 
 #!/usr/bin/env python3
-from
- indicators.rrr_filter.scorer import score_trade
+
 
 def evaluate_trade(tp1_score: Any, ema_score: Any, adx_score: Any, ttp_score: Any, threshold: Any = 0.65, return_reasons: Any = False) -> Any:
-    pass
-""""
-""""
+    # pass
+""""""""
+""""""""
 Evaluate a trade based on RRR sub-scores and return pass/fail and reasons.
 
 Args:
@@ -20,7 +21,7 @@ threshold (float, optional): Score threshold to pass RRR. Default is 0.65.
 
 Returns:
         tuple: (passed: bool, score: float, reasons: list)
-    """"
+    """"""""
     score = score_trade(tp1_score, ema_score, adx_score, ttp_score)
     passed = score >= threshold
 

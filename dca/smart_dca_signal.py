@@ -11,10 +11,11 @@ def detect_local_reversal(prices: List[float]) -> bool:
 #!/usr/bin/env python3
 import json
 import logging
-from pathlib import Path
-from datetime import datetime
-import yaml
 import sys
+from datetime import datetime
+from pathlib import Path
+
+import yaml
 from modules.fork_safu_evaluator import get_safu_exit_decision, load_safu_exit_model
 
 safu_exit_model = load_safu_exit_model()
@@ -22,38 +23,38 @@ safu_exit_model = load_safu_exit_model()
 # === Paths ===
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from dca.utils.entry_utils import (
-    get_live_3c_trades,
-    get_latest_indicators,
-    send_dca_signal,
-    load_fork_entry_score,
-    simulate_new_avg_price,
-    get_rsi_slope,
-    get_macd_lift,
-    save_entry_score_to_redis,
-    load_entry_score_from_redis,
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
 )
-
-
-from dca.utils.fork_score_utils import compute_fork_score
+from dca.modules.dca_decision_engine import should_dca
 from dca.modules.fork_safu_evaluator import get_safu_score
 from dca.utils.btc_filter import get_btc_status
-from dca.modules.dca_decision_engine import should_dca
+from dca.utils.entry_utils import (
+    get_latest_indicators,
+    get_live_3c_trades,
+    get_macd_lift,
+    get_rsi_slope,
+    load_entry_score_from_redis,
+    load_fork_entry_score,
+    save_entry_score_to_redis,
+    send_dca_signal,
+    simulate_new_avg_price,
+)
+from dca.utils.fork_score_utils import compute_fork_score
+from dca.utils.recovery_confidence_utils import predict_confidence_score
 from dca.utils.recovery_odds_utils import (
+    SNAPSHOT_PATH,
     get_latest_snapshot,
     predict_recovery_odds,
-    SNAPSHOT_PATH,
 )
-from dca.utils.recovery_confidence_utils import predict_confidence_score
+from dca.utils.spend_predictor import adjust_volume, predict_spend_volume
+from dca.utils.trade_health_evaluator import evaluate_trade_health
 from dca.utils.tv_utils import load_tv_kicker
 from dca.utils.zombie_utils import is_zombie_trade
-from dca.utils.spend_predictor import predict_spend_volume, adjust_volume
-from dca.utils.trade_health_evaluator import evaluate_trade_health
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
-from utils.redis_manager import get_redis_manager, RedisKeyManager
-from config.unified_config_manager import get_config
-
-
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 CONFIG_PATH = PATHS[
     "dca_config"
@@ -788,7 +789,6 @@ def run():
             and conf_delta >= soft_conf_override.get("min_confidence_delta", 0.05)
             and tp1_shift >= soft_conf_override.get("min_tp1_shift_pct", 2.0)
         ):
-
             print("🔓 Smart Soft Rescue Triggered (confidence & health aligned)")
             reason = "smart_soft_rescue"
             should_fire = True
@@ -881,7 +881,9 @@ def run():
             btc_context = (
                 indicators.get("btc_context")
                 if "btc_context" in indicators
-                else btc_context if "btc_context" in locals() else None
+                else btc_context
+                if "btc_context" in locals()
+                else None
             )
             if btc_context and isinstance(btc_context, dict):
                 input_features["btc_rsi"] = float(btc_context.get("rsi", 0.0))
@@ -930,7 +932,9 @@ def run():
             remaining_allowed = cap - spent_so_far
             # Stricter spend guard logic
             if remaining_allowed <= 0 or volume <= 0:
-                print(f"⛔ [Spend Guard] Blocked: Cap ${cap} reached or no volume allowed")
+                print(
+                    f"⛔ [Spend Guard] Blocked: Cap ${cap} reached or no volume allowed"
+                )
                 rejection_reason = "spend_guard_limit"
                 log_entry = {
                     "timestamp": datetime.utcnow().isoformat(),
@@ -1100,8 +1104,12 @@ def run():
         if trailing_cfg.get("enabled", False) and last_logged:
             last_price = last_logged.get("current_price")
             min_gap = trailing_cfg.get("min_pct_gap_from_last_dca", 2.0)
-            allow_override_conf = trailing_cfg.get("allow_override_if_confidence_gt", None)
-            allow_override_time = trailing_cfg.get("allow_override_if_time_elapsed_min", None)
+            allow_override_conf = trailing_cfg.get(
+                "allow_override_if_confidence_gt", None
+            )
+            allow_override_time = trailing_cfg.get(
+                "allow_override_if_time_elapsed_min", None
+            )
 
             gap_pct = (
                 abs((current_price - last_price) / last_price) * 100
@@ -1110,14 +1118,20 @@ def run():
             )
 
             time_since_last = (
-                (datetime.utcnow() - datetime.fromisoformat(last_logged["timestamp"])).total_seconds() / 60
+                (
+                    datetime.utcnow() - datetime.fromisoformat(last_logged["timestamp"])
+                ).total_seconds()
+                / 60
                 if last_logged.get("timestamp")
                 else 999
             )
 
             allow_override = (
-                (allow_override_conf is not None and confidence_score >= allow_override_conf)
-                or (allow_override_time is not None and time_since_last >= allow_override_time)
+                allow_override_conf is not None
+                and confidence_score >= allow_override_conf
+            ) or (
+                allow_override_time is not None
+                and time_since_last >= allow_override_time
             )
 
             if gap_pct < min_gap and not allow_override:

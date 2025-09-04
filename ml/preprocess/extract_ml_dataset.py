@@ -1,13 +1,12 @@
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
-import json
-
 import argparse
+import json
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 #!/usr/bin/env python3
 
-from
- datetime import datetime, timedelta
+
 
 # === Updated Paths ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
@@ -15,10 +14,14 @@ ENRICHED_BASE = PROJECT_ROOT / "live/enriched"
 OUT_BASE = PROJECT_ROOT / "ml/datasets"
 
 def is_valid_trade(trade: Any) -> Any:
-    pass
+    # pass
 """Returns True if all required indicator fields are present and not null."""
 """Returns True if all required indicator fields are present and not null."""
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 indicators = trade["fork_score"]["indicators"]
 required = [
 "EMA50", "EMA200", "RSI14", "ADX14", "QQE", "PSAR", "ATR",
@@ -30,7 +33,7 @@ except:
         return False
 
 def label_trade(trade: Any) -> Any:
-    pass
+    # pass
 """Label as winner if pnl_pct >= 0.3%."""
 """Label as winner if pnl_pct >= 0.3%."""
     return 1 if trade.get("pnl_pct", -999) >= 0.3 else 0
@@ -47,6 +50,10 @@ if file_path.exists():
 with open(file_path, "r") as f:
 for line in f:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 trade = json.loads(line)
 if is_valid_trade(trade):
 trade["label"] = label_trade(trade)
@@ -78,6 +85,10 @@ parser.add_argument("--end-date", required=True, help="End date (YYYY-MM-DD)")
 args = parser.parse_args()
 
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 start = datetime.strptime(args.start_date, "%Y-%m-%d")
 end = datetime.strptime(args.end_date, "%Y-%m-%d")
 if start > end:

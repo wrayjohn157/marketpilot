@@ -168,10 +168,10 @@ class UnifiedConfigManager:
     def __init__(self, environment: str = None):
         self.environment = environment or self.detect_environment()
         self.load_all_configs()
-    
+
     def get_path(self, key: str) -> Path:
         # Smart path resolution with environment support
-    
+
     def get_config(self, key: str) -> Dict:
         # Load and validate config with smart defaults
 ```
@@ -181,7 +181,7 @@ class UnifiedConfigManager:
 class ConfigValidator:
     def validate_paths(self, paths: Dict) -> bool:
         # Validate all paths exist and are accessible
-    
+
     def validate_config(self, config: Dict, schema: Dict) -> bool:
         # Validate config against schema
 ```
@@ -191,7 +191,7 @@ class ConfigValidator:
 class SmartDefaults:
     def get_default_paths(self, environment: str) -> Dict:
         # Environment-specific default paths
-    
+
     def get_default_config(self, config_type: str) -> Dict:
         # Smart defaults for each config type
 ```

@@ -9,7 +9,7 @@
 #### **New API Structure**
 ```
 /api/account/summary     → Account summary data
-/api/trades/active       → Active trades data  
+/api/trades/active       → Active trades data
 /api/3commas/metrics     → 3Commas trading data
 /api/btc/context         → BTC market context
 /api/fork/metrics        → Fork trading metrics
@@ -96,7 +96,7 @@ class ThreeCommasAPI:
         self.credentials = get_3commas_credentials()
         self.max_retries = 3
         self.retry_delay = 1
-    
+
     def _make_request(self, path, query="", method="GET"):
         # Robust request handling with retry logic
 ```
@@ -131,7 +131,7 @@ class ApiClient {
   async request(endpoint, options = {}) {
     // Retry logic, error handling, timeout management
   }
-  
+
   async getAccountSummary() { /* ... */ }
   async getActiveTrades() { /* ... */ }
   async get3CommasMetrics() { /* ... */ }

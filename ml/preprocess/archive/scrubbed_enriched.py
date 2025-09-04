@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import json
 import argparse
+import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -12,18 +12,22 @@ TV_HISTORY_BASE = PROJECT_ROOT / "output/tv_history"
 BTC_SNAPSHOT_BASE = PROJECT_ROOT / "dashboard_backend/btc_logs"
 OUTPUT_DIR = PROJECT_ROOT / "ml/datasets/enriched"
 
+
 # === Helpers ===
 def parse_iso(ts: str) -> datetime:
     return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
 
+
 def time_diff_seconds(dt1: datetime, dt2: datetime) -> float:
     return abs((dt1 - dt2).total_seconds())
+
 
 def load_jsonl(path: Path) -> list:
     if not path.exists():
         return []
     with open(path, "r") as f:
         return [json.loads(line.strip()) for line in f if line.strip()]
+
 
 def find_nearest_snapshot(snapshots: list, target_dt: datetime, max_diff: int) -> dict:
     best = None
@@ -38,6 +42,7 @@ def find_nearest_snapshot(snapshots: list, target_dt: datetime, max_diff: int) -
         except:
             continue
     return best
+
 
 def find_fork_score(symbol: str, entry_dt: datetime, grace: int = 3600) -> dict:
     date_str = entry_dt.strftime("%Y-%m-%d")
@@ -58,6 +63,7 @@ def find_fork_score(symbol: str, entry_dt: datetime, grace: int = 3600) -> dict:
         except:
             continue
     return best
+
 
 def find_tv_score(symbol: str, entry_dt: datetime, grace: int = 3600) -> dict:
     date_str = entry_dt.strftime("%Y-%m-%d")
@@ -81,9 +87,12 @@ def find_tv_score(symbol: str, entry_dt: datetime, grace: int = 3600) -> dict:
             continue
     return best
 
+
 # === Main ===
 def main():
-    parser = argparse.ArgumentParser(description="Enrich trades with fork, TV, and BTC context.")
+    parser = argparse.ArgumentParser(
+        description="Enrich trades with fork, TV, and BTC context."
+    )
     parser.add_argument("--date", type=str, help="Target date in YYYY-MM-DD (UTC)")
     args = parser.parse_args()
     date_str = args.date or (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
@@ -136,6 +145,7 @@ def main():
             f.write(json.dumps(rec) + "\n")
 
     print(f"[DONE] Enriched {len(enriched_records)} records into: {out_file}")
+
 
 if __name__ == "__main__":
     main()

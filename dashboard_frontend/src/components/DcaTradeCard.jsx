@@ -72,7 +72,7 @@ export default function DcaTradeCard({ trade }) {
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">{symbol}</h2>
           <Button size="sm" onClick={refreshPrice} disabled={isRefreshing}>
-            {isRefreshing 
+            {isRefreshing
               ? <RefreshCw className="w-4 h-4 animate-spin" />
               : "Refresh"}
           </Button>

@@ -7,20 +7,21 @@ import os
 import re
 from pathlib import Path
 
+
 def fix_string_literals(file_path):
     """Fix unterminated string literals in a file"""
     print(f"Fixing string literals in {file_path}...")
-    
+
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
-        
+
         original_content = content
-        
+
         # Fix unterminated string literals
-        lines = content.split('\n')
+        lines = content.split("\n")
         fixed_lines = []
-        
+
         for i, line in enumerate(lines):
             # Check for unterminated strings
             if line.count('"') % 2 != 0:
@@ -31,104 +32,125 @@ def fix_string_literals(file_path):
                 # Add closing quote
                 lines[i] = line + "'"
                 print(f"  Fixed unterminated single quote on line {i+1}")
-            
+
             # Fix escaped quotes that might be causing issues
             if '\\"' in line or "\\'" in line:
                 # Replace escaped quotes with regular quotes
                 lines[i] = lines[i].replace('\\"', '"').replace("\\'", "'")
                 print(f"  Fixed escaped quotes on line {i+1}")
-        
-        content = '\n'.join(lines)
-        
+
+        content = "\n".join(lines)
+
         # Fix other common syntax issues
         # Fix malformed function calls with extra commas
-        content = re.sub(r',\s*\)', ')', content)
-        
+        content = re.sub(r",\s*\)", ")", content)
+
         # Fix malformed imports
-        content = re.sub(r'^import\s*$', '', content, flags=re.MULTILINE)
-        
+        content = re.sub(r"^import\s*$", "", content, flags=re.MULTILINE)
+
         # Fix unexpected indentation
-        lines = content.split('\n')
+        lines = content.split("\n")
         fixed_lines = []
-        
+
         for i, line in enumerate(lines):
             # Fix lines that are unexpectedly indented at module level
-            if (line.startswith('    ') and 
-                i > 0 and 
-                (lines[i-1].strip().startswith('import ') or 
-                 lines[i-1].strip().startswith('from ') or
-                 lines[i-1].strip() == '' or
-                 lines[i-1].strip().startswith('#')) and
-                not line.strip().startswith('def ') and
-                not line.strip().startswith('class ') and
-                not line.strip().startswith('if ') and
-                not line.strip().startswith('for ') and
-                not line.strip().startswith('while ') and
-                not line.strip().startswith('try:') and
-                not line.strip().startswith('except') and
-                not line.strip().startswith('finally:') and
-                not line.strip().startswith('with ') and
-                not line.strip().startswith('@') and
-                not line.strip().startswith('return') and
-                not line.strip().startswith('yield') and
-                not line.strip().startswith('raise') and
-                not line.strip().startswith('assert') and
-                not line.strip().startswith('pass') and
-                not line.strip().startswith('break') and
-                not line.strip().startswith('continue')):
+            if (
+                line.startswith("    ")
+                and i > 0
+                and (
+                    lines[i - 1].strip().startswith("import ")
+                    or lines[i - 1].strip().startswith("from ")
+                    or lines[i - 1].strip() == ""
+                    or lines[i - 1].strip().startswith("#")
+                )
+                and not line.strip().startswith("def ")
+                and not line.strip().startswith("class ")
+                and not line.strip().startswith("if ")
+                and not line.strip().startswith("for ")
+                and not line.strip().startswith("while ")
+                and not line.strip().startswith("try:")
+                and not line.strip().startswith("except")
+                and not line.strip().startswith("finally:")
+                and not line.strip().startswith("with ")
+                and not line.strip().startswith("@")
+                and not line.strip().startswith("return")
+                and not line.strip().startswith("yield")
+                and not line.strip().startswith("raise")
+                and not line.strip().startswith("assert")
+                and not line.strip().startswith("pass")
+                and not line.strip().startswith("break")
+                and not line.strip().startswith("continue")
+            ):
                 fixed_lines.append(line.lstrip())
                 print(f"  Fixed unexpected indentation on line {i+1}")
             else:
                 fixed_lines.append(line)
-        
-        content = '\n'.join(fixed_lines)
-        
+
+        content = "\n".join(fixed_lines)
+
         # Fix unindent issues
-        lines = content.split('\n')
+        lines = content.split("\n")
         fixed_lines = []
         indent_level = 0
-        
+
         for i, line in enumerate(lines):
             stripped = line.strip()
             if not stripped:
                 fixed_lines.append(line)
                 continue
-                
+
             # Calculate expected indentation
-            if stripped.startswith(('def ', 'class ', 'if ', 'for ', 'while ', 'try:', 'with ', 'except', 'finally:', 'else:', 'elif ')):
+            if stripped.startswith(
+                (
+                    "def ",
+                    "class ",
+                    "if ",
+                    "for ",
+                    "while ",
+                    "try:",
+                    "with ",
+                    "except",
+                    "finally:",
+                    "else:",
+                    "elif ",
+                )
+            ):
                 indent_level = 0
-            elif stripped.startswith(('return', 'yield', 'raise', 'assert', 'pass', 'break', 'continue')):
+            elif stripped.startswith(
+                ("return", "yield", "raise", "assert", "pass", "break", "continue")
+            ):
                 indent_level = 4
-            elif stripped.startswith(('import ', 'from ')):
+            elif stripped.startswith(("import ", "from ")):
                 indent_level = 0
-            
+
             # Fix unindent issues
-            if line.startswith('    ') and indent_level == 0:
+            if line.startswith("    ") and indent_level == 0:
                 fixed_lines.append(line.lstrip())
-            elif not line.startswith(' ') and indent_level > 0:
-                fixed_lines.append('    ' * (indent_level // 4) + line)
+            elif not line.startswith(" ") and indent_level > 0:
+                fixed_lines.append("    " * (indent_level // 4) + line)
             else:
                 fixed_lines.append(line)
-        
-        content = '\n'.join(fixed_lines)
-        
+
+        content = "\n".join(fixed_lines)
+
         if content != original_content:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.write(content)
             print(f"  ✅ Fixed string literals and syntax issues")
             return True
         else:
             print(f"  ℹ️  No changes needed")
             return False
-            
+
     except Exception as e:
         print(f"  ❌ Error fixing {file_path}: {e}")
         return False
 
+
 def main():
     """Fix string literals in problematic files"""
     print("🔧 Fixing string literals and syntax issues...")
-    
+
     # Files with string literal issues
     problem_files = [
         "dashboard_backend/eval_routes/gpt_eval_api.py",
@@ -175,17 +197,18 @@ def main():
         "utils/ml_logger.py",
         "utils/log_reader.py",
     ]
-    
+
     fixed_count = 0
-    
+
     for file_path in problem_files:
         if os.path.exists(file_path):
             if fix_string_literals(file_path):
                 fixed_count += 1
         else:
             print(f"⚠️  File not found: {file_path}")
-    
+
     print(f"\n🎉 Fixed {fixed_count} files")
+
 
 if __name__ == "__main__":
     main()

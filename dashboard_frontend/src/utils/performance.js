@@ -12,10 +12,10 @@ class PerformanceMonitor {
   init() {
     // Monitor Core Web Vitals
     this.observeWebVitals();
-    
+
     // Monitor API performance
     this.observeAPICalls();
-    
+
     // Monitor component render times
     this.observeComponentPerformance();
   }
@@ -61,31 +61,31 @@ class PerformanceMonitor {
     window.fetch = function(...args) {
       const startTime = performance.now();
       const url = args[0];
-      
+
       return originalFetch.apply(this, args)
         .then(response => {
           const endTime = performance.now();
           const duration = endTime - startTime;
-          
+
           self.recordMetric('api_call', {
             url,
             duration,
             status: response.status,
             success: response.ok
           });
-          
+
           return response;
         })
         .catch(error => {
           const endTime = performance.now();
           const duration = endTime - startTime;
-          
+
           self.recordMetric('api_error', {
             url,
             duration,
             error: error.message
           });
-          
+
           throw error;
         });
     };
@@ -100,21 +100,21 @@ class PerformanceMonitor {
     if (!this.metrics.has(name)) {
       this.metrics.set(name, []);
     }
-    
+
     const metric = {
       name,
       value,
       timestamp: Date.now(),
       url: window.location.href
     };
-    
+
     this.metrics.get(name).push(metric);
-    
+
     // Keep only last 100 entries per metric
     if (this.metrics.get(name).length > 100) {
       this.metrics.get(name).shift();
     }
-    
+
     // Notify observers
     this.notifyObservers(name, metric);
   }
@@ -126,7 +126,7 @@ class PerformanceMonitor {
   getMetricAverage(name) {
     const values = this.getMetric(name);
     if (values.length === 0) return 0;
-    
+
     const sum = values.reduce((acc, metric) => acc + metric.value, 0);
     return sum / values.length;
   }
@@ -162,7 +162,7 @@ class PerformanceMonitor {
 
   getReport() {
     const report = {};
-    
+
     for (const [name, values] of this.metrics) {
       report[name] = {
         count: values.length,
@@ -172,13 +172,13 @@ class PerformanceMonitor {
         max: Math.max(...values.map(v => v.value))
       };
     }
-    
+
     return report;
   }
 
   sendReport() {
     const report = this.getReport();
-    
+
     // Send to analytics service
     if (process.env.NODE_ENV === 'production') {
       fetch('/api/analytics/performance', {

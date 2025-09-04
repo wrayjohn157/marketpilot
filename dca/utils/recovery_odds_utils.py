@@ -1,16 +1,20 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
-
-import pandas as pd
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import joblib
-from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs, get_config
+import pandas as pd
 
+from config.unified_config_manager import (
+    get_all_configs,
+    get_all_paths,
+    get_config,
+    get_path,
+)
 
 #!/usr/bin/env python3
 
-from
- pathlib import Path
+
 
 # === Dynamic Paths ===
 BASE_DIR = get_path("base")  # /market7
@@ -28,29 +32,37 @@ EXPECTED_FEATURES = [
 
 # === Load model once ===
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 MODEL = joblib.load(RECOVERY_MODEL_PATH)
 except Exception as e:
 print(f"[ERROR] Failed to load recovery model: {e}")
 MODEL = None
 
 def get_latest_snapshot(symbol: str, deal_id: int):
-    pass
+    # pass
 """Load the latest row from the recovery snapshot for a trade."""
 """Load the latest row from the recovery snapshot for a trade."""
 file = SNAPSHOT_PATH / f"{symbol.replace('USDT_', '')}_{deal_id}.jsonl"
 if not file.exists():
         return None
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 with open(file, "r") as f:
 lines = f.readlines()
 if lines:
             return json.loads(lines[-1])
-except Exception:
+# except Exception:
         return None
     return None
 
 def predict_recovery_odds(snapshot_row: dict) -> float:
-    pass
+    # pass
 """Predict recovery odds from the latest snapshot dict."""
 """Predict recovery odds from the latest snapshot dict."""
 if not snapshot_row:
@@ -60,6 +72,10 @@ print("[WARN] No recovery model loaded; cannot predict odds.")
         return 0.0
 
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 row = snapshot_row.copy()
 meta = row.pop("snapshot_meta", {})
 for k, v in meta.items():

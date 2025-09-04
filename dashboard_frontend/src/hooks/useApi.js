@@ -65,13 +65,13 @@ export const usePaginatedData = (apiCall, initialPage = 1, pageSize = 10) => {
       setLoading(true);
       setError(null);
       const result = await apiCall(pageNum, pageSize);
-      
+
       if (pageNum === 1) {
         setAllData(result.data || []);
       } else {
         setAllData(prev => [...prev, ...(result.data || [])]);
       }
-      
+
       setHasMore(result.hasMore || false);
     } catch (err) {
       setError(err.message);
@@ -97,12 +97,12 @@ export const usePaginatedData = (apiCall, initialPage = 1, pageSize = 10) => {
     setHasMore(true);
   }, []);
 
-  return { 
-    data: allData, 
-    loading, 
-    error, 
-    hasMore, 
-    loadMore, 
+  return {
+    data: allData,
+    loading,
+    error,
+    hasMore,
+    loadMore,
     reset,
     refetch: () => fetchPage(page)
   };

@@ -1,15 +1,14 @@
-from typing import Dict, List, Optional, Any, Union, Tuple
 import json
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+from utils.redis_manager import RedisKeyManager, get_redis_manager
 
+from .evaluate import evaluate_trade
 from .time_to_profit import analyze_time_to_tp1
 from .trend_slope import calculate_ema_slope
-from utils.redis_manager import get_redis_manager, RedisKeyManager
-
 
 #!/usr/bin/env python3
-from
- .evaluate import evaluate_trade
+
 
 # Redis setup
 r = get_redis_manager()
@@ -34,6 +33,10 @@ redis_key = f"{symbol}_1h"
 existing_data = r.get_cache(redis_key)
 if existing_data:
 try:
+    # pass
+# except Exception:
+# pass
+# pass
 existing_data = json.loads(existing_data)
 except json.JSONDecodeError:
 existing_data = {}
@@ -95,7 +98,7 @@ adx = info.get("ADX14")
 ema_values = [info.get("EMA50"), info.get("EMA200")]
 
 print(f""
-n[CONFIG]️ Running RRR filter for {symbol}")"
+n[CONFIG] Running RRR filter for {symbol}")"
 print(f" - ATR: {atr}")
 print(f" - ADX: {adx}")
 print(f" - EMA50: {ema_values[0]}")

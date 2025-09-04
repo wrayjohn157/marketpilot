@@ -37,19 +37,19 @@ const appReducer = (state, action) => {
   switch (action.type) {
     case ActionTypes.SET_USER:
       return { ...state, user: action.payload };
-    
+
     case ActionTypes.UPDATE_SETTINGS:
-      return { 
-        ...state, 
-        settings: { ...state.settings, ...action.payload } 
+      return {
+        ...state,
+        settings: { ...state.settings, ...action.payload }
       };
-    
+
     case ActionTypes.SET_SYSTEM_STATUS:
-      return { 
-        ...state, 
-        system: { ...state.system, ...action.payload } 
+      return {
+        ...state,
+        system: { ...state.system, ...action.payload }
       };
-    
+
     case ActionTypes.ADD_ERROR:
       return {
         ...state,
@@ -58,25 +58,25 @@ const appReducer = (state, action) => {
           errors: [...state.system.errors, action.payload]
         }
       };
-    
+
     case ActionTypes.CLEAR_ERRORS:
       return {
         ...state,
         system: { ...state.system, errors: [] }
       };
-    
+
     case ActionTypes.UPDATE_TRADING_DATA:
       return {
         ...state,
         trading: { ...state.trading, ...action.payload }
       };
-    
+
     case ActionTypes.SET_LOADING:
       return {
         ...state,
         system: { ...state.system, status: 'loading' }
       };
-    
+
     default:
       return state;
   }
@@ -94,7 +94,7 @@ export const AppProvider = ({ children }) => {
     const initializeApp = async () => {
       try {
         dispatch({ type: ActionTypes.SET_LOADING });
-        
+
         // Load initial data
         const [accountSummary, activeTrades, btcContext] = await Promise.all([
           apiClient.getAccountSummary(),
@@ -127,7 +127,7 @@ export const AppProvider = ({ children }) => {
             timestamp: new Date().toISOString()
           }
         });
-        
+
         dispatch({
           type: ActionTypes.SET_SYSTEM_STATUS,
           payload: { status: 'error' }
@@ -186,19 +186,19 @@ export const AppProvider = ({ children }) => {
     dispatch,
     actions: {
       setUser: (user) => dispatch({ type: ActionTypes.SET_USER, payload: user }),
-      updateSettings: (settings) => dispatch({ 
-        type: ActionTypes.UPDATE_SETTINGS, 
-        payload: settings 
+      updateSettings: (settings) => dispatch({
+        type: ActionTypes.UPDATE_SETTINGS,
+        payload: settings
       }),
-      addError: (error) => dispatch({ 
-        type: ActionTypes.ADD_ERROR, 
-        payload: error 
+      addError: (error) => dispatch({
+        type: ActionTypes.ADD_ERROR,
+        payload: error
       }),
       clearErrors: () => dispatch({ type: ActionTypes.CLEAR_ERRORS }),
       refreshData: async () => {
         try {
           dispatch({ type: ActionTypes.SET_LOADING });
-          
+
           const [accountSummary, activeTrades, btcContext] = await Promise.all([
             apiClient.getAccountSummary(),
             apiClient.getActiveTrades(),
