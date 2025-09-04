@@ -9,6 +9,8 @@ import hashlib
 import requests
 from datetime import datetime, timedelta
 from config.config_loader import PATHS
+from utils.credential_manager import get_3commas_credentials
+
 
 # === Load credentials properly ===
 with open(PATHS["paper_cred"], "r") as f:

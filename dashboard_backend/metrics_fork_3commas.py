@@ -4,6 +4,8 @@ import requests
 from datetime import datetime, timedelta
 import hmac
 import hashlib
+from utils.credential_manager import get_3commas_credentials
+
 
 # Load 3Commas API credentials from credentials.json
 with open("credentials.json") as f:

@@ -15,6 +15,8 @@ from fork.utils.fork_entry_logger import log_fork_entry
 import hashlib
 import hmac
 import subprocess
+from utils.credential_manager import get_3commas_credentials
+
 
 #!/usr/bin/env python3
 """Refactored Fork Runner - Clean, modular implementation."""

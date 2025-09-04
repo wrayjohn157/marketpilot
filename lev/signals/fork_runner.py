@@ -8,6 +8,8 @@ from config.config_loader import PATHS
 from fork.utils.entry_utils import get_entry_price, compute_score_hash
 from fork.utils.fork_entry_logger import log_fork_entry
 import subprocess
+from utils.credential_manager import get_3commas_credentials
+
 
 #!/usr/bin/env python3
 from

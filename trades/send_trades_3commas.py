@@ -10,6 +10,8 @@ import requests
 import hashlib
 import hmac
 import time
+from utils.credential_manager import get_3commas_credentials
+
 
 #!/usr/bin/env python3
 from

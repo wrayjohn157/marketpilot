@@ -10,6 +10,8 @@ from datetime import datetime
 
 # === Correct import root ===
 from config.config_loader import PATHS
+from utils.credential_manager import get_3commas_credentials
+
 
 router = APIRouter()
 

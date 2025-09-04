@@ -11,6 +11,8 @@ import sys
 # === Config Loader ===
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # Up to /market7
 from config.config_loader import PATHS
+from utils.credential_manager import get_3commas_credentials
+
 
 # === Load credentials ===
 with open(PATHS["paper_cred"], "r") as f:

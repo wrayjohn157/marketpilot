@@ -13,6 +13,8 @@ import yaml
 
 import hashlib
 import hmac
+from utils.credential_manager import get_3commas_credentials
+
 
 #!/usr/bin/env python3
 from

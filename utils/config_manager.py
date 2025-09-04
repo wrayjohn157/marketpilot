@@ -4,6 +4,8 @@ import json
 import logging
 
 import yaml
+from utils.credential_manager import get_3commas_credentials
+
 
 """Centralized configuration management for Market7."""
 

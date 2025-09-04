@@ -6,6 +6,8 @@ from pathlib import Path
 import json
 import traceback
 import os
+from utils.credential_manager import get_3commas_credentials
+
 
 router = APIRouter(prefix="/gpt")
 

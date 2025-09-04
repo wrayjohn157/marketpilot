@@ -12,6 +12,8 @@ import requests
 
 import hashlib
 import hmac
+from utils.credential_manager import get_3commas_credentials
+
 
 #!/usr/bin/env python3
 
@@ -32,8 +34,7 @@ REDIS = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
 # === 3Commas Trade Fetch (Paginated) ===
 def get_live_3c_trades() -> Any:
     try:
-        with open(CRED_PATH, "r") as f:
-            creds = json.load(f)
+        creds = get_3commas_credentials()
 
         BOT_ID = creds["3commas_bot_id"]
         API_KEY = creds["3commas_api_key"]
@@ -91,8 +92,7 @@ def get_live_3c_trades() -> Any:
 
 def send_dca_signal(pair: Any, volume: Any = 15) -> Any:
     try:
-        with open(CRED_PATH, "r") as f:
-            creds = json.load(f)
+        creds = get_3commas_credentials()
 
         payload = {
             "action": "add_funds_in_quote",

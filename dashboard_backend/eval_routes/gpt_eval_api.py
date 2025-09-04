@@ -66,5 +66,7 @@ async def ask_gpt(req: Request):
 
     except Exception as e:
         import traceback
+from utils.credential_manager import get_3commas_credentials
+
         print("[❌ GPT ERROR]", traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"OpenAI Error: {str(e)}")

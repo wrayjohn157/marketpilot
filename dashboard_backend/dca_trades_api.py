@@ -89,6 +89,8 @@ from pydantic import BaseModel
 # === Load 3Commas API credentials ===
 from pathlib import Path
 import json
+from utils.credential_manager import get_3commas_credentials
+
 
 CRED_PATH = Path("/home/signal/market7/config/paper_cred.json")
 with open(CRED_PATH) as f:

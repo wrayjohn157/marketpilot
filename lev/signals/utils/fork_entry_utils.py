@@ -9,6 +9,8 @@ from config.config_loader import PATHS
 import hashlib
 import hmac
 import time
+from utils.credential_manager import get_3commas_credentials
+
 
 # /home/signal/market7/fork/utils/fork_entry_utils.py
 
