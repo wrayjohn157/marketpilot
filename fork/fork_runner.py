@@ -23,7 +23,7 @@ PROJECT_ROOT = CURRENT_FILE.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
 # === Config Paths ===
-FORK_SCORE_SCRIPT = PROJECT_ROOT / "indicators" / "fork_score_filter.py"
+FORK_SCORE_SCRIPT = PROJECT_ROOT / "indicators" / "fork_pipeline_runner_integrated.py"
 TV_KICKER_SCRIPT = PROJECT_ROOT / "indicators" / "tv_kicker.py"
 
 FORK_RRR_PATH = get_path("final_fork_rrr_trades")
