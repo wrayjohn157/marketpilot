@@ -1,284 +1,170 @@
-import React, { useState, useEffect } from "react";
-import { RefreshCw, ShieldCheck, TrendingUp, Activity, Percent, Zap } from "lucide-react";
-import { Button } from "./Button";
-import { Card } from "./Card";
-import { Sparkline } from "./Sparkline";
-import { TradingViewChart } from "./TradingViewChart";
+import React from "react";
+import { TrendingUp, TrendingDown, DollarSign, AlertTriangle, Target, BarChart3 } from "lucide-react";
 
-export default function TradeCard({ trade }) {
-  const [liveTrade, setLiveTrade] = useState(trade);
-  const [loading, setLoading] = useState(false);
-  const [confirmClose, setConfirmClose] = useState(false);
-  const [showChart, setShowChart] = useState(false);
-
+export default function TradeCardEnhanced({ trade }) {
   const {
     deal_id,
     symbol,
-    avg_entry_price,
-    current_price,
-    tp1_shift,
-    entry_score,
-    current_score,
-    confidence_score,
-    recovery_odds,
-    safu_score,
-    step,
+    pair,
     open_pnl,
-    pnl_pct,
-    sparkline_data = [],
-    rejection_reason,
-    be_price,
-  } = liveTrade;
+    open_pnl_pct,
+    drawdown_pct,
+    drawdown_usd,
+    step,
+    confidence_score,
+    spent_amount,
+    current_price,
+    entry_price
+  } = trade;
 
-  const entry = parseFloat(avg_entry_price) || 1;
-  const current = parseFloat(current_price) || entry;
-  const breakEven = parseFloat(be_price) || entry;
-  const tp1 = breakEven * (1 + (parseFloat(tp1_shift) || 0) / 100);
+  const isProfit = open_pnl >= 0;
+  const isHighDrawdown = drawdown_pct > 10;
+  const isHighConfidence = confidence_score > 0.7;
 
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 640);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
-  useEffect(() => {
-    const fetchDcaEval = async () => {
-      try {
-        const res = await fetch("/dca-evals");
-        const json = await res.json();
-        const data = Array.isArray(json) ? json : json.evaluations;
-
-        if (Array.isArray(data)) {
-          const match = data.find(d => d.deal_id === deal_id);
-          if (match) {
-            setLiveTrade(prev => ({
-              ...prev,
-              ...match,
-            }));
-          }
-        } else {
-          console.error("❌ DCA evals response is not an array:", json);
-        }
-      } catch (err) {
-        console.error("❌ Error fetching DCA evals:", err);
-      }
-    };
-
-    fetchDcaEval();
-  }, [deal_id]);
-
-  const refreshPrice = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/refresh-price/${deal_id}`);
-      const data = await res.json();
-
-      if (data?.current_price) {
-        setLiveTrade(prev => ({
-          ...prev,
-          current_price: data.current_price,
-          open_pnl: data.open_pnl ?? prev.open_pnl,
-          pnl_pct: data.pnl_pct ?? prev.pnl_pct,
-        }));
-      } else {
-        console.error("⚠️ Invalid refresh payload:", data);
-      }
-    } catch (e) {
-      console.error("❌ Refresh error:", e);
-    } finally {
-      setLoading(false);
-    }
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value || 0);
   };
 
-  const handleForceClose = async (deal_id, pair) => {
-    try {
-      const res = await fetch("/panic-sell", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deal_id }),
-      });
+  const formatPercentage = (value) => {
+    return `${(value || 0).toFixed(2)}%`;
+  };
 
-      if (res.ok) {
-        const data = await res.json();
-        alert(
-          `🚨 Panic Sell Complete\n\n${pair}\nClosed at ${data.close_price?.toFixed(4)} for ${
-            data.pnl_pct?.toFixed(2)
-          }%\n→ ${data.pnl_usdt?.toFixed(2)} USDT\nStatus: ${data.status || "n/a"}`
-        );
-        window.location.reload();
-      } else {
-        alert("❌ Panic sell request failed");
-      }
-    } catch (e) {
-      console.error("❌ Panic sell error:", e);
-      alert("❌ Panic sell failed or display error — please check console.");
-    }
+  const getConfidenceColor = (score) => {
+    if (score >= 0.8) return "text-green-400";
+    if (score >= 0.6) return "text-yellow-400";
+    return "text-red-400";
+  };
+
+  const getDrawdownColor = (pct) => {
+    if (pct <= 5) return "text-green-400";
+    if (pct <= 10) return "text-yellow-400";
+    return "text-red-400";
   };
 
   return (
-    <>
-      {/* Sparkline ghost background */}
-      {sparkline_data.length > 1 && (
-        <div className="absolute inset-0 opacity-5 blur-[3px] pointer-events-none">
-          <Sparkline data={sparkline_data} />
+    <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 hover:border-gray-700 transition-all duration-200">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+          <h3 className="text-lg font-semibold text-white">{symbol}</h3>
+          <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">
+            {pair}
+          </span>
         </div>
-      )}
+        <div className="flex items-center gap-1">
+          {isHighConfidence && (
+            <div className="w-2 h-2 rounded-full bg-green-400" title="High Confidence"></div>
+          )}
+          {isHighDrawdown && (
+            <AlertTriangle className="w-4 h-4 text-red-400" title="High Drawdown" />
+          )}
+        </div>
+      </div>
 
-      {/* Main Card content */}
-      <Card className="w-full max-w-md border border-gray-800 ring-1 ring-gray-700 rounded-xl p-4 shadow-md bg-gray-900/80 backdrop-blur-sm">
-        {/* Top: Symbol and Refresh */}
-        <div className="flex justify-between items-center mb-2">
-          <button
-            onClick={() => setShowChart(true)}
-            className="text-base font-semibold tracking-tight text-white hover:underline"
-            title="View on TradingView"
-          >
-            {symbol}
-          </button>
-          <Button size="xs" variant="ghost" onClick={refreshPrice} disabled={loading} title="Refresh">
-            <RefreshCw className="w-4 h-4 text-green-400" />
-          </Button>
-        </div>
-        {/* Entry/TP1 & Reason */}
-        <div className="text-sm text-muted-foreground">
-          Entry: {entry.toFixed(4)} › TP1: {tp1.toFixed(4)}
-        </div>
-        {rejection_reason && (
-          <div className="italic text-yellow-400 text-xs mt-1">
-            Reason: {rejection_reason.replaceAll("_", " ").toUpperCase()}
+      {/* PnL Section */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm text-gray-400">Unrealized P&L</span>
+          <div className={`flex items-center gap-1 ${isProfit ? "text-green-400" : "text-red-400"}`}>
+            {isProfit ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+            <span className="font-semibold">{formatCurrency(open_pnl)}</span>
           </div>
+        </div>
+        <div className="text-right">
+          <span className={`text-sm font-medium ${isProfit ? "text-green-400" : "text-red-400"}`}>
+            {formatPercentage(open_pnl_pct)}
+          </span>
+        </div>
+      </div>
+
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1 text-xs text-gray-400">
+            <DollarSign className="w-3 h-3" />
+            <span>Entry Price</span>
+          </div>
+          <div className="text-sm font-medium text-white">
+            {formatCurrency(entry_price)}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <div className="flex items-center gap-1 text-xs text-gray-400">
+            <DollarSign className="w-3 h-3" />
+            <span>Current Price</span>
+          </div>
+          <div className="text-sm font-medium text-white">
+            {formatCurrency(current_price)}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <div className="flex items-center gap-1 text-xs text-gray-400">
+            <BarChart3 className="w-3 h-3" />
+            <span>Drawdown</span>
+          </div>
+          <div className={`text-sm font-medium ${getDrawdownColor(drawdown_pct)}`}>
+            {formatPercentage(drawdown_pct)}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <div className="flex items-center gap-1 text-xs text-gray-400">
+            <Target className="w-3 h-3" />
+            <span>DCA Step</span>
+          </div>
+          <div className="text-sm font-medium text-white">
+            {step || 0}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Section */}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-800">
+        <div className="space-y-1">
+          <div className="text-xs text-gray-400">Confidence</div>
+          <div className={`text-sm font-medium ${getConfidenceColor(confidence_score)}`}>
+            {formatPercentage(confidence_score * 100)}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <div className="text-xs text-gray-400">Invested</div>
+          <div className="text-sm font-medium text-white">
+            {formatCurrency(spent_amount)}
+          </div>
+        </div>
+
+        <div className="text-xs text-gray-500">
+          ID: {deal_id?.slice(-6) || "N/A"}
+        </div>
+      </div>
+
+      {/* Status Indicators */}
+      <div className="flex items-center gap-2 mt-3">
+        {isHighConfidence && (
+          <span className="text-xs bg-green-900 text-green-300 px-2 py-1 rounded">
+            High Confidence
+          </span>
         )}
-        {/* Stats grid */}
-        <div className="grid grid-cols-3 gap-3 text-xs text-muted-foreground mt-3">
-          <div>
-            <div className="text-[10px] uppercase">Score</div>
-            <div className="text-white font-medium">{entry_score?.toFixed(2)} → {current_score?.toFixed(2)}</div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase">SAFU</div>
-            <div className="text-white font-medium">{safu_score?.toFixed(2)}</div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase">Conf</div>
-            <div className="text-white font-medium">{confidence_score?.toFixed(2)}</div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase">Odds</div>
-            <div className="text-white font-medium">{recovery_odds?.toFixed(2)}</div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase">Step</div>
-            <div className="text-white font-medium">{step ?? 0}</div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase">PnL</div>
-            <div className={open_pnl >= 0 ? "text-green-400 font-semibold" : "text-red-400 font-semibold"}>
-              {(typeof open_pnl === "number" ? open_pnl.toFixed(2) : "N/A")} USDT <span className="text-muted">({pnl_pct?.toFixed(2)}%)</span>
-            </div>
-          </div>
-        </div>
-        {/* Enhanced progress bar: symmetrical with BE as center */}
-        <div className="relative w-full h-4 rounded-full bg-gray-800 overflow-hidden mt-4 mb-2 border border-gray-700">
-          {/* Red zone fill (left of BE) */}
-          {current < breakEven && (
-            <div
-              className="absolute top-0 bottom-0 left-0 bg-red-500"
-              style={{
-                width: `${((current - Math.min(entry, breakEven)) / (breakEven - Math.min(entry, breakEven))) * 50}%`
-              }}
-              title={`Now: $${current.toFixed(4)}`}
-            />
-          )}
-
-          {/* Green zone fill (right of BE) */}
-          {current >= breakEven && (
-            <div
-              className="absolute top-0 bottom-0 left-1/2 bg-green-500"
-              style={{
-                width: `${((Math.min(current, tp1) - breakEven) / (tp1 - breakEven)) * 50}%`
-              }}
-              title={`Now: $${current.toFixed(4)}`}
-            />
-          )}
-
-          {/* Break-even marker */}
-          <div className="absolute top-0 bottom-0 w-[2px] bg-yellow-400 left-1/2" title="Break Even" />
-
-          {/* Entry marker */}
-          <div
-            className="absolute top-0 bottom-0 w-[2px] bg-white/70"
-            style={{
-              left: `${((entry - Math.min(entry, tp1)) / (tp1 - Math.min(entry, tp1))) * 100}%`
-            }}
-            title="Entry"
-          />
-
-          {/* TP1 marker */}
-          <div
-            className="absolute top-0 bottom-0 w-[2px] bg-blue-400"
-            style={{ left: "100%" }}
-            title="TP1"
-          />
-        </div>
-        <div className="flex justify-between text-[10px] text-muted-foreground -mt-1">
-          <span>${Math.min(entry, tp1).toFixed(4)}</span>
-          <span>BE: ${breakEven.toFixed(4)}</span>
-          <span>${tp1.toFixed(4)}</span>
-        </div>
-        {/* Tag row */}
-        <div className="flex justify-start gap-4 text-xs text-white mt-2">
-          {liveTrade.is_zombie ? (
-            <div className="flex items-center gap-1 text-red-400">
-              <Activity className="w-4 h-4" /> Zombie
-            </div>
-          ) : (
-            <>
-              {safu_score >= 0.5 && recovery_odds >= 0.75 && confidence_score >= 0.7 && (
-                <>
-                  <div className="flex items-center gap-1 text-green-400">
-                    <ShieldCheck className="w-4 h-4" /> SAFU
-                  </div>
-                  <div className="flex items-center gap-1 text-yellow-400">
-                    <Zap className="w-4 h-4" /> Recovery Odds
-                  </div>
-                </>
-              )}
-              {!(safu_score >= 0.5 && recovery_odds >= 0.75 && confidence_score >= 0.7) && (
-                <div className="text-gray-500 italic text-xs">No qualifying tags</div>
-              )}
-            </>
-          )}
-        </div>
-        {/* Sparkline is background only */}
-        {/* Always-on Panic Sell button with confirmation */}
-        <div className="mt-4 flex justify-end">
-          <button
-            className="border border-red-500 text-red-500 px-3 py-1 rounded hover:bg-red-100"
-            onClick={() => {
-              const confirmClose = window.confirm("⚠️ Are you sure you want to panic sell this trade?");
-              if (confirmClose) {
-                handleForceClose(deal_id, symbol);
-              }
-            }}
-          >
-            ⚠️ Panic Sell
-          </button>
-        </div>
-      </Card>
-      {showChart && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-4 w-full max-w-4xl relative">
-            <button
-              onClick={() => setShowChart(false)}
-              className="absolute top-2 right-2 text-black hover:text-red-500 text-xl font-bold"
-            >
-              ×
-            </button>
-            <TradingViewChart symbol={symbol} interval="1h" />
-          </div>
-        </div>
-      )}
-    </>
+        {isHighDrawdown && (
+          <span className="text-xs bg-red-900 text-red-300 px-2 py-1 rounded">
+            High Drawdown
+          </span>
+        )}
+        {step > 3 && (
+          <span className="text-xs bg-yellow-900 text-yellow-300 px-2 py-1 rounded">
+            Deep DCA
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
