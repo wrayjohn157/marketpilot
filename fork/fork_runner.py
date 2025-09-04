@@ -12,8 +12,7 @@ from utils.credential_manager import get_3commas_credentials
 
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+from pathlib import Path
 
 # === Setup ===
 CURRENT_FILE = Path(__file__).resolve()

@@ -9,8 +9,7 @@ import redis
 from config.config_loader import PATHS
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+from pathlib import Path
 
 # === CONFIG ===
 

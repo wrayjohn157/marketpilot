@@ -9,8 +9,7 @@ import redis
 from config.config_loader import PATHS  # ✅ Use the loader
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+from pathlib import Path
 
 # ✅ Inject base path so config/ can be imported when run via systemd
 CURRENT_FILE = Path(__file__).resolve()

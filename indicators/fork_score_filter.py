@@ -14,8 +14,7 @@ from config.config_loader import PATHS
 import re
 
 #!/usr/bin/env python3
-from
- ta.momentum import stochrsi
+from ta.momentum import RSIIndicator, StochRSIIndicator
 
 # === Setup ===
 CURRENT_FILE = Path(__file__).resolve()
