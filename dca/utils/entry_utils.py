@@ -1,4 +1,4 @@
-    from datetime import timedelta
+from datetime import timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Union, Tuple
 import json
@@ -17,8 +17,7 @@ from utils.credential_manager import get_3commas_credentials
 
 #!/usr/bin/env python3
 
-from
- datetime import datetime
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
