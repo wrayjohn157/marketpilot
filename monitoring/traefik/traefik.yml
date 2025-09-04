@@ -1,0 +1,44 @@
+api:
+  dashboard: true
+  insecure: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entrypoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: monitoring
+  file:
+    filename: /etc/traefik/dynamic/tls.yml
+    watch: true
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: admin@market7.local
+      storage: /etc/traefik/certs/acme.json
+      httpChallenge:
+        entryPoint: web
+      tlsChallenge: {}
+
+log:
+  level: INFO
+  filePath: /var/log/traefik/traefik.log
+
+accessLog:
+  filePath: /var/log/traefik/access.log
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addServicesLabels: true

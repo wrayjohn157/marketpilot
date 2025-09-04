@@ -1,0 +1,111 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'market7'
+    environment: 'production'
+
+rule_files:
+  - "rules/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporter - System metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # cAdvisor - Container metrics
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # Redis Exporter
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 30s
+
+  # PostgreSQL Exporter
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 30s
+
+  # Market7 Backend Application
+  - job_name: 'market7-backend'
+    static_configs:
+      - targets: ['backend:8000']
+    scrape_interval: 15s
+    metrics_path: /metrics
+    scheme: http
+
+  # Market7 Frontend (if metrics endpoint exists)
+  - job_name: 'market7-frontend'
+    static_configs:
+      - targets: ['frontend:80']
+    scrape_interval: 30s
+    metrics_path: /metrics
+    scheme: http
+
+  # Traefik
+  - job_name: 'traefik'
+    static_configs:
+      - targets: ['traefik:8080']
+    scrape_interval: 30s
+    metrics_path: /metrics
+    scheme: http
+
+  # Custom Market7 Trading Metrics
+  - job_name: 'market7-trading'
+    static_configs:
+      - targets: ['backend:8000']
+    scrape_interval: 10s
+    metrics_path: /api/metrics/trading
+    scheme: http
+
+  # Market7 ML Pipeline Metrics
+  - job_name: 'market7-ml'
+    static_configs:
+      - targets: ['backend:8000']
+    scrape_interval: 30s
+    metrics_path: /api/metrics/ml
+    scheme: http
+
+  # Market7 DCA System Metrics
+  - job_name: 'market7-dca'
+    static_configs:
+      - targets: ['backend:8000']
+    scrape_interval: 15s
+    metrics_path: /api/metrics/dca
+    scheme: http
+
+  # Market7 3Commas API Metrics
+  - job_name: 'market7-3commas'
+    static_configs:
+      - targets: ['backend:8000']
+    scrape_interval: 60s
+    metrics_path: /api/metrics/3commas
+    scheme: http
+
+  # Market7 Redis Metrics
+  - job_name: 'market7-redis'
+    static_configs:
+      - targets: ['backend:8000']
+    scrape_interval: 30s
+    metrics_path: /api/metrics/redis
+    scheme: http

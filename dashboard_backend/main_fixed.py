@@ -28,6 +28,17 @@ app = FastAPI(
     version="2.0.0"
 )
 
+# === Monitoring ===
+from .middleware import MetricsMiddleware, LoggingMiddleware
+from .metrics_routes import router as metrics_router
+
+# Add monitoring middleware
+app.add_middleware(MetricsMiddleware)
+app.add_middleware(LoggingMiddleware)
+
+# Include metrics routes
+app.include_router(metrics_router)
+
 # === Redis ===
 from utils.redis_manager import get_redis_manager
 from utils.credential_manager import get_3commas_credentials
