@@ -6,10 +6,12 @@ import numpy as np
 
 from utils.sim_snapshot_loader import sim_generate_snapshot_series
 import joblib
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+BASE_DIR = get_path("base").parent
 MODEL_PATH = BASE_DIR / "ml" / "models" / "xgb_confidence_model.pkl"
 SNAPSHOT_DIR = BASE_DIR / "sim" / "sandbox3" / "snapshots"
 

@@ -5,6 +5,8 @@ import logging
 import pandas as pd
 
 import joblib
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 
@@ -16,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # === Dynamic Paths ===
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7
+BASE_DIR = get_path("base")  # /market7
 MODEL_PATH = BASE_DIR / "ml" / "models" / "xgb_confidence_model.pkl"
 SNAPSHOT_DIR = BASE_DIR / "ml" / "datasets" / "recovery_snapshots"
 

@@ -4,12 +4,14 @@ from typing import Optional, Tuple
 import json
 
 from indicators.fork_score_filter import compute_subscores
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 
 # === Dynamic Paths ===
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7
-FORK_HISTORY_BASE = BASE_DIR / "output" / "fork_history"
+BASE_DIR = get_path("base")  # /market7
+FORK_HISTORY_BASE = get_path("fork_history")
 
 # === Entry Score Loader ===
 def load_fork_entry_score(symbol: str, entry_ts: int) -> Optional[float]:

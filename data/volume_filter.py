@@ -8,7 +8,8 @@ import sys
 import redis
 import requests
 
-from config.config_loader import PATHS
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 from
@@ -23,7 +24,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 # === Paths ===
 SYMBOL_LIST_FILE = Path("/home/signal/market7/data/binance_symbols.json")
-OUTPUT_FILE = PATHS["filtered_pairs"]
+OUTPUT_FILE = get_path("filtered_pairs")
 
 # === Volume threshold (in USDT) ===
 MIN_VOLUME_USDT = 3_000_000

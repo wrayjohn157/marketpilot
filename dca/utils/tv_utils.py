@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Dict, List, Optional, Any, Union, Tuple
 import json
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 """
@@ -11,7 +13,7 @@ from
  pathlib import Path
 
 # === Paths ===
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = get_path("base")
 TV_KICKER_PATH = BASE_DIR / "output" / "tv_history"
 TV_RAW_PATH = BASE_DIR / "output" / "tv_screener_raw_dict.txt"
 

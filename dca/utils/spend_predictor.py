@@ -4,6 +4,8 @@ import logging
 import pandas as pd
 
 import joblib
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 """
@@ -14,7 +16,7 @@ from
  pathlib import Path
 
 # === Paths ===
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /market7
+BASE_DIR = get_path("base")  # /market7
 MODEL_PATH = BASE_DIR / "ml" / "models" / "xgb_spend_model.pkl"
 
 # === Configure logging ===

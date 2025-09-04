@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 
@@ -9,8 +11,8 @@ from
  pathlib import Path
 
 # === Dynamic Paths ===
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /home/signal/market7
-BTC_SNAPSHOT_BASE = BASE_DIR / "dashboard_backend" / "btc_logs" #BTC_SNAPSHOT_BASE = BASE_DIR / "dashboard_backend" / "snapshots" / "btc_"
+BASE_DIR = get_path("base")  # /home/signal/market7
+BTC_SNAPSHOT_BASE = get_path("btc_logs") #BTC_SNAPSHOT_BASE = BASE_DIR / "dashboard_backend" / "snapshots" / "btc_"
 
 # === BTC Snapshot Loader ===
 def get_latest_btc_snapshot() -> Any:

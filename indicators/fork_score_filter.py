@@ -10,11 +10,12 @@ import pandas as pd
 import redis
 import yaml
 
-from config.config_loader import PATHS
 import re
 
 #!/usr/bin/env python3
 from ta.momentum import RSIIndicator, StochRSIIndicator
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 # === Setup ===
 CURRENT_FILE = Path(__file__).resolve()
@@ -23,12 +24,12 @@ sys.path.append(str(PROJECT_ROOT))
 
 # --- Load paths from config_loader ---
 
-CONFIG_PATH = PATHS["base"] / "config" / "fork_score_config.yaml"
+CONFIG_PATH = get_path("base") / "config" / "fork_score_config.yaml"
 FORK_INPUT_FILE = PATHS["fork_candidates"]
-OUTPUT_FILE = PATHS["final_fork_rrr_trades"]
-BACKTEST_CANDIDATES_FILE = PATHS["fork_backtest_candidates"]
-FORK_HISTORY_BASE = PATHS["fork_history"]
-SNAPSHOT_BASE = PATHS["snapshots"]
+OUTPUT_FILE = get_path("final_fork_rrr_trades")
+BACKTEST_CANDIDATES_FILE = get_path("fork_backtest_candidates")
+FORK_HISTORY_BASE = get_path("fork_history")
+SNAPSHOT_BASE = get_path("snapshots")
 
 REDIS_SET = "FORK_RRR_PASSED"
 REDIS_FINAL_TRADES = "FORK_FINAL_TRADES"

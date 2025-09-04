@@ -3,8 +3,9 @@ from typing import List
 import logging
 import sys
 
-from config.config_loader import PATHS
 from dca.core import DCAEngine
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 """Refactored Smart DCA Signal - Clean, modular implementation."""
@@ -36,7 +37,7 @@ def main() -> None:
     """Main entry point for DCA signal processing."""
     try:
         # Initialize DCA Engine
-        config_path = PATHS["dca_config"]
+        config_path = get_path("dca_config")
         engine = DCAEngine(config_path)
         
         # Run DCA processing

@@ -24,7 +24,6 @@ from ta.volatility import AverageTrueRange, BollingerBands, KeltnerChannel
 from ta.volume import VolumeSMAIndicator, VolumePriceTrendIndicator
 from ta.others import DailyReturnIndicator
 
-from config.config_loader import PATHS
 
 
 class Timeframe(Enum):

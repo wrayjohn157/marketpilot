@@ -12,17 +12,18 @@ import pandas as pd
 import redis
 import requests
 
-from config.config_loader import PATHS
 import time
 
 # /home/signal/market7/data/rolling_indicators.py
 
 #!/usr/bin/env python3
 from pathlib import Path
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 # === Patch sys.path to reach /market7 ===
 CURRENT_FILE = Path(__file__).resolve()
-PROJECT_ROOT = CURRENT_FILE.parents[1]
+PROJECT_ROOT = get_path("base")
 sys.path.append(str(PROJECT_ROOT))
 
 # === Import central paths ===
@@ -41,8 +42,8 @@ KLINE_LIMIT = 210
 TIMEFRAMES = ["15m", "1h", "4h"]
 
 # === Paths ===
-FILTERED_FILE = PATHS["filtered_pairs"]
-SNAPSHOTS_BASE = PATHS["snapshots"]
+FILTERED_FILE = get_path("filtered_pairs")
+SNAPSHOTS_BASE = get_path("snapshots")
 FORK_METRICS_FILE = Path(
     "/home/signal/market7/dashboard_backend/cache/fork_metrics.json"
 )

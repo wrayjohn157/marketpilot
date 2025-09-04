@@ -1,12 +1,13 @@
 # dashboard_backend/config_routes/tv_screener_config_api.py
 
-from config.config_loader import PATHS
 from fastapi import APIRouter, HTTPException
 from pathlib import Path
 import yaml
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 router = APIRouter()
-CONFIG_PATH = PATHS["tv_screener_config"]
+CONFIG_PATH = get_path("tv_screener_config")
 
 # === Helpers ===
 def load_config():

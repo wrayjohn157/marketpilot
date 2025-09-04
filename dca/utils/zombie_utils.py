@@ -1,10 +1,11 @@
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
     import yaml
 
-    from config.config_loader import PATHS
-
+    
 def is_zombie_trade(indicators: Any, recovery_odds: Any, score: Any) -> Any:
 
-    config_path = PATHS["dca_config"]
+    config_path = get_path("dca_config")
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 

@@ -4,9 +4,10 @@ import json
 import os
 import sys
 
-from config.config_loader import PATHS
 from dateutil import parser as dtparser
 import argparse
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 from
@@ -24,7 +25,7 @@ def index_by_deal_id(rows: Any) -> Any:
     return {r["deal_id"]: r for r in rows if "deal_id" in r}
 
 def load_btc_context(date_str: Any) -> Any:
-    path = PATHS["btc_logs"] / date_str / "btc_snapshots.jsonl"
+    path = get_path("btc_logs") / date_str / "btc_snapshots.jsonl"
     if not path.exists():
         return [], []
     snapshots = load_jsonl(path)

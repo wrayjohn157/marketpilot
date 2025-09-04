@@ -3,7 +3,6 @@ from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import os
 
-from config.config_loader import PATHS
 
 # /home/signal/market7/fork/utils/entry_utils.py
 

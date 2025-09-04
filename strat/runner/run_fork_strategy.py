@@ -7,6 +7,8 @@ from config_loader import PATHS
 from scorer.fork_scorer import score_fork
 from utils.strategy_loader import load_strategy_config
 import argparse
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 # /market7/strat/runner/run_fork_strategy.py
 
@@ -19,8 +21,8 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "config"))
 
 # === Dynamic paths from PATHS ===
 FORK_INPUT_FILE = PATHS["fork_candidates"] #FORK_INPUT_FILE = PATHS["final_forked_trades"]
-OUTPUT_FILE = PATHS["final_fork_rrr_trades"]
-BACKTEST_CANDIDATES_FILE = PATHS["fork_backtest_candidates"]
+OUTPUT_FILE = get_path("final_fork_rrr_trades")
+BACKTEST_CANDIDATES_FILE = get_path("fork_backtest_candidates")
 
 def main(strategy_name: Any) -> Any:
     config = load_strategy_config(strategy_name)

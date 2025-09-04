@@ -6,7 +6,6 @@ from pathlib import Path
 import json
 import redis
 
-from config.config_loader import PATHS
 
 # === FastAPI ===
 app = FastAPI()

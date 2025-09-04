@@ -4,13 +4,14 @@ from fastapi import APIRouter
 import redis
 import json
 from pathlib import Path
-from config.config_loader import PATHS
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 router = APIRouter()
 r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
 # === Paths ===
-CACHE_PATH = PATHS["live_logs"] / "ml_confidence.json"
+CACHE_PATH = get_path("live_logs") / "ml_confidence.json"
 
 @router.get("/ml/confidence")
 def get_confidence_data():

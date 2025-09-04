@@ -15,7 +15,8 @@ from ta.momentum import RSIIndicator
 from ta.trend import MACD, ADXIndicator
 
 from utils.credential_manager import get_3commas_credentials, CredentialError
-from config.config_loader import PATHS
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 logger = logging.getLogger(__name__)
 
@@ -231,7 +232,7 @@ def get_latest_indicators(symbol: str, tf: str = "15m") -> Optional[Dict[str, An
         Indicator data or None
     """
     try:
-        snapshot_base = PATHS["snapshots"]
+        snapshot_base = get_path("snapshots")
         today = datetime.utcnow().strftime("%Y-%m-%d")
         indicator_path = snapshot_base / today / f"{symbol.upper()}_{tf}_indicators.json"
         
@@ -258,7 +259,7 @@ def load_fork_entry_score(symbol: str, deal_id: int) -> Optional[Dict[str, Any]]
         Fork entry score data or None
     """
     try:
-        fork_history = PATHS["fork_history"]
+        fork_history = get_path("fork_history")
         score_path = fork_history / f"{symbol}_{deal_id}_score.json"
         
         if not score_path.exists():

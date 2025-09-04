@@ -4,11 +4,12 @@ from typing import Dict, List, Optional, Any, Union, Tuple
 from dca_status import compute_indicators  # example: replace with your real function
 import yaml
 
-from config.config_loader import PATHS
 from dashboard_backend.dca.core import (
 from dca_trades_api import adjust_volume  # example: replace with your real function
 from dca_trades_api import should_dca  # example: replace with your real function
 import argparse
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 # dashboard_backend/dca/core.py
 """
@@ -31,7 +32,7 @@ def load_config(path: Path = None, fallback: bool = False):
     elif path:
         config_path = Path(path)
     else:
-        config_path = PATHS["dca_config"]
+        config_path = get_path("dca_config")
     with open(config_path) as f:
         return yaml.safe_load(f)
 

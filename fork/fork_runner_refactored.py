@@ -8,7 +8,6 @@ import redis
 import requests
 import yaml
 
-from config.config_loader import PATHS
 from core.fork_scorer_refactored import ForkScorer
 from fork.utils.entry_utils import get_entry_price, compute_score_hash
 from fork.utils.fork_entry_logger import log_fork_entry
@@ -16,6 +15,8 @@ import hashlib
 import hmac
 import subprocess
 from utils.credential_manager import get_3commas_credentials
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 
 #!/usr/bin/env python3
@@ -82,7 +83,7 @@ class ForkRunner:
         Returns:
             Credentials dictionary
         """
-        cred_path = PATHS["paper_cred"]
+        cred_path = get_path("paper_cred")
         try:
             with open(cred_path, "r") as f:
                 return json.load(f)

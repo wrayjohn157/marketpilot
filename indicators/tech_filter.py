@@ -10,6 +10,8 @@ from config.config_loader import PATHS  # ✅ Use the loader
 
 #!/usr/bin/env python3
 from pathlib import Path
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 # ✅ Inject base path so config/ can be imported when run via systemd
 CURRENT_FILE = Path(__file__).resolve()
@@ -23,7 +25,7 @@ logging.basicConfig(
 r = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
 # === Load paths dynamically ===
-OUTPUT_FILE = PATHS["final_fork_rrr_trades"]
+OUTPUT_FILE = get_path("final_fork_rrr_trades")
 FORK_FILE = PATHS["fork_candidates"]
 VOLUME_PASSED_SET = "VOLUME_PASSED_TOKENS"
 

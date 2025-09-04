@@ -5,12 +5,14 @@ import redis
 import requests
 
 import time
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 from
  pathlib import Path
 
 # Paths
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = get_path("base")
 SYMBOLS_PATH = BASE_DIR / "lev" / "data" / "perps" / "lev_symbols.json"
 
 # Redis connection

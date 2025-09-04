@@ -9,13 +9,15 @@ import pandas as pd
 import yaml
 
 from .sim_safu_utils import sim_get_safu_score, load_sim_safu_indicators
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 from
  pathlib import Path
 
 # === Paths & Config ===
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-SAFU_CONFIG_PATH = BASE_DIR / "config" / "fork_safu_config.yaml"
+BASE_DIR = get_path("base")
+SAFU_CONFIG_PATH = get_path("fork_safu_config")
 SNAPSHOT_BASE = Path("/home/signal/market7/data/snapshots")
 
 with open(SAFU_CONFIG_PATH) as f:

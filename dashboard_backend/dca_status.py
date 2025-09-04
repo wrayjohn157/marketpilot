@@ -6,11 +6,12 @@ import json
 from datetime import datetime
 
 from dca.utils.entry_utils import get_live_3c_trades
-from config.config_loader import PATHS
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 # === Paths ===
 today = datetime.utcnow().strftime("%Y-%m-%d")
-DCA_LOG_PATH = PATHS["live_logs"] / today / "dca_log.jsonl"
+DCA_LOG_PATH = get_path("live_logs") / today / "dca_log.jsonl"
 SNAPSHOT_BASE = PATHS["kline_snapshots"]
 RECOVERY_SNAPSHOT_PATH = Path("/home/signal/market7/ml/datasets/recovery_snapshots")
 

@@ -25,8 +25,9 @@ import joblib
 import shap
 
 # Configuration
-from config.config_loader import PATHS
 from utils.credential_manager import get_3commas_credentials
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 
 class ModelType(Enum):
@@ -167,7 +168,7 @@ class DataManager:
     
     def __init__(self, tenant_id: str):
         self.tenant_id = tenant_id
-        self.base_path = Path(PATHS["base"]) / "ml" / "datasets" / tenant_id
+        self.base_path = Path(get_path("base")) / "ml" / "datasets" / tenant_id
         self.base_path.mkdir(parents=True, exist_ok=True)
     
     async def pull_3commas_data(self, bot_id: str, start_date: datetime, end_date: datetime) -> pd.DataFrame:
@@ -220,7 +221,7 @@ class FeatureStore:
     
     def __init__(self, tenant_id: str):
         self.tenant_id = tenant_id
-        self.feature_path = Path(PATHS["base"]) / "ml" / "features" / tenant_id
+        self.feature_path = Path(get_path("base")) / "ml" / "features" / tenant_id
         self.feature_path.mkdir(parents=True, exist_ok=True)
     
     def compute_technical_features(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -271,7 +272,7 @@ class ModelRegistry:
     
     def __init__(self, tenant_id: str):
         self.tenant_id = tenant_id
-        self.registry_path = Path(PATHS["base"]) / "ml" / "models" / tenant_id
+        self.registry_path = Path(get_path("base")) / "ml" / "models" / tenant_id
         self.registry_path.mkdir(parents=True, exist_ok=True)
     
     def register_model(self, model: Any, config: ModelConfig, result: TrainingResult) -> str:

@@ -15,7 +15,6 @@ import yaml
 from dataclasses import dataclass
 from enum import Enum
 
-from config.config_loader import PATHS
 from utils.credential_manager import get_3commas_credentials
 
 

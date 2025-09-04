@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 from enum import Enum
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 logger = logging.getLogger(__name__)
 
@@ -258,8 +260,7 @@ class CredentialError(Exception):
 # Global credential manager instance
 def get_credential_manager() -> CredentialManager:
     """Get the global credential manager instance."""
-    from config.config_loader import PATHS
-    return CredentialManager(PATHS["base"])
+        return CredentialManager(get_path("base"))
 
 
 # Convenience functions for common credential types

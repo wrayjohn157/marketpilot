@@ -9,14 +9,15 @@ from pathlib import Path
 from datetime import datetime
 
 # === Correct import root ===
-from config.config_loader import PATHS
 from utils.credential_manager import get_3commas_credentials
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 
 router = APIRouter()
 
 # === Load API credentials ===
-with open(PATHS["paper_cred"], "r") as f:
+with open(get_path("paper_cred"), "r") as f:
     creds = json.load(f)
 
 API_KEY = creds["3commas_api_key"]
@@ -67,7 +68,7 @@ def refresh_price(deal_id: int):
         # Optional: patch in DCA log details
         latest = {}
         today = datetime.utcnow().strftime("%Y-%m-%d")
-        dca_log_path = PATHS["live_logs"].parent / "dca" / "logs" / today / "dca_log.jsonl"
+        dca_log_path = get_path("live_logs").parent / "dca" / "logs" / today / "dca_log.jsonl"
 
         if dca_log_path.exists():
             with open(dca_log_path, "r") as f:

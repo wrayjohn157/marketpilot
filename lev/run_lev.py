@@ -10,7 +10,6 @@ from dca.utils.btc_filter import get_btc_status
 import yaml
 
 from __future__ import
-from config.config_loader import PATHS
 from dca.utils.entry_utils import get_latest_indicators
 from dca.utils.recovery_confidence_utils import predict_confidence_score
 from dca.utils.recovery_odds_utils import predict_recovery_odds
@@ -20,6 +19,8 @@ import random
 import re
 import shutil
 import textwrap
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
  annotations
@@ -29,7 +30,7 @@ import textwrap
 # ------------------------
 # Paths / Logging
 # ------------------------
-BASE = PATHS["base"]
+BASE = get_path("base")
 LOG_DIR = BASE / "lev" / "logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 CFG_PATH = Path("config/leverage_config.yaml")

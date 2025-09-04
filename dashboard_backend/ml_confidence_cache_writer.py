@@ -10,7 +10,6 @@ from pathlib import Path
 # === Correct import root ===
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from config.config_loader import PATHS
 from dca.utils.entry_utils import get_live_3c_trades
 
 # === Config ===

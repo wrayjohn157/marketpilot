@@ -12,6 +12,8 @@ import requests
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 from
@@ -20,7 +22,7 @@ from
 # === Config ===
 BASE_DIR = Path("/home/signal/market7")
 SYMBOLS_FILE = BASE_DIR / "data" / "binance_symbols.json"
-SNAPSHOT_DIR = BASE_DIR / "data" / "snapshots"
+SNAPSHOT_DIR = get_path("snapshots")
 TIMEFRAMES = ["1h", "4h", "15m"]
 KLINE_LIMIT = 210
 START_DATE = datetime(2025, 6, 1)

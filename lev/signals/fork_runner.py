@@ -4,11 +4,12 @@ import os, sys, json, time, redis, logging, requests, hmac, hashlib
 
 import yaml
 
-from config.config_loader import PATHS
 from fork.utils.entry_utils import get_entry_price, compute_score_hash
 from fork.utils.fork_entry_logger import log_fork_entry
 import subprocess
 from utils.credential_manager import get_3commas_credentials
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 
 #!/usr/bin/env python3
@@ -24,12 +25,12 @@ sys.path.append(str(PROJECT_ROOT))
 FORK_SCORE_SCRIPT = PROJECT_ROOT / "indicators" / "fork_score_filter.py"
 TV_KICKER_SCRIPT = PROJECT_ROOT / "indicators" / "tv_kicker.py"
 
-FORK_RRR_PATH = PATHS["final_fork_rrr_trades"]
-FORK_TV_PATH = PATHS["fork_tv_adjusted"]
-FORK_BACKTEST_PATH = PATHS["fork_backtest_candidates"]
-TV_CONFIG_PATH = PATHS["tv_screener_config"]
-CRED_PATH = PATHS["paper_cred"]
-BTC_LOGS_DIR = PATHS["btc_logs"]
+FORK_RRR_PATH = get_path("final_fork_rrr_trades")
+FORK_TV_PATH = get_path("fork_tv_adjusted")
+FORK_BACKTEST_PATH = get_path("fork_backtest_candidates")
+TV_CONFIG_PATH = get_path("tv_screener_config")
+CRED_PATH = get_path("paper_cred")
+BTC_LOGS_DIR = get_path("btc_logs")
 
 # === Redis / 3Commas ===
 REDIS_HOST = "localhost"

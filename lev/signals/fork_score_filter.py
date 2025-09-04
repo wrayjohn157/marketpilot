@@ -10,9 +10,10 @@ import pandas as pd
 import redis
 import yaml
 
-from config.config_loader import PATHS
 import argparse
 import re
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 
@@ -65,10 +66,10 @@ sys.path.append(str(PROJECT_ROOT))
 # Default paths (can be overridden by CLI)
 DEFAULT_CONFIG_PATH = Path("lev/signals/config/fork_config.yaml")
 FORK_INPUT_FILE = PATHS["fork_candidates"]
-DEFAULT_OUTPUT_FILE = PATHS["final_fork_rrr_trades"]
-DEFAULT_BACKTEST_CANDIDATES_FILE = PATHS["fork_backtest_candidates"]
-FORK_HISTORY_BASE = PATHS["fork_history"]
-SNAPSHOT_BASE = PATHS["snapshots"]
+DEFAULT_OUTPUT_FILE = get_path("final_fork_rrr_trades")
+DEFAULT_BACKTEST_CANDIDATES_FILE = get_path("fork_backtest_candidates")
+FORK_HISTORY_BASE = get_path("fork_history")
+SNAPSHOT_BASE = get_path("snapshots")
 
 # Redis keys are namespaced by mode (lev) and side (long/short)
 REDIS_PREFIX = "LEV"

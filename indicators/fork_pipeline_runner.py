@@ -6,10 +6,11 @@ import os
 
 import redis
 
-from config.config_loader import PATHS
 
 #!/usr/bin/env python3
 from pathlib import Path
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 # === CONFIG ===
 
@@ -23,7 +24,7 @@ INDICATOR_WEIGHTS = {
 MIN_SCORE = 0.65
 
 FORK_INPUT_FILE = str(Path(PATHS["base_path"]) / "output" / "fork_candidates.json")
-FINAL_OUTPUT_FILE = PATHS["final_fork_rrr_trades"]
+FINAL_OUTPUT_FILE = get_path("final_fork_rrr_trades")
 BACKTEST_CANDIDATES_FILE = str(Path(PATHS["base_path"]) / "output" / "fork_backtest_candidates.json")
 FORK_HISTORY_BASE = Path(PATHS["fork_history_path"])
 SNAPSHOT_BASE = Path(PATHS["snapshots_path"])

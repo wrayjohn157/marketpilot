@@ -5,11 +5,12 @@ import json
 import redis
 import requests
 
-from config.config_loader import PATHS
 import hashlib
 import hmac
 import time
 from utils.credential_manager import get_3commas_credentials
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 
 # /home/signal/market7/fork/utils/fork_entry_utils.py
@@ -18,11 +19,11 @@ from
  datetime import datetime
 
 # Paths
-SNAPSHOT_BASE = PATHS["snapshots"]
-FORK_HISTORY = PATHS["fork_history"]
-BTC_LOG_PATH = PATHS["btc_logs"]
-REGISTRY_PATH = PATHS["live_logs"] / "fork_registry.json"
-CRED_PATH = PATHS["paper_cred"]
+SNAPSHOT_BASE = get_path("snapshots")
+FORK_HISTORY = get_path("fork_history")
+BTC_LOG_PATH = get_path("btc_logs")
+REGISTRY_PATH = get_path("live_logs") / "fork_registry.json"
+CRED_PATH = get_path("paper_cred")
 
 # Redis Setup
 REDIS = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
@@ -38,7 +39,7 @@ def compute_score_hash(indicators: Any) -> Any:
 
 def get_day_folder(entry_time: Any) -> Any:
     day = datetime.utcfromtimestamp(entry_time).strftime("%Y-%m-%d")
-    folder = PATHS["live_logs"] / day
+    folder = get_path("live_logs") / day
     folder.mkdir(parents=True, exist_ok=True)
     return folder
 

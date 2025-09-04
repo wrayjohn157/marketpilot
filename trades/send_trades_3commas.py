@@ -11,6 +11,8 @@ import hashlib
 import hmac
 import time
 from utils.credential_manager import get_3commas_credentials
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 
 #!/usr/bin/env python3
@@ -21,7 +23,7 @@ from
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 # === Load credentials manually ===
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = get_path("base")
 CRED_PATH = BASE_DIR / "config" / "paper_cred.json"
 
 with open(CRED_PATH) as f:

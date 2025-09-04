@@ -8,12 +8,13 @@ import hmac
 import hashlib
 import requests
 from datetime import datetime, timedelta
-from config.config_loader import PATHS
 from utils.credential_manager import get_3commas_credentials
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 
 # === Load credentials properly ===
-with open(PATHS["paper_cred"], "r") as f:
+with open(get_path("paper_cred"), "r") as f:
     creds = json.load(f)
 
 API_KEY = creds["3commas_api_key"]
@@ -179,7 +180,7 @@ if __name__ == "__main__":
     result["last_updated"] = datetime.utcnow().isoformat()
 
     # Write to backend cache
-    cache_path = PATHS["base"] / "dashboard_backend" / "cache" / "fork_metrics.json"
+    cache_path = get_path("base") / "dashboard_backend" / "cache" / "fork_metrics.json"
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     with open(cache_path, "w") as f:
         json.dump(result, f, indent=2)

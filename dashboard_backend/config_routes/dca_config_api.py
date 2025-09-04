@@ -3,8 +3,10 @@
 from fastapi import APIRouter, HTTPException
 from pathlib import Path
 import yaml
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
 
-CONFIG_PATH = Path("/home/signal/market7/config/dca_config.yaml")
+
+CONFIG_PATH = get_path("dca_config")
 
 router = APIRouter()
 

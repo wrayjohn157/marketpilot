@@ -14,12 +14,14 @@ import joblib
 
 #!/usr/bin/env python3
 from pathlib import Path
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 # === Paths ===
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-SAFU_CONFIG_PATH = BASE_DIR / "config" / "fork_safu_config.yaml"
-SNAPSHOT_BASE = BASE_DIR / "data" / "snapshots"
-MODEL_PATH = BASE_DIR / "ml" / "models" / "safu_exit_model.pkl"
+BASE_DIR = get_path("base")
+SAFU_CONFIG_PATH = get_path("fork_safu_config")
+SNAPSHOT_BASE = get_path("snapshots")
+MODEL_PATH = get_path("models") / "safu_exit_model.pkl"
 
 # === Load config ===
 with open(SAFU_CONFIG_PATH) as f:

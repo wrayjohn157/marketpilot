@@ -17,7 +17,6 @@ import yaml
     from dca.utils.safu_reentry_utils import should_reenter_after_safu
     from dca.utils.trade_health_evaluator import evaluate_trade_health
     from sim.sandbox.utils.trade_utils import build_mock_trade
-from config.config_loader import PATHS
 from dca.modules.dca_decision_engine import should_dca
 from dca.modules.fork_safu_evaluator import (
 from dca.utils.entry_utils import get_latest_indicators, get_rsi_slope, get_macd_lift
@@ -26,6 +25,8 @@ from dca.utils.spend_predictor import adjust_volume
 from dca.utils.spend_predictor import predict_spend_volume
 from dca.utils.zombie_utils import is_zombie_trade
 from sim.sandbox.utils.local_indicators import (
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -93,7 +94,7 @@ def load_config(path: Path = None, fallback: bool = False):
     elif path:
         config_path = Path(path)
     else:
-        config_path = PATHS["dca_config"]
+        config_path = get_path("dca_config")
     with open(config_path) as f:
         return yaml.safe_load(f)
 

@@ -6,7 +6,6 @@ from pathlib import Path
 import yaml
 import os
 
-from config.config_loader import PATHS
 
 CONFIG_PATH = PATHS["dca"] / "config" / "dca_config.yaml"
 

@@ -13,6 +13,8 @@ import requests
 
     import argparse
 import time
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
 """
@@ -40,9 +42,9 @@ PATHS = {
     "snapshots": Path("/home/signal/market7/data/snapshots"),
 }
 
-FILTERED_FILE = PATHS["filtered_pairs"]
-SNAPSHOTS_BASE = PATHS["snapshots"]
-FORK_METRICS_FILE = Path("/home/signal/market7/dashboard_backend/cache/fork_metrics.json")
+FILTERED_FILE = get_path("filtered_pairs")
+SNAPSHOTS_BASE = get_path("snapshots")
+FORK_METRICS_FILE = get_path("dashboard_cache") / "fork_metrics.json"
 # filtered perps (contract IDs like BTCUSDT)
 PERP_FILTERED_IDS = Path("/home/signal/market7/lev/data/perps/filtered_perps.json")
 

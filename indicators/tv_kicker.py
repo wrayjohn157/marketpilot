@@ -7,7 +7,8 @@ import sys
 
 import yaml
 
-from config.config_loader import PATHS
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 #!/usr/bin/env python3
  Path
@@ -20,13 +21,13 @@ sys.path.append(str(PROJECT_ROOT))
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 # === Paths ===
-INPUT_FILE = PATHS["fork_backtest_candidates"]
-FORK_TV_OUTPUT = PATHS["fork_tv_adjusted"]
-TV_HISTORY_BASE = PATHS["tv_history"]
+INPUT_FILE = get_path("fork_backtest_candidates")
+FORK_TV_OUTPUT = get_path("fork_tv_adjusted")
+TV_HISTORY_BASE = get_path("tv_history")
 
 today_str = datetime.utcnow().strftime("%Y-%m-%d")
 TV_FILE = TV_HISTORY_BASE / today_str / "tv_screener_raw_dict.txt"
-CONFIG_PATH = Path("/home/signal/market7/config/tv_screener_config.yaml")
+CONFIG_PATH = get_path("tv_screener_config")
 
 # === Load Config ===
 try:

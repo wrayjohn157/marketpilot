@@ -7,9 +7,10 @@ from datetime import datetime
 from pathlib import Path
 
 from unified_fork_metrics import get_fork_trade_metrics
-from config.config_loader import PATHS
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
 
-OUTPUT_PATH = PATHS["base"] / "dashboard_backend" / "cache" / "fork_metrics.json"
+
+OUTPUT_PATH = get_path("base") / "dashboard_backend" / "cache" / "fork_metrics.json"
 
 def main():
     data = get_fork_trade_metrics()

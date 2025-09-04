@@ -49,12 +49,13 @@ from dca.utils.tv_utils import load_tv_kicker
 from dca.utils.zombie_utils import is_zombie_trade
 from dca.utils.spend_predictor import predict_spend_volume, adjust_volume
 from dca.utils.trade_health_evaluator import evaluate_trade_health
-from config.config_loader import PATHS
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 CONFIG_PATH = PATHS[
     "dca_config"
-]  # CONFIG_PATH = PATHS["dca_config"] #CONFIG_PATH = PATHS["base"] / "dca" / "config" / "dca_config.yaml"
-LOG_DIR = PATHS["base"] / "dca" / "logs"
+]  # CONFIG_PATH = get_path("dca_config") #CONFIG_PATH = get_path("base") / "dca" / "config" / "dca_config.yaml"
+LOG_DIR = get_path("base") / "dca" / "logs"
 SNAPSHOT_DIR = SNAPSHOT_PATH
 DCA_TRACKING_PATH = LOG_DIR / "dca_tracking" / "dca_fired.jsonl"
 

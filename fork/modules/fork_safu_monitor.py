@@ -14,6 +14,8 @@ import yaml
 import hashlib
 import hmac
 from utils.credential_manager import get_3commas_credentials
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 
 #!/usr/bin/env python3
@@ -21,10 +23,10 @@ from
  pathlib import Path
 
 # === Dynamic Paths (Market7 style) ===
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # ~/market7
+BASE_DIR = get_path("base")  # ~/market7
 CONFIG_PATH = BASE_DIR / "config" / "paper_cred.json"
-SAFU_CONFIG_PATH = BASE_DIR / "config" / "fork_safu_config.yaml"
-SNAPSHOT_BASE = BASE_DIR / "data" / "snapshots"
+SAFU_CONFIG_PATH = get_path("fork_safu_config")
+SNAPSHOT_BASE = get_path("snapshots")
 
 # === Credentials ===
 with open(CONFIG_PATH) as f:

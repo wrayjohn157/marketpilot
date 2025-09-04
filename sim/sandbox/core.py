@@ -10,7 +10,6 @@ import yaml
     from dca.utils.recovery_odds_utils import (
     from dca.utils.safu_reentry_utils import should_reenter_after_safu
     from dca.utils.trade_health_evaluator import evaluate_trade_health
-from config.config_loader import PATHS
 from dca.utils.entry_utils import get_latest_indicators, get_rsi_slope, get_macd_lift
 from dca.utils.recovery_confidence_utils import predict_confidence_score
 from dca.utils.spend_predictor import predict_spend_volume
@@ -20,6 +19,8 @@ from modules.fork_safu_evaluator import get_safu_exit_decision, load_safu_exit_m
 from modules.fork_safu_evaluator import get_safu_score
 from utils.entry_utils import load_klines_around_time
 from utils.local_indicators import fetch_binance_klines, compute_all_indicators
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 """
 Core DCA engine functions extracted for reuse in simulation and live evaluation.
@@ -66,7 +67,7 @@ def load_config(path: Path = None, fallback: bool = False):
     elif path:
         config_path = Path(path)
     else:
-        config_path = PATHS["dca_config"]
+        config_path = get_path("dca_config")
     with open(config_path) as f:
         return yaml.safe_load(f)
 

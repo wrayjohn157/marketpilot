@@ -7,8 +7,9 @@ import sys
 import redis
 import requests
 
-from config.config_loader import PATHS
 import time
+from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+
 
 # /home/signal/market7/data/rolling_klines.py
 
@@ -35,10 +36,10 @@ KLINE_LIMIT = 210
 REFRESH_INTERVAL = 60
 
 # === Paths ===
-FILTERED_FILE = PATHS["filtered_pairs"]
+FILTERED_FILE = get_path("filtered_pairs")
 BINANCE_SYMBOLS_FILE = PATHS["binance_symbols"]
-SNAPSHOTS_BASE = PATHS["snapshots"]
-FORK_METRICS_FILE = Path("/home/signal/market7/dashboard_backend/cache/fork_metrics.json")
+SNAPSHOTS_BASE = get_path("snapshots")
+FORK_METRICS_FILE = get_path("dashboard_cache") / "fork_metrics.json"
 
 def get_snapshot_dir() -> Any:
     path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
