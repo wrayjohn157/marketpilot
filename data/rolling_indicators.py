@@ -18,8 +18,7 @@ import time
 # /home/signal/market7/data/rolling_indicators.py
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+from pathlib import Path
 
 # === Patch sys.path to reach /market7 ===
 CURRENT_FILE = Path(__file__).resolve()
