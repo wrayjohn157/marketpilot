@@ -17,6 +17,7 @@ import ScanReview from "./pages/ScanReview";
 import TradeDashboard from "./pages/TradeDashboard.jsx";
 import TvScreenerConfig from "./pages/TvScreenerConfig";
 import DcaStrategyBuilder from "./pages/DcaStrategyBuilder";
+import SimulationPage from "./pages/SimulationPage";
 
 // Help System
 import HelpModal from "./components/HelpSystem/HelpModal";
@@ -67,6 +68,7 @@ function App() {
               <Route path="/tv-config" element={<TvScreenerConfig />} />
               <Route path="/safu-config" element={<SafuConfig />} />
               <Route path="/dca-tuner" element={<DcaStrategyBuilder />} />
+              <Route path="/simulation" element={<SimulationPage />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="*" element={<Navigate to="/trade-dashboard" replace />} />
             </Routes>

@@ -9,6 +9,7 @@ const links = [
   { label: "Scan Review", icon: "🔍", path: "/scan-review" },
   { label: "DCA Tracker", icon: "📊", path: "/dca-tracker" },
   { label: "DCA Strategy Builder", icon: "📐", path: "/dca-tuner" },
+  { label: "DCA Simulation", icon: "🎯", path: "/simulation" },
   { label: "ML Monitor", icon: "🤖", path: "/ml-monitor" },
   { label: "BTC Panel", icon: "⚠️", path: "/btc-panel" },
   { label: "Fork Config", icon: "🛠️", path: "/fork-score" },

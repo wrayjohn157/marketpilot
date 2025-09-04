@@ -34,6 +34,7 @@ from ml_confidence_api import router as ml_confidence_router
 from refresh_price_api import router as price_refresh_router
 from sim_routes.dca_simulate_route import router as dca_simulate_router
 from sim_routes.sim_dca_strategies import router as sim_dca_strategy_router
+from sim_routes.simulation_integration import router as simulation_router
 
 # === Route imports ===
 from unified_fork_metrics import get_fork_trade_metrics
@@ -56,6 +57,7 @@ app.include_router(price_series_router)
 app.include_router(dca_simulate_router)
 app.include_router(sim_dca_strategy_router)
 app.include_router(sim_dca_router)
+app.include_router(simulation_router)
 # app.include_router(capital_router, prefix="/api") #app.include_router(capital_router)
 
 
