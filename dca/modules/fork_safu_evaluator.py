@@ -13,8 +13,7 @@ import yaml
 import joblib
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+from pathlib import Path
 
 # === Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
