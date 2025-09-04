@@ -1,0 +1,214 @@
+version: '3.8'
+
+services:
+  # Redis for caching and queues
+  redis:
+    image: redis:7-alpine
+    container_name: market7-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL for persistent data
+  postgres:
+    image: postgres:15-alpine
+    container_name: market7-postgres
+    environment:
+      POSTGRES_DB: market7
+      POSTGRES_USER: market7
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-market7_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./deploy/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U market7"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # InfluxDB for time-series data
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: market7-influxdb
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUX_PASSWORD:-influx_password}
+      DOCKER_INFLUXDB_INIT_ORG: market7
+      DOCKER_INFLUXDB_INIT_BUCKET: trading_data
+    ports:
+      - "8086:8086"
+    volumes:
+      - influx_data:/var/lib/influxdb2
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Main trading application
+  trading-app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: market7-trading
+    environment:
+      - ENVIRONMENT=production
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=postgres
+      - INFLUX_HOST=influxdb
+      - LOG_LEVEL=INFO
+    volumes:
+      - ../logs:/app/logs
+      - ../data:/app/data
+      - ../models:/app/models
+      - ../config:/app/config
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "health_check.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ML Pipeline service
+  ml-pipeline:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: market7-ml
+    environment:
+      - ENVIRONMENT=production
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=postgres
+      - INFLUX_HOST=influxdb
+      - SERVICE_TYPE=ml
+    command: python3 ml/ml_pipeline_runner_integrated.py
+    volumes:
+      - ../logs:/app/logs
+      - ../data:/app/data
+      - ../models:/app/models
+      - ../config:/app/config
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Indicator service
+  indicator-service:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: market7-indicators
+    environment:
+      - ENVIRONMENT=production
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=postgres
+      - SERVICE_TYPE=indicators
+    command: python3 indicators/indicator_runner_integrated.py
+    volumes:
+      - ../logs:/app/logs
+      - ../data:/app/data
+      - ../config:/app/config
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # DCA service
+  dca-service:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: market7-dca
+    environment:
+      - ENVIRONMENT=production
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=postgres
+      - SERVICE_TYPE=dca
+    command: python3 dca/smart_dca_signal_integrated.py
+    volumes:
+      - ../logs:/app/logs
+      - ../data:/app/data
+      - ../config:/app/config
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: market7-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf
+      - ./deploy/ssl:/etc/nginx/ssl
+    depends_on:
+      - trading-app
+    restart: unless-stopped
+
+  # Prometheus for monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: market7-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./deploy/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    restart: unless-stopped
+
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: market7-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./deploy/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./deploy/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  postgres_data:
+  influx_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  default:
+    name: market7-network

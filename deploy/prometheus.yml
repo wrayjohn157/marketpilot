@@ -1,0 +1,71 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Market7 Trading App
+  - job_name: 'market7-trading'
+    static_configs:
+      - targets: ['trading-app:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Market7 ML Pipeline
+  - job_name: 'market7-ml'
+    static_configs:
+      - targets: ['ml-pipeline:8001']
+    metrics_path: '/metrics'
+    scrape_interval: 60s
+
+  # Market7 Indicator Service
+  - job_name: 'market7-indicators'
+    static_configs:
+      - targets: ['indicator-service:8002']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Market7 DCA Service
+  - job_name: 'market7-dca'
+    static_configs:
+      - targets: ['dca-service:8003']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Redis
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+
+  # PostgreSQL
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    scrape_interval: 30s
+
+  # InfluxDB
+  - job_name: 'influxdb'
+    static_configs:
+      - targets: ['influxdb:8086']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Node Exporter (if available)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s

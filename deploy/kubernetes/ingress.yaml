@@ -1,0 +1,63 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: market7-ingress
+  namespace: market7
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - market7.yourdomain.com
+    secretName: market7-tls
+  rules:
+  - host: market7.yourdomain.com
+    http:
+      paths:
+      - path: /api/trading
+        pathType: Prefix
+        backend:
+          service:
+            name: market7-trading
+            port:
+              number: 8000
+      - path: /api/ml
+        pathType: Prefix
+        backend:
+          service:
+            name: market7-ml
+            port:
+              number: 8001
+      - path: /api/indicators
+        pathType: Prefix
+        backend:
+          service:
+            name: market7-indicators
+            port:
+              number: 8002
+      - path: /api/dca
+        pathType: Prefix
+        backend:
+          service:
+            name: market7-dca
+            port:
+              number: 8003
+      - path: /health
+        pathType: Prefix
+        backend:
+          service:
+            name: market7-trading
+            port:
+              number: 8000
+      - path: /metrics
+        pathType: Prefix
+        backend:
+          service:
+            name: market7-trading
+            port:
+              number: 8000

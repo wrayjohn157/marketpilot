@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: market7-config
+  namespace: market7
+data:
+  # Environment configuration
+  ENVIRONMENT: "production"
+  DEBUG: "false"
+  LOG_LEVEL: "INFO"
+  
+  # Service endpoints
+  REDIS_HOST: "market7-redis"
+  POSTGRES_HOST: "market7-postgres"
+  INFLUX_HOST: "market7-influxdb"
+  
+  # API configuration
+  API_RATE_LIMIT: "100"
+  API_TIMEOUT: "60"
+  
+  # Trading configuration
+  MAX_POSITIONS: "10"
+  MAX_DAILY_LOSS: "1000"
+  MAX_DAILY_TRADES: "50"
+  
+  # ML configuration
+  ML_MODEL_UPDATE_INTERVAL: "3600"
+  ML_PREDICTION_CACHE_TTL: "300"
+  
+  # Monitoring configuration
+  PROMETHEUS_PORT: "9090"
+  GRAFANA_PORT: "3000"
