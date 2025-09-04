@@ -49,155 +49,107 @@ const DcaStrategyBuilder = () => {
   const [entryTime, setEntryTime] = useState(null);
   const [dcaResults, setDcaResults] = useState([]);
   const [formData, setFormData] = useState(null);
-  // fallback params for initial render
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  // Default config matching actual backend structure
   const [params, setParams] = useState({
-    entryScore: 0.75,
-    currentScore: 0.62,
-    safuScore: 0.85,
-    drawdownPct: -11,
-    tp1ShiftPct: 5.2,
-    confidence: 0.7,
-    odds: 0.65,
-    rsi: 42,
-    macdHistogram: 0.003,
-    macdLift: 0.01,
-    rsiSlope: 1.5,
-    adx: 24.5,
-    // Zombie Detection config
+    max_trade_usdt: 2000,
+    base_order_usdt: 200,
+    drawdown_trigger_pct: 1.2,
+    safu_score_threshold: 0.5,
+    score_decay_min: 0.2,
+    buffer_zone_pct: 0,
+    require_indicator_health: true,
+    indicator_thresholds: {
+      rsi: 42,
+      macd_histogram: 0.0001,
+      adx: 12,
+    },
+    use_btc_filter: false,
+    btc_indicators: {
+      rsi_max: 35,
+      macd_histogram_max: 0,
+      adx_max: 15,
+    },
+    use_trajectory_check: true,
+    trajectory_thresholds: {
+      macd_lift_min: 0.0001,
+      rsi_slope_min: 1.0,
+    },
+    require_tp1_feasibility: true,
+    max_tp1_shift_pct: 25,
+    require_recovery_odds: true,
+    min_recovery_probability: 0.5,
+    min_confidence_odds: 0.65,
+    use_confidence_override: true,
+    confidence_dca_guard: {
+      safu_score_min: 0.5,
+      macd_lift_min: 0.00005,
+      rsi_slope_min: 1.0,
+      confidence_score_min: 0.75,
+      min_confidence_delta: 0.1,
+      min_tp1_shift_gain_pct: 1.5,
+    },
+    soft_confidence_override: {
+      enabled: false,
+    },
+    min_be_improvement_pct: 2.0,
+    step_repeat_guard: {
+      enabled: true,
+      min_conf_delta: 0.1,
+      min_tp1_delta: 1.5,
+    },
+    so_volume_table: [20, 15, 25, 40, 65, 90, 150, 250],
+    tp1_targets: [0.4, 1.1, 1.7, 2.4, 3.0, 3.9, 5.2, 7.1, 10.0],
     zombie_tag: {
       enabled: true,
       min_drawdown_pct: 0.5,
       max_drawdown_pct: 5,
       max_score: 0.3,
       require_zero_recovery_odds: true,
-      max_macd_lift: 0,
-      max_rsi_slope: 0,
+      max_macd_lift: 0.0,
+      max_rsi_slope: 0.0,
     },
-    scoreDecayMin: 0.2,
-    safuThreshold: 0.5,
-    maxTp1ShiftPct: 40,
-    allowReentry: 1,
-    minConfidenceDelta: 0.02,
-    minTp1Delta: 3,
-    useSafuReentry: 1,
-    btcSafeRequired: 1,
-    confidenceOverride: 1,
-    maxTradeUsdt: 2000,
-    baseOrderUsdt: 200,
-    requireTp1Feasibility: 1,
-    requireIndicatorHealth: 1,
-    // --- Extended config below ---
-    // Global DCA config
-    drawdown_trigger_pct: 0.9,
-    buffer_zone_pct: 0,
-    require_recovery_odds: false,
-    min_recovery_probability: 0.85,
-    min_confidence_odds: 0.85,
-    min_be_improvement_pct: 0.8,
-
-    // Trajectory Check
-    use_trajectory_check: true,
-    trajectory_thresholds: {
-      macd_lift_min: 0.0001,
-      rsi_slope_min: 1.5,
-    },
-
-    // Abandon thresholds
-    abandon_thresholds: {
-      min_score: 0.2,
-      min_safu_score: 0.4,
-      min_recovery_odds: 0.4,
-    },
-
-    // Confidence DCA guard
-    use_confidence_override: false,
-    confidence_dca_guard: {
-      safu_score_min: 0.5,
-      macd_lift_min: 5e-05,
-      rsi_slope_min: 1,
-      confidence_score_min: 0.7,
-      min_confidence_delta: 0.05,
-      min_tp1_shift_gain_pct: 1.1,
-    },
-
-    // Soft confidence override
-    use_soft_confidence_override: false,
-    soft_confidence_override: {
-      min_confidence: 0.75,
-      min_recovery_odds: 0.8,
-      min_safu_score: 0.7,
-      min_health_score: 0.6,
-      min_drawdown_pct: 2,
-      min_confidence_delta: 0.05,
-      min_tp1_shift_pct: 2,
-    },
-
-    // Safety order table and TP1 targets
-    so_volume_table: [20, 10, 19, 36.1, 68.59, 130.32, 247.61, 470.46, 893.87],
-    tp1_targets: [0.4, 1.1, 1.7, 2.4, 3, 3.9, 5.2, 7.1, 10],
-
-    // ML spend model
     use_ml_spend_model: true,
     spend_adjustment_rules: {
       min_volume: 20,
-      max_multiplier: 3,
+      max_multiplier: 3.0,
       tp1_shift_soft_cap: 2.5,
-      low_dd_pct_limit: 1,
+      low_dd_pct_limit: 1.0,
     },
-
-    // Health scoring
-    health_scoring: {
-      enabled: true,
-      weights: {
-        recovery_odds: 0.4,
-        confidence_score: 0.3,
-        safu_score: 0.1,
-        entry_score_decay: 0.1,
-        indicator_health: 0.1,
-      },
-      decay_threshold: 0.3,
-      indicator_thresholds: {
-        rsi_min: 45,
-        macd_histogram_min: 0,
-        adx_min: 20,
-      },
-      health_thresholds: {
-        healthy: 0.7,
-        weak: 0.4,
-      },
-    },
-
-    // Step guards
-    step_repeat_guard: {
-      enabled: true,
-      min_conf_delta: 0.05,
-      min_tp1_delta: 1.2,
-    },
-    step_progress_guard: {
-      enabled: true,
-      min_price_change_pct: 0.5,
-      min_seconds_elapsed: 900,
-      min_be_improvement_pct: 1,
-    },
-
-    // SAFU exit model
-    use_safu_exit_model: true,
-    ml_exit_threshold: 0.6,
-    enforce_if: "both",
-
-    // Logging
     log_verbose: true,
+    enforce_price_below_last_step: true,
+    trailing_step_guard: {
+      enabled: true,
+      min_pct_gap_from_last_dca: 2.0,
+    },
+    adaptive_step_spacing: {
+      enabled: false,
+    },
+    require_macd_cross: false,
+    macd_cross_lookback: 1,
+    bottom_reversal_filter: {
+      enabled: true,
+      macd_lift_min: 0.0003,
+      rsi_slope_min: 0.6,
+      local_price_reversal_window: 3,
+    },
   });
 
-  // --- Load DCA config from API with fallback logic ---
-  const [config, setConfig] = useState(null);
-  const [error, setError] = useState(null);
-
-  // On mount, fetch the active config and set as formData
+  // Load DCA config from API
   useEffect(() => {
-    fetch(`${window.location.origin}/sim/config/dca`)
+    fetch("/config/dca")
       .then(res => res.json())
-      .then(data => setFormData(data));
+      .then(data => {
+        setFormData(data);
+        setError(null);
+      })
+      .catch(err => {
+        setError("Failed to load config");
+        console.error("Config load error:", err);
+      });
   }, []);
 
   useEffect(() => {
@@ -220,9 +172,7 @@ const DcaStrategyBuilder = () => {
   }, [symbol, interval]);
 
   // Merge fallback params with loaded config for any missing keys
-  const configData = formData
-    ? { ...params, ...formData }
-    : params;
+  const configData = formData ? { ...params, ...formData } : params;
 
   const updateParam = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }));
@@ -246,573 +196,292 @@ const DcaStrategyBuilder = () => {
     });
   };
 
-  // --- Save and Restore handlers for Save/Restore buttons below ---
-  const handleSave = () => {
-    console.log("Save Config clicked");
-    // Add save logic
-    fetch(`${window.location.origin}/sim/config/dca`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData)
-    });
+  // Save configuration
+  const handleSave = async () => {
+    setSaving(true);
+    setError(null);
+    setSuccess(null);
+    
+    try {
+      const response = await fetch("/config/dca", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+      
+      if (response.ok) {
+        setSuccess("Configuration saved successfully!");
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        throw new Error("Failed to save configuration");
+      }
+    } catch (err) {
+      setError("Failed to save configuration: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  // (flattenConfig removed; no longer needed)
+  // Reset to default configuration
+  const handleReset = async () => {
+    if (!window.confirm("Are you sure you want to reset to default configuration? This will overwrite all current settings.")) {
+      return;
+    }
+    
+    setSaving(true);
+    setError(null);
+    setSuccess(null);
+    
+    try {
+      // Reset to default values
+      setFormData({ ...params });
+      setSuccess("Configuration reset to defaults!");
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError("Failed to reset configuration: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  const handleRestore = () => {
-    console.log("Restore Default Config clicked");
-    // Add restore logic
-    fetch(`${window.location.origin}/sim/config/dca/default`)
-      .then(res => res.json())
-      .then(data => {
-        setFormData(data);
-        fetch(`${window.location.origin}/sim/config/dca`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-      });
+  // Load default configuration from server
+  const handleLoadDefaults = async () => {
+    setSaving(true);
+    setError(null);
+    setSuccess(null);
+    
+    try {
+      const response = await fetch("/config/dca/default");
+      if (response.ok) {
+        const defaultConfig = await response.json();
+        setFormData(defaultConfig);
+        setSuccess("Default configuration loaded!");
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        throw new Error("Failed to load default configuration");
+      }
+    } catch (err) {
+      setError("Failed to load default configuration: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <Card className="p-6 bg-gray-900 text-white">
       <CardHeader>
         <CardTitle className="text-2xl">📌 DCA Strategy Builder</CardTitle>
+        {error && (
+          <div className="bg-red-600 text-white p-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="bg-green-600 text-white p-3 rounded mb-4">
+            {success}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Core DCA Config */}
-        <Section title="🛠️ DCA Config">
+        <Section title="🛠️ Core DCA Settings">
           <FieldGrid>
-            <NumericField label="Entry Score" value={configData.entryScore} onChange={(v) => updateParam("entryScore", v)} />
-            <NumericField label="Current Score" value={configData.currentScore} onChange={(v) => updateParam("currentScore", v)} />
-            <NumericField label="SAFU Score" value={configData.safuScore} onChange={(v) => updateParam("safuScore", v)} />
-            <NumericField label="Drawdown %" value={configData.drawdownPct} onChange={(v) => updateParam("drawdownPct", v)} />
-            <NumericField label="TP1 Shift %" value={configData.tp1ShiftPct} onChange={(v) => updateParam("tp1ShiftPct", v)} />
-            <NumericField label="Confidence" value={configData.confidence} onChange={(v) => updateParam("confidence", v)} />
-            <NumericField
-              label="Max Trade USDT"
-              value={configData.maxTradeUsdt}
-              onChange={(v) => updateParam("maxTradeUsdt", v)}
+            <NumericField 
+              label="Max Trade USDT" 
+              value={configData.max_trade_usdt} 
+              onChange={(v) => updateParam("max_trade_usdt", v)} 
             />
-            <NumericField
-              label="Base Order USDT"
-              value={configData.baseOrderUsdt}
-              onChange={(v) => updateParam("baseOrderUsdt", v)}
+            <NumericField 
+              label="Base Order USDT" 
+              value={configData.base_order_usdt} 
+              onChange={(v) => updateParam("base_order_usdt", v)} 
             />
-            <NumericField
-              label="Drawdown Trigger %"
-              value={configData.drawdown_trigger_pct}
-              onChange={(v) => updateParam("drawdown_trigger_pct", v)}
+            <NumericField 
+              label="Drawdown Trigger %" 
+              value={configData.drawdown_trigger_pct} 
+              onChange={(v) => updateParam("drawdown_trigger_pct", v)} 
             />
-            <NumericField
-              label="Buffer Zone %"
-              value={configData.buffer_zone_pct}
-              onChange={(v) => updateParam("buffer_zone_pct", v)}
+            <NumericField 
+              label="SAFU Score Threshold" 
+              value={configData.safu_score_threshold} 
+              onChange={(v) => updateParam("safu_score_threshold", v)} 
             />
-            <NumericField
-              label="SAFU Score Threshold"
-              value={configData.safu_score_threshold}
-              onChange={(v) => updateParam("safu_score_threshold", v)}
+            <NumericField 
+              label="Score Decay Min" 
+              value={configData.score_decay_min} 
+              onChange={(v) => updateParam("score_decay_min", v)} 
             />
-            <NumericField
-              label="Score Decay Min"
-              value={configData.score_decay_min}
-              onChange={(v) => updateParam("score_decay_min", v)}
+            <NumericField 
+              label="Buffer Zone %" 
+              value={configData.buffer_zone_pct} 
+              onChange={(v) => updateParam("buffer_zone_pct", v)} 
             />
-            <SwitchField
-              label="Require Indicator Health"
-              checked={configData.require_indicator_health}
-              onChange={(v) => updateParam("require_indicator_health", v)}
+            <SwitchField 
+              label="Require Indicator Health" 
+              checked={configData.require_indicator_health} 
+              onChange={(v) => updateParam("require_indicator_health", v)} 
             />
           </FieldGrid>
         </Section>
 
-        {/* Symbol/Interval and Series grid */}
-        <div className="flex flex-wrap gap-4">
-          <div className="flex flex-col">
-            <label>Symbol</label>
-            <input value={symbol} onChange={(e) => setSymbol(e.target.value)} className="bg-gray-800 p-2 rounded" />
-          </div>
-          <div className="flex flex-col">
-            <label>Interval</label>
-            <input value={interval} onChange={(e) => setInterval(e.target.value)} className="bg-gray-800 p-2 rounded" />
-          </div>
-          <div className="flex flex-col">
-            <label>Price Series</label>
-            <span className="text-sm text-gray-400">
-              {series.length ? `${series.length} candles loaded` : "No candle data loaded."}
-            </span>
-          </div>
-        </div>
+        {/* Indicator Thresholds */}
         <Collapsible>
-          <CollapsibleTrigger className="text-blue-400 cursor-pointer text-sm hover:underline mb-4">
-            ▶ Advanced DCA Settings
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-gray-800 rounded">
+            <span className="font-semibold">🔪 Indicator Thresholds</span>
+            <span className="text-gray-400">Click to expand</span>
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-6">
-
-        {/* SAFU Exit Model */}
-        <Section title="🚪 SAFU Exit Model">
-          <FieldGrid>
-            <SwitchField
-              label="Use SAFU Exit Model"
-              checked={configData.use_safu_exit_model}
-              onChange={(v) => updateParam("use_safu_exit_model", v)}
-            />
-            <NumericField
-              label="ML Exit Threshold"
-              value={configData.ml_exit_threshold}
-              onChange={(val) => updateParam("ml_exit_threshold", val)}
-            />
-            <FormField label="Enforce If">
-              <select
-                className="bg-gray-800 p-2 rounded"
-                value={configData.enforce_if}
-                onChange={(e) => updateParam("enforce_if", e.target.value)}
-              >
-                <option value="ml_only">ML Only</option>
-                <option value="score_only">Score Only</option>
-                <option value="both">Both</option>
-              </select>
-            </FormField>
-          </FieldGrid>
-        </Section>
-
-        {/* Logging */}
-        <Section title="🔊 Logging">
-          <FieldGrid>
-            <SwitchField
-              label="Verbose Logging"
-              checked={configData.log_verbose}
-              onChange={(v) => updateParam("log_verbose", v)}
-            />
-          </FieldGrid>
-        </Section>
-
-        {/* Health Scoring */}
-        <Section title="🧬 Health Scoring">
-          <FieldGrid>
-            <SwitchField
-              label="Enable Health Scoring"
-              checked={configData.health_scoring.enabled}
-              onChange={(v) =>
-                updateNestedParam("health_scoring", "enabled", v)
-              }
-            />
-            <NumericField
-              label="Recovery Odds Weight"
-              value={configData.health_scoring.weights.recovery_odds}
-              onChange={(val) =>
-                updateNestedParam("health_scoring", "weights", {
-                  ...configData.health_scoring.weights,
-                  recovery_odds: val,
-                })
-              }
-            />
-            <NumericField
-              label="Confidence Score Weight"
-              value={configData.health_scoring.weights.confidence_score}
-              onChange={(val) =>
-                updateNestedParam("health_scoring", "weights", {
-                  ...configData.health_scoring.weights,
-                  confidence_score: val,
-                })
-              }
-            />
-            <NumericField
-              label="SAFU Score Weight"
-              value={configData.health_scoring.weights.safu_score}
-              onChange={(val) =>
-                updateNestedParam("health_scoring", "weights", {
-                  ...configData.health_scoring.weights,
-                  safu_score: val,
-                })
-              }
-            />
-            <NumericField
-              label="Entry Score Decay Weight"
-              value={configData.health_scoring.weights.entry_score_decay}
-              onChange={(val) =>
-                updateNestedParam("health_scoring", "weights", {
-                  ...configData.health_scoring.weights,
-                  entry_score_decay: val,
-                })
-              }
-            />
-            <NumericField
-              label="Indicator Health Weight"
-              value={configData.health_scoring.weights.indicator_health}
-              onChange={(val) =>
-                updateNestedParam("health_scoring", "weights", {
-                  ...configData.health_scoring.weights,
-                  indicator_health: val,
-                })
-              }
-            />
-            <NumericField
-              label="Decay Threshold"
-              value={configData.health_scoring.decay_threshold}
-              onChange={(val) =>
-                updateNestedParam("health_scoring", "decay_threshold", val)
-              }
-            />
-            <NumericField
-              label="RSI Min"
-              value={configData.health_scoring.indicator_thresholds.rsi_min}
-              onChange={(val) =>
-                updateNestedParam("health_scoring", "indicator_thresholds", {
-                  ...configData.health_scoring.indicator_thresholds,
-                  rsi_min: val,
-                })
-              }
-            />
-            <NumericField
-              label="MACD Histogram Min"
-              value={configData.health_scoring.indicator_thresholds.macd_histogram_min}
-              onChange={(val) =>
-                updateNestedParam("health_scoring", "indicator_thresholds", {
-                  ...configData.health_scoring.indicator_thresholds,
-                  macd_histogram_min: val,
-                })
-              }
-            />
-            <NumericField
-              label="ADX Min"
-              value={configData.health_scoring.indicator_thresholds.adx_min}
-              onChange={(val) =>
-                updateNestedParam("health_scoring", "indicator_thresholds", {
-                  ...configData.health_scoring.indicator_thresholds,
-                  adx_min: val,
-                })
-              }
-            />
-            <NumericField
-              label="Healthy Threshold"
-              value={configData.health_scoring.health_thresholds.healthy}
-              onChange={(val) =>
-                updateNestedParam("health_scoring", "health_thresholds", {
-                  ...configData.health_scoring.health_thresholds,
-                  healthy: val,
-                })
-              }
-            />
-            <NumericField
-              label="Weak Threshold"
-              value={configData.health_scoring.health_thresholds.weak}
-              onChange={(val) =>
-                updateNestedParam("health_scoring", "health_thresholds", {
-                  ...configData.health_scoring.health_thresholds,
-                  weak: val,
-                })
-              }
-            />
-          </FieldGrid>
-        </Section>
-
-        {/* Soft Confidence Override */}
-        <Section title="🧪 Soft Confidence Override">
-          <FieldGrid>
-            <SwitchField
-              label="Use Soft Confidence Override"
-              checked={configData.use_soft_confidence_override}
-              onChange={(v) => updateParam("use_soft_confidence_override", v)}
-            />
-            <NumericField
-              label="Min Confidence"
-              value={configData.soft_confidence_override.min_confidence}
-              onChange={(val) =>
-                updateNestedParam("soft_confidence_override", "min_confidence", val)
-              }
-            />
-            <NumericField
-              label="Min Recovery Odds"
-              value={configData.soft_confidence_override.min_recovery_odds}
-              onChange={(val) =>
-                updateNestedParam("soft_confidence_override", "min_recovery_odds", val)
-              }
-            />
-            <NumericField
-              label="Min SAFU Score"
-              value={configData.soft_confidence_override.min_safu_score}
-              onChange={(val) =>
-                updateNestedParam("soft_confidence_override", "min_safu_score", val)
-              }
-            />
-            <NumericField
-              label="Min Health Score"
-              value={configData.soft_confidence_override.min_health_score}
-              onChange={(val) =>
-                updateNestedParam("soft_confidence_override", "min_health_score", val)
-              }
-            />
-            <NumericField
-              label="Min Drawdown %"
-              value={configData.soft_confidence_override.min_drawdown_pct}
-              onChange={(val) =>
-                updateNestedParam("soft_confidence_override", "min_drawdown_pct", val)
-              }
-            />
-            <NumericField
-              label="Min Confidence Delta"
-              value={configData.soft_confidence_override.min_confidence_delta}
-              onChange={(val) =>
-                updateNestedParam("soft_confidence_override", "min_confidence_delta", val)
-              }
-            />
-            <NumericField
-              label="Min TP1 Shift %"
-              value={configData.soft_confidence_override.min_tp1_shift_pct}
-              onChange={(val) =>
-                updateNestedParam("soft_confidence_override", "min_tp1_shift_pct", val)
-              }
-            />
-          </FieldGrid>
-        </Section>
-
-        {/* Zombie Detection */}
-        <Section title="💀 Zombie Detection">
-          <FieldGrid>
-            <SwitchField
-              label="Enable Zombie Detection"
-              checked={configData.zombie_tag.enabled}
-              onChange={(v) => updateNestedParam("zombie_tag", "enabled", v)}
-            />
-            <NumericField
-              label="Min Drawdown %"
-              value={configData.zombie_tag.min_drawdown_pct}
-              onChange={(val) =>
-                updateNestedParam("zombie_tag", "min_drawdown_pct", val)
-              }
-            />
-            <NumericField
-              label="Max Drawdown %"
-              value={configData.zombie_tag.max_drawdown_pct}
-              onChange={(val) =>
-                updateNestedParam("zombie_tag", "max_drawdown_pct", val)
-              }
-            />
-            <NumericField
-              label="Max Score"
-              value={configData.zombie_tag.max_score}
-              onChange={(val) =>
-                updateNestedParam("zombie_tag", "max_score", val)
-              }
-            />
-            <SwitchField
-              label="Require Zero Recovery Odds"
-              checked={configData.zombie_tag.require_zero_recovery_odds}
-              onChange={(v) =>
-                updateNestedParam("zombie_tag", "require_zero_recovery_odds", v)
-              }
-            />
-            <NumericField
-              label="Max MACD Lift"
-              value={configData.zombie_tag.max_macd_lift}
-              onChange={(val) =>
-                updateNestedParam("zombie_tag", "max_macd_lift", val)
-              }
-            />
-            <NumericField
-              label="Max RSI Slope"
-              value={configData.zombie_tag.max_rsi_slope}
-              onChange={(val) =>
-                updateNestedParam("zombie_tag", "max_rsi_slope", val)
-              }
-            />
-          </FieldGrid>
-        </Section>
-
-        {/* SO Volume Table & TP1 Targets */}
-        <Section title="📈 SO Volume & TP1 Targets">
-          <FieldGrid>
-            {configData.so_volume_table.map((vol, idx) => (
-              <NumericField
-                key={`so_${idx}`}
-                label={`SO Volume ${idx + 1}`}
-                value={vol}
-                onChange={(val) => updateArrayParam("so_volume_table", idx, val)}
+          <CollapsibleContent className="p-4 bg-gray-800 rounded mt-2">
+            <FieldGrid>
+              <NumericField 
+                label="RSI" 
+                value={configData.indicator_thresholds?.rsi} 
+                onChange={(v) => updateNestedParam("indicator_thresholds", "rsi", v)} 
               />
-            ))}
-            {configData.tp1_targets.map((tgt, idx) => (
-              <NumericField
-                key={`tp1_${idx}`}
-                label={`TP1 Target ${idx + 1}`}
-                value={tgt}
-                onChange={(val) => updateArrayParam("tp1_targets", idx, val)}
+              <NumericField 
+                label="MACD Histogram" 
+                value={configData.indicator_thresholds?.macd_histogram} 
+                onChange={(v) => updateNestedParam("indicator_thresholds", "macd_histogram", v)} 
               />
-            ))}
-          </FieldGrid>
-        </Section>
-
-
-
-
-        {/* ML Spend Model */}
-        <Section title="🤖 ML Spend Model">
-          <FieldGrid>
-            <SwitchField
-              label="Use ML Spend Model"
-              checked={configData.use_ml_spend_model}
-              onChange={(v) => updateParam("use_ml_spend_model", v)}
-            />
-            <NumericField
-              label="Min Volume"
-              value={configData.spend_adjustment_rules.min_volume}
-              onChange={(val) =>
-                updateNestedParam("spend_adjustment_rules", "min_volume", val)
-              }
-            />
-            <NumericField
-              label="Max Multiplier"
-              value={configData.spend_adjustment_rules.max_multiplier}
-              onChange={(val) =>
-                updateNestedParam("spend_adjustment_rules", "max_multiplier", val)
-              }
-            />
-            <NumericField
-              label="TP1 Shift Soft Cap"
-              value={configData.spend_adjustment_rules.tp1_shift_soft_cap}
-              onChange={(val) =>
-                updateNestedParam("spend_adjustment_rules", "tp1_shift_soft_cap", val)
-              }
-            />
-            <NumericField
-              label="Low DD % Limit"
-              value={configData.spend_adjustment_rules.low_dd_pct_limit}
-              onChange={(val) =>
-                updateNestedParam("spend_adjustment_rules", "low_dd_pct_limit", val)
-              }
-            />
-          </FieldGrid>
-        </Section>
-
-        {/* Step Guards */}
-        <Section title="🚧 Step Guards">
-          <FieldGrid>
-            <SwitchField
-              label="Enable Step Repeat Guard"
-              checked={configData.step_repeat_guard.enabled}
-              onChange={(v) =>
-                updateNestedParam("step_repeat_guard", "enabled", v)
-              }
-            />
-            <NumericField
-              label="Min Confidence Delta"
-              value={configData.step_repeat_guard.min_conf_delta}
-              onChange={(val) =>
-                updateNestedParam("step_repeat_guard", "min_conf_delta", val)
-              }
-            />
-            <NumericField
-              label="Min TP1 Delta"
-              value={configData.step_repeat_guard.min_tp1_delta}
-              onChange={(val) =>
-                updateNestedParam("step_repeat_guard", "min_tp1_delta", val)
-              }
-            />
-
-            <SwitchField
-              label="Enable Step Progress Guard"
-              checked={configData.step_progress_guard.enabled}
-              onChange={(v) =>
-                updateNestedParam("step_progress_guard", "enabled", v)
-              }
-            />
-            <NumericField
-              label="Min Price Change %"
-              value={configData.step_progress_guard.min_price_change_pct}
-              onChange={(val) =>
-                updateNestedParam("step_progress_guard", "min_price_change_pct", val)
-              }
-            />
-            <NumericField
-              label="Min Seconds Elapsed"
-              value={configData.step_progress_guard.min_seconds_elapsed}
-              onChange={(val) =>
-                updateNestedParam("step_progress_guard", "min_seconds_elapsed", val)
-              }
-            />
-            <NumericField
-              label="Min BE Improvement %"
-              value={configData.step_progress_guard.min_be_improvement_pct}
-              onChange={(val) =>
-                updateNestedParam("step_progress_guard", "min_be_improvement_pct", val)
-              }
-            />
-          </FieldGrid>
-        </Section>
-
-
-        {entryTime !== null && (
-          <div className="mb-4 p-2 bg-gray-700 rounded">
-            <span className="text-sm text-green-400">✅ Selected Entry Timestamp:</span>{" "}
-            <span className="text-sm text-white">{new Date(entryTime).toISOString().replace("T", " ").slice(0, 19)} UTC</span>
-          </div>
-        )}
-
+              <NumericField 
+                label="ADX" 
+                value={configData.indicator_thresholds?.adx} 
+                onChange={(v) => updateNestedParam("indicator_thresholds", "adx", v)} 
+              />
+            </FieldGrid>
           </CollapsibleContent>
         </Collapsible>
 
-        <div className="mt-6 w-full" style={{ height: '400px' }}>
-          <CandleChart
-            data={series}
-            width={800}
-            height={400}
-            selectedIndex={entryTime !== null ? series.findIndex(c => c.timestamp === entryTime) : -1}
-            onCandleClick={(timestamp) => {
-              console.log("Candle clicked →", timestamp);
-              setEntryTime(timestamp);
-            }}
-            dcaMarkers={dcaResults.filter(d => d.decision === "FIRE")}
-          />
-        </div>
+        {/* BTC Filter */}
+        <Collapsible>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-gray-800 rounded">
+            <span className="font-semibold">₿ BTC Filter</span>
+            <span className="text-gray-400">Click to expand</span>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="p-4 bg-gray-800 rounded mt-2">
+            <FieldGrid>
+              <SwitchField 
+                label="Use BTC Filter" 
+                checked={configData.use_btc_filter} 
+                onChange={(v) => updateParam("use_btc_filter", v)} 
+              />
+              <NumericField 
+                label="BTC RSI Max" 
+                value={configData.btc_indicators?.rsi_max} 
+                onChange={(v) => updateNestedParam("btc_indicators", "rsi_max", v)} 
+              />
+              <NumericField 
+                label="BTC MACD Max" 
+                value={configData.btc_indicators?.macd_histogram_max} 
+                onChange={(v) => updateNestedParam("btc_indicators", "macd_histogram_max", v)} 
+              />
+              <NumericField 
+                label="BTC ADX Max" 
+                value={configData.btc_indicators?.adx_max} 
+                onChange={(v) => updateNestedParam("btc_indicators", "adx_max", v)} 
+              />
+            </FieldGrid>
+          </CollapsibleContent>
+        </Collapsible>
 
-        <div className="mt-4">
-          <button
-            onClick={async () => {
-              if (entryTime === null) {
-                alert("Select an entry candle.");
-                return;
-              }
-              try {
-                const res = await fetch("/dca/simulate", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    symbol,
-                    entry_time: entryTime,  // 🔥 Already in milliseconds
-                    tf: interval,
-                    ...params
-                  })
-                });
+        {/* Safety Order Table */}
+        <Collapsible>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-gray-800 rounded">
+            <span className="font-semibold">📊 Safety Order Table</span>
+            <span className="text-gray-400">Click to expand</span>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="p-4 bg-gray-800 rounded mt-2">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">SO Volume Table</label>
+              {configData.so_volume_table?.map((volume, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <span className="w-8 text-sm">Step {index + 1}:</span>
+                  <Input
+                    type="number"
+                    value={volume}
+                    className="w-24 bg-gray-700 border-gray-600 text-white"
+                    onChange={(e) => updateArrayParam("so_volume_table", index, parseFloat(e.target.value))}
+                  />
+                </div>
+              ))}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
-                const data = await res.json();
-                let resultArray = [];
-                if (Array.isArray(data)) {
-                  resultArray = data;
-                } else if (Array.isArray(data?.result)) {
-                  resultArray = data.result;
-                } else if (Array.isArray(data?.result?.simulation)) {
-                  resultArray = data.result.simulation;
-                } else if (data?.result?.simulation && Array.isArray(data.result.simulation)) {
-                  resultArray = data.result.simulation;
-                } else {
-                  console.error("Unexpected response format:", data);
+        {/* Chart and Simulation */}
+        <Section title="📈 Price Chart & Simulation">
+          <div className="space-y-4">
+            <div className="flex space-x-4">
+              <select
+                value={symbol}
+                onChange={(e) => setSymbol(e.target.value)}
+                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded text-white"
+              >
+                <option value="BTC">BTC</option>
+                <option value="ETH">ETH</option>
+                <option value="ADA">ADA</option>
+                <option value="SOL">SOL</option>
+              </select>
+              <select
+                value={interval}
+                onChange={(e) => setInterval(e.target.value)}
+                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded text-white"
+              >
+                <option value="15m">15m</option>
+                <option value="1h">1h</option>
+                <option value="4h">4h</option>
+                <option value="1d">1d</option>
+              </select>
+            </div>
+            
+            <CandleChart
+              data={series}
+              onCandleClick={(candle) => setEntryTime(candle.timestamp)}
+              height={400}
+            />
+            
+            <button
+              onClick={async () => {
+                if (!entryTime) {
+                  alert("Please click on a candle to set entry time");
                   return;
                 }
+                
+                try {
+                  const response = await fetch("/dca/simulate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      symbol,
+                      entry_time: entryTime,
+                      tf: interval,
+                      config: formData
+                    })
+                  });
+                  
+                  const data = await response.json();
+                  let resultArray = [];
+                  
+                  if (data.result && Array.isArray(data.result)) {
+                    resultArray = data.result;
+                  } else if (data.series && Array.isArray(data.series)) {
+                    resultArray = data.series;
+                  } else {
+                    console.error("Unexpected response format:", data);
+                    return;
+                  }
 
-                const mapped = resultArray.map(d => ({ ...d, time: d.timestamp }));
-                setDcaResults(mapped);
-              } catch (err) {
-                console.error("Simulation failed:", err);
-              }
-            }}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded"
-          >
-            Run DCA Simulation
-          </button>
-        </div>
+                  const mapped = resultArray.map(d => ({ ...d, time: d.timestamp }));
+                  setDcaResults(mapped);
+                } catch (err) {
+                  console.error("Simulation failed:", err);
+                }
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded"
+            >
+              Run DCA Simulation
+            </button>
+          </div>
+        </Section>
 
         {entryTime !== null && (
           <div className="mt-2 text-sm text-gray-300">
@@ -836,16 +505,33 @@ const DcaStrategyBuilder = () => {
           </div>
         )}
 
-        {/* Save/Restore Buttons */}
+        {/* Action Buttons */}
         <div className="flex flex-wrap gap-4 justify-end mt-6">
-          <Button onClick={handleSave} variant="default" size="md">
-            Save Config
+          <Button 
+            onClick={handleLoadDefaults} 
+            variant="outline" 
+            size="md"
+            disabled={saving}
+          >
+            Load Defaults
           </Button>
-          <Button onClick={handleRestore} variant="danger" size="md">
-            Restore Default Config
+          <Button 
+            onClick={handleReset} 
+            variant="danger" 
+            size="md"
+            disabled={saving}
+          >
+            Reset to Default
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            variant="default" 
+            size="md"
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Save Config"}
           </Button>
         </div>
-
       </CardContent>
     </Card>
   );
