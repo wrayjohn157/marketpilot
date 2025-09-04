@@ -1,7 +1,7 @@
 // src/components/Sidebar.jsx
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, HelpCircle, PlayCircle } from "lucide-react";
 
 const links = [
   { label: "Dashboard", icon: "📊", path: "/dashboard" },
@@ -17,7 +17,7 @@ const links = [
   { label: "SAFU Config", icon: "🧯", path: "/safu-config" },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ onHelpClick, onTourClick }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -67,6 +67,44 @@ export default function Sidebar() {
             {link.label}
           </NavLink>
         ))}
+
+        {/* Help System */}
+        <div className="pt-4 border-t border-gray-800">
+          <button
+            onClick={() => {
+              onTourClick && onTourClick();
+              setOpen(false);
+            }}
+            className="w-full flex items-center py-2 px-3 rounded hover:bg-gray-800 transition-all text-gray-300 hover:text-white"
+          >
+            <PlayCircle size={16} className="mr-2" />
+            Take Tour
+          </button>
+          
+          <button
+            onClick={() => {
+              onHelpClick && onHelpClick();
+              setOpen(false);
+            }}
+            className="w-full flex items-center py-2 px-3 rounded hover:bg-gray-800 transition-all text-gray-300 hover:text-white"
+          >
+            <HelpCircle size={16} className="mr-2" />
+            Help & Docs
+          </button>
+
+          <NavLink
+            to="/faq"
+            className={({ isActive }) =>
+              `block py-2 px-3 rounded hover:bg-gray-800 transition-all ${
+                isActive ? "bg-gray-800 text-green-400 font-semibold" : "text-gray-300"
+              }`
+            }
+            onClick={() => setOpen(false)}
+          >
+            <span className="mr-2">❓</span>
+            FAQ
+          </NavLink>
+        </div>
       </div>
     </>
   );

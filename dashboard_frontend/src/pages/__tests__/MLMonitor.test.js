@@ -1,6 +1,9 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import MLMonitor from '../MLMonitor';
+
+// Mock fetch
+global.fetch = jest.fn();
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -8,6 +11,36 @@ global.fetch = jest.fn();
 describe('MLMonitor', () => {
   beforeEach(() => {
     fetch.mockClear();
+    // Mock successful fetch response
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        models: [
+          {
+            name: 'safu_exit',
+            type: 'binary_classification',
+            accuracy: 0.85,
+            status: 'active',
+            last_trained: '2024-01-01T08:00:00Z'
+          }
+        ],
+        predictions: [
+          {
+            id: 'pred_1',
+            symbol: 'BTCUSDT',
+            model_type: 'safu_exit',
+            prediction: 0.85,
+            confidence: 0.92,
+            timestamp: '2024-01-01T10:00:00Z'
+          }
+        ],
+        performance: {
+          total_predictions: 1000,
+          average_accuracy: 0.83,
+          active_models: 3
+        }
+      })
+    });
   });
 
   it('renders loading state initially', () => {

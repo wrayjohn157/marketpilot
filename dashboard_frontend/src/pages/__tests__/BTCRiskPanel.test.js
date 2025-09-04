@@ -1,6 +1,9 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import BTCRiskPanel from '../BTCRiskPanel';
+
+// Mock fetch
+global.fetch = jest.fn();
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -22,7 +25,9 @@ describe('BTCRiskPanel', () => {
   it('renders error state when fetch fails', async () => {
     fetch.mockRejectedValueOnce(new Error('Network error'));
     
-    render(<BTCRiskPanel />);
+    await act(async () => {
+      render(<BTCRiskPanel />);
+    });
     
     await waitFor(() => {
       expect(screen.getByText('Error: Network error')).toBeInTheDocument();

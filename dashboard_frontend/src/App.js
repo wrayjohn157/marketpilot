@@ -18,12 +18,39 @@ import TradeDashboard from "./pages/TradeDashboard.jsx";
 import TvScreenerConfig from "./pages/TvScreenerConfig";
 import DcaStrategyBuilder from "./pages/DcaStrategyBuilder";
 
+// Help System
+import HelpModal from "./components/HelpSystem/HelpModal";
+import OnboardingTour from "./components/HelpSystem/OnboardingTour";
+import FAQ from "./components/HelpSystem/FAQ";
+import { useState, useEffect } from "react";
+
 function App() {
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showOnboardingTour, setShowOnboardingTour] = useState(false);
+  const [hasCompletedTour, setHasCompletedTour] = useState(false);
+
+  // Check if user has completed onboarding tour
+  useEffect(() => {
+    const tourCompleted = localStorage.getItem('market7-tour-completed');
+    if (!tourCompleted) {
+      setShowOnboardingTour(true);
+    }
+  }, []);
+
+  const handleTourComplete = () => {
+    setShowOnboardingTour(false);
+    setHasCompletedTour(true);
+    localStorage.setItem('market7-tour-completed', 'true');
+  };
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-950 text-white">
         <div className="md:flex">
-          <Sidebar />
+          <Sidebar 
+            onHelpClick={() => setShowHelpModal(true)}
+            onTourClick={() => setShowOnboardingTour(true)}
+          />
           <main className="flex-1 p-6 overflow-y-auto">
             <Routes>
               <Route path="/trade-dashboard" element={<TradeDashboard />} />
@@ -40,10 +67,23 @@ function App() {
               <Route path="/tv-config" element={<TvScreenerConfig />} />
               <Route path="/safu-config" element={<SafuConfig />} />
               <Route path="/dca-tuner" element={<DcaStrategyBuilder />} />
+              <Route path="/faq" element={<FAQ />} />
               <Route path="*" element={<Navigate to="/trade-dashboard" replace />} />
             </Routes>
           </main>
         </div>
+
+        {/* Help System */}
+        <HelpModal 
+          isOpen={showHelpModal} 
+          onClose={() => setShowHelpModal(false)} 
+        />
+        
+        <OnboardingTour 
+          isOpen={showOnboardingTour} 
+          onClose={() => setShowOnboardingTour(false)}
+          onComplete={handleTourComplete}
+        />
       </div>
     </Router>
   );
