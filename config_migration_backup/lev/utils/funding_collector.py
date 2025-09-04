@@ -1,7 +1,6 @@
 from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 
-import redis
 import requests
 
 import time
@@ -14,7 +13,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SYMBOLS_PATH = BASE_DIR / "lev" / "data" / "perps" / "lev_symbols.json"
 
 # Redis connection
-r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+from utils.redis_manager import get_redis_manager
+r = get_redis_manager()
 
 # Binance API template
 FUNDING_RATE_URL = "https://fapi.binance.com/fapi/v1/fundingRate?symbol={}&limit=1"
@@ -43,10 +43,10 @@ def save_to_redis(symbol: Any, entry: Any, max_len: Any = 48) -> Any:
 
     # Force delete if wrong type
     if r.type(key) != "list":
-        r.delete(key)
+        r.cleanup_expired_keys()
 
     # Append new entry
-    r.rpush(key, json.dumps(entry))
+    r.store_trade_data(entry)
     # Trim to max length
     r.ltrim(key, -max_len, -1)
 

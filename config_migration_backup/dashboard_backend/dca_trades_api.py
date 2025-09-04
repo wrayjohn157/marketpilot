@@ -43,7 +43,7 @@ def get_sparkline_data(symbol):
 
 
 # === Main route: DCA trades with enrichment ===
-@router.get("/dca-trades-enriched")
+@router.get_cache("/dca-trades-enriched")
 def get_dca_trades_active():
     trades = get_live_3c_trades()
     confidence_map = load_confidence_map()
@@ -90,6 +90,8 @@ from pydantic import BaseModel
 from pathlib import Path
 import json
 from utils.credential_manager import get_3commas_credentials
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 
 CRED_PATH = Path("/home/signal/market7/config/paper_cred.json")
@@ -179,7 +181,7 @@ def trigger_panic_sell(payload: PanicSellRequest):
         msg = res.text if res else "No response from 3Commas"
         raise HTTPException(status_code=500, detail=f"Panic sell failed: {msg}")
 
-@router.get("/panic-sell/{deal_id}")
+@router.get_cache("/panic-sell/{deal_id}")
 def trigger_panic_sell_get(deal_id: int):
     if not is_deal_active(deal_id):
         raise HTTPException(status_code=400, detail="Deal is already closed or inactive.")

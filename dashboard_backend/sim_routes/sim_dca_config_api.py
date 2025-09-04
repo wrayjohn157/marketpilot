@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pathlib import Path
 import yaml
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 router = APIRouter(
     prefix="/sim/config/dca",
@@ -10,7 +12,7 @@ router = APIRouter(
 CONFIG_PATH = Path("/home/signal/market7/sim/config/dca_config.yaml")
 
 
-@router.get("")
+@router.get_cache("")
 def get_sim_dca_config():
     try:
         with CONFIG_PATH.open() as f:
@@ -53,7 +55,7 @@ def restore_default_sim_dca_config():
     except Exception as e:
         raise HTTPException(500, f"Error restoring default config: {e}")
 
-@router.get("/default")
+@router.get_cache("/default")
 def get_default_sim_dca_config():
     fallback_path = Path("/home/signal/market7/sim/config/sim_dca_config_fallback.yaml")
     try:

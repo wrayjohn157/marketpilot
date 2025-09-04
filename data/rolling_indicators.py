@@ -9,7 +9,6 @@ from ta.momentum import StochRSIIndicator, RSIIndicator
 from ta.trend import EMAIndicator, ADXIndicator, MACD, PSARIndicator
 from ta.volatility import AverageTrueRange
 import pandas as pd
-import redis
 import requests
 
 import time
@@ -49,7 +48,8 @@ FORK_METRICS_FILE = Path(
 )
 
 # === Redis ===
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+from utils.redis_manager import get_redis_manager
+r = get_redis_manager()
 
 def get_snapshot_dir() -> Any:
     path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
@@ -194,13 +194,13 @@ def main() -> Any:
                 if df is None or len(df) < 100:
                     continue
                 indicators = compute_indicators(df)
-                key = f"{symbol.upper()}_{tf}"
-                r.set(key, json.dumps(indicators))
+                key = RedisKeyManager.indicator(symbol, tf)
+                r.store_indicators(key, indicators)
 
                 try:
-                    r.set(f"{symbol.upper()}_{tf}_RSI14", indicators["RSI14"])
-                    r.set(f"{symbol.upper()}_{tf}_StochRSI_K", indicators["StochRSI_K"])
-                    r.set(f"{symbol.upper()}_{tf}_StochRSI_D", indicators["StochRSI_D"])
+                    r.set_cache(f"indicators:{symbol.upper()}:{tf}:RSI14", indicators["RSI14"])
+                    r.set_cache(f"indicators:{symbol.upper()}:{tf}:StochRSI_K", indicators["StochRSI_K"])
+                    r.set_cache(f"indicators:{symbol.upper()}:{tf}:StochRSI_D", indicators["StochRSI_D"])
                 except Exception as e:
                     logging.warning(
                         f"⚠️ Failed to write individual indicators for {symbol}: {e}"

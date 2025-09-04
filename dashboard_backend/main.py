@@ -4,14 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 from pathlib import Path
 import json
-import redis
 
 
 # === FastAPI ===
 app = FastAPI()
 
 # === Redis ===
-r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+from utils.redis_manager import get_redis_manager
+r = get_redis_manager()
 
 # === Allow CORS from anywhere (or restrict to your domain) ===
 app.add_middleware(
@@ -86,11 +86,11 @@ def get_btc_context():
             return 0.0
 
     return {
-        "status": r.get("btc_condition") or "UNKNOWN",
-        "rsi": parse_float(r.get("BTC_15m_RSI14")),
-        "adx": parse_float(r.get("BTC_1h_ADX14")),
-        "ema": parse_float(r.get("BTC_1h_EMA50")),
-        "close": parse_float(r.get("BTC_1h_latest_close")),
+        "status": r.get_cache("cache:btc_condition") or "UNKNOWN",
+        "rsi": parse_float(r.get_cache("indicators:BTC:15m:RSI14")),
+        "adx": parse_float(r.get_cache("indicators:BTC:1h:ADX14")),
+        "ema": parse_float(r.get_cache("indicators:BTC:1h:EMA50")),
+        "close": parse_float(r.get_cache("indicators:BTC:1h:latest_close")),
     }
 
 
@@ -106,7 +106,7 @@ def serve_cached_metrics():
 
 @app.get("/active-trades")
 def active_trades():
-    raw = r.get("active_trades")
+    raw = r.get_cache("active_trades")
     if not raw:
         return []
 
@@ -123,7 +123,7 @@ def active_trades():
         else:
             symbol = entry
 
-        score_raw = r.get(f"trade_health:{symbol}")
+        score_raw = r.get_cache(f"trade_health:{symbol}")
         try:
             score = int(score_raw) if score_raw else None
         except:
@@ -137,7 +137,7 @@ def active_trades():
 @app.get("/trade-health/{symbol}")
 def trade_health(symbol: str):
     redis_key = f"trade_health:{symbol.upper()}"
-    raw = r.get(redis_key)
+    raw = r.get_cache(redis_key)
 
     if not raw:
         return {"error": "No data"}

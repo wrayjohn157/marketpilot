@@ -3,6 +3,8 @@ from fastapi import APIRouter, Query
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Dict
 from .capital_utils import (
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
     load_closed_trades,
     load_logs_grouped,
     compute_trade_metrics,
@@ -30,7 +32,7 @@ def parse_range(start: Optional[str], end: Optional[str]) -> (datetime, datetime
     return parse_dt(start), parse_dt(end)
 
 
-@router.get("/trades")
+@router.get_cache("/trades")
 def list_trades(
     start: Optional[str] = Query(None, description="ISO date/time (UTC)"),
     end: Optional[str] = Query(None, description="ISO date/time (UTC)"),
@@ -72,7 +74,7 @@ def list_trades(
     return {"count": len(out), "items": out}
 
 
-@router.get("/trades/{deal_id}")
+@router.get_cache("/trades/{deal_id}")
 def trade_detail(deal_id: int):
     # default to 45d window; this is just to find logs around the deal
     now = datetime.now(UTC)
@@ -92,7 +94,7 @@ def trade_detail(deal_id: int):
     return metrics
 
 
-@router.get("/open")
+@router.get_cache("/open")
 def open_snapshot(
     interval_minutes: int = Query(5, ge=1, le=60),
     lookback_hours: int = Query(48, ge=1, le=168),

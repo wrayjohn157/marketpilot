@@ -2,14 +2,14 @@ from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import os
 
-import redis
 
 #!/usr/bin/env python3
 from
  datetime import datetime
 
 # Connect to Redis
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
+from utils.redis_manager import get_redis_manager
+redis_client = get_redis_manager()
 
 def store_klines(symbol: str, timeframe: str, klines: list):
     """

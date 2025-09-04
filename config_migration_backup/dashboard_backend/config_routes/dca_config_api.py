@@ -3,6 +3,8 @@
 from fastapi import APIRouter, HTTPException
 from pathlib import Path
 import yaml
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 CONFIG_PATH = Path("/home/signal/market7/config/dca_config.yaml")
 
@@ -21,7 +23,7 @@ def save_config(data):
 
 # === Routes ===
 
-@router.get("/dca")
+@router.get_cache("/dca")
 def read_dca_config():
     return load_config()
 

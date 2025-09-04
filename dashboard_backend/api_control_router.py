@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from pathlib import Path
 import yaml
 import os
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 
 CONFIG_PATH = PATHS["dca"] / "config" / "dca_config.yaml"
@@ -50,7 +52,7 @@ def save_config(data):
 
 
 # === GET current config ===
-@router.get("/config/dca")
+@router.get_cache("/config/dca")
 def get_dca_config():
     raw = load_config()
     try:

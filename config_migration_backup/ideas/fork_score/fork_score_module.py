@@ -1,6 +1,5 @@
 # fork_score_module.py
 import json
-import redis
 import logging
 import re
 import yaml
@@ -8,6 +7,8 @@ import pandas as pd
 from pathlib import Path
 from datetime import datetime
 from ta.momentum import stochrsi
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 # === Setup ===
 CONFIG_PATH = Path("/home/signal/market6/config/fork_score_config.yaml")
@@ -60,7 +61,7 @@ def load_kline_volumes(symbol):
     except: return None, None
 
 def score_symbol(symbol: str, strat_config: dict):
-    data = r.get(f"{symbol.upper()}_1h")
+    data = r.get_cache(f"{symbol.upper()}_1h")
     data = json.loads(data) if data else {}
     
     # === Extract indicators ===
@@ -73,12 +74,12 @@ def score_symbol(symbol: str, strat_config: dict):
     macd_hist = extract_float(data.get("MACD_Histogram"))
     macd_hist_prev = extract_float(data.get("MACD_Histogram_Prev"))
 
-    rsi = extract_float(r.get(f"{symbol.upper()}_15m_RSI14"))
-    k = extract_float(r.get(f"{symbol.upper()}_15m_StochRSI_K"))
-    d = extract_float(r.get(f"{symbol.upper()}_15m_StochRSI_D"))
+    rsi = extract_float(r.get_cache(f"{symbol.upper()}_15m_RSI14"))
+    k = extract_float(r.get_cache(f"{symbol.upper()}_15m_StochRSI_K"))
+    d = extract_float(r.get_cache(f"{symbol.upper()}_15m_StochRSI_D"))
 
-    current_vol = extract_float(r.get(f"{symbol.upper()}_15m_volume"))
-    sma9_vol = extract_float(r.get(f"{symbol.upper()}_15m_volume_sma9"))
+    current_vol = extract_float(r.get_cache(f"{symbol.upper()}_15m_volume"))
+    sma9_vol = extract_float(r.get_cache(f"{symbol.upper()}_15m_volume_sma9"))
     if current_vol == 0 or sma9_vol == 0:
         current_vol, sma9_vol = load_kline_volumes(symbol)
 

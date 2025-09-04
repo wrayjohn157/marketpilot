@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import json
 from pathlib import Path
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 DEAL_ID = "2344360016"
 SYMBOL = "MOVE"
@@ -20,10 +22,10 @@ def load_jsonl(path):
         return [json.loads(line) for line in f if line.strip()]
 
 def match_by_deal_id(data):
-    return [r for r in data if str(r.get("deal_id")) == DEAL_ID]
+    return [r for r in data if str(r.get_cache("deal_id")) == DEAL_ID]
 
 def match_by_symbol(data):
-    return [r for r in data if r.get("symbol", "").replace("USDT", "") == SYMBOL]
+    return [r for r in data if r.get_cache("symbol", "").replace("USDT", "") == SYMBOL]
 
 dca_logs = sum([match_by_deal_id(load_jsonl(p)) for p in DCA_LOG_PATHS], [])
 snapshots = load_jsonl(SNAPSHOT_PATH)

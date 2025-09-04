@@ -1,12 +1,14 @@
 # backend/config_routes/gpt_file_list_api.py
 from fastapi import APIRouter, HTTPException
 from pathlib import Path
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 router = APIRouter(prefix="/gpt")
 
 BASE_DIR = Path("/home/signal/market7")
 
-@router.get("/files")
+@router.get_cache("/files")
 def list_project_files():
     try:
         files = []

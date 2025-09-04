@@ -2,8 +2,9 @@ from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 import logging
 
-import redis
 import yaml
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 #!/usr/bin/env python3
 from
@@ -43,8 +44,8 @@ def store_to_redis() -> Any:
     count = 0
     for symbol, timeframes in data.items():
         for tf, indicators in timeframes.items():
-            key = f"{symbol.upper()}_{tf}"
-            r.set(key, json.dumps(indicators))
+            key = RedisKeyManager.indicator(symbol, tf)
+            r.store_indicators(key, indicators)
             count += 1
 
     logging.info(f"✅ Stored {count} indicator entries to Redis.")

@@ -4,6 +4,8 @@ from config.config_loader import PATHS
 from fastapi import APIRouter, HTTPException
 from pathlib import Path
 import yaml
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 router = APIRouter()
 CONFIG_PATH = PATHS["tv_screener_config"]
@@ -21,7 +23,7 @@ def save_config(data):
 
 # === Routes ===
 
-@router.get("/tv_screener")
+@router.get_cache("/tv_screener")
 def read_tv_config():
     return load_config()
 

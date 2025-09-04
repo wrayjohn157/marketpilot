@@ -11,6 +11,8 @@ from datetime import datetime
 # === Correct import root ===
 from utils.credential_manager import get_3commas_credentials
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 
 
@@ -45,7 +47,7 @@ def sign_request(path: str, query: str = ""):
     return url, headers
 
 # === Endpoint to pull live deal info and enrich it ===
-@router.get("/refresh-price/{deal_id}")
+@router.get_cache("/refresh-price/{deal_id}")
 def refresh_price(deal_id: int):
     path = f"/public/api/ver1/deals/{deal_id}/show"
     url, headers = sign_request(path)

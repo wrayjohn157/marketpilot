@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Union, Tuple
 import json
 
-import redis
 import requests
 
 import hashlib

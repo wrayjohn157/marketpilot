@@ -4,6 +4,8 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from statistics import mean
 from live.strat.strategy_loader import load_strategy_config
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 HISTORY_PATH = Path("/home/signal/market6/output/fork_history")
 
@@ -51,10 +53,10 @@ def apply_strategy(entries, strat):
 
 
 def summarize(results):
-    passed = [r for r in results if r.get("strategy_passed")]
-    failed = [r for r in results if not r.get("strategy_passed")]
+    passed = [r for r in results if r.get_cache("strategy_passed")]
+    failed = [r for r in results if not r.get_cache("strategy_passed")]
     avg_score = mean(r["score"] for r in results if "score" in r)
-    avg_rsi = mean(r["raw_indicators"]["rsi"] for r in results if r.get("raw_indicators", {}).get("rsi") is not None)
+    avg_rsi = mean(r["raw_indicators"]["rsi"] for r in results if r.get_cache("raw_indicators", {}).get("rsi") is not None)
     return {
         "total": len(results),
         "passed": len(passed),
@@ -86,8 +88,8 @@ def main():
 
     print("\n🔬 Sample failed reasons:")
     for r in results[:10]:
-        if not r.get("strategy_passed"):
-            print(f"❌ {r['symbol']} | Score: {r['score']} | RSI: {r['raw_indicators'].get('rsi')} | TP1 Shift: {r.get('tp1_shift')}")
+        if not r.get_cache("strategy_passed"):
+            print(f"❌ {r['symbol']} | Score: {r['score']} | RSI: {r['raw_indicators'].get('rsi')} | TP1 Shift: {r.get_cache('tp1_shift')}")
 
 
 if __name__ == "__main__":

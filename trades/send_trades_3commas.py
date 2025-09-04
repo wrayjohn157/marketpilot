@@ -4,7 +4,6 @@ import logging
 import os
 import sys
 
-import redis
 import requests
 
 import hashlib
@@ -36,10 +35,11 @@ EMAIL_TOKEN = creds["3commas_email_token"]
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 REDIS_DB = 0
-FINAL_TRADES_KEY = "FINAL_TRADES"
+FINAL_TRADES_KEY = "queues:final_trades"
 FINAL_FILTER_KEY = "FINAL_RRR_FILTERED_TRADES"
-SENT_TRADES_KEY = "SENT_TRADES"
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+SENT_TRADES_KEY = "sessions:sent_trades"
+from utils.redis_manager import get_redis_manager
+r = get_redis_manager()
 
 # === Constants ===
 DELAY_SECONDS = 0
@@ -49,7 +49,7 @@ THREECOMMAS_URL = "https://app.3commas.io/trade_signal/trading_view"
 
 # === Functions ===
 def should_send_trade(symbol: Any, current_price: Any) -> Any:
-    last_data = r.hget(SENT_TRADES_KEY, symbol)
+    last_data = r.get_trade_data()
     if last_data is None:
         return True
     try:
@@ -77,7 +77,7 @@ def send_trade_to_3commas(symbol: Any, current_price: Any) -> Any:
         response = requests.post(THREECOMMAS_URL, json=payload, timeout=10)
         response.raise_for_status()
         logging.info(f"✅ Sent {pair} to 3Commas.")
-        r.hset(SENT_TRADES_KEY, symbol, json.dumps({"entry_price": current_price}))
+        r.store_trade_data({\"symbol\": symbol, \"data\": {"entry_price": current_price}})
         return True
     except Exception as e:
         logging.error(f"❌ Failed to send {pair} to 3Commas: {e}")
@@ -87,7 +87,7 @@ def main() -> Any:
     logging.info("🚀 Sending final trades to 3Commas bot...")
 
     try:
-        data = r.get(FINAL_TRADES_KEY)
+        data = r.get_cache(FINAL_TRADES_KEY)
         if not data:
             logging.info("No final trades in Redis.")
             return
@@ -99,7 +99,7 @@ def main() -> Any:
     # If final_trades is a list, try to load detailed trade info
     if isinstance(final_trades, list):
         logging.info("Final trades is a list; loading detailed data from FINAL_RRR_FILTERED_TRADES.")
-        detailed_data = r.get(FINAL_FILTER_KEY)
+        detailed_data = r.get_cache(FINAL_FILTER_KEY)
         if not detailed_data:
             logging.info("No detailed trades found.")
             return

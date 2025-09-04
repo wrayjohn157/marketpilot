@@ -7,6 +7,8 @@ import json
 import traceback
 import os
 from utils.credential_manager import get_3commas_credentials
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 
 router = APIRouter(prefix="/gpt")
@@ -95,7 +97,7 @@ async def edit_code(request: Request):
         raise HTTPException(status_code=500, detail=f"OpenAI Error: {str(e)}")
 
 
-@router.get("/files")
+@router.get_cache("/files")
 async def list_files():
     excluded_dirs = {"__pycache__", ".git", "node_modules", "build"}
     files = []

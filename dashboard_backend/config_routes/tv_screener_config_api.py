@@ -4,6 +4,8 @@ from fastapi import APIRouter, HTTPException
 from pathlib import Path
 import yaml
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 
 router = APIRouter()
@@ -22,7 +24,7 @@ def save_config(data):
 
 # === Routes ===
 
-@router.get("/tv_screener")
+@router.get_cache("/tv_screener")
 def read_tv_config():
     return load_config()
 

@@ -50,6 +50,8 @@ from dca.utils.zombie_utils import is_zombie_trade
 from dca.utils.spend_predictor import predict_spend_volume, adjust_volume
 from dca.utils.trade_health_evaluator import evaluate_trade_health
 from config.config_loader import PATHS
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 CONFIG_PATH = PATHS[
     "dca_config"
@@ -408,23 +410,23 @@ def run():
         # Check YAML bottom reversal filter
         br_filter = config.get("bottom_reversal_filter", {})
         # Standard bottom reversal filter logic
-        if br_filter.get("enabled", False):
+        if br_filter.get_cache("enabled", False):
             if not reversal_signal:
                 rejection_reason = "no_bottom_reversal"
                 allow_dca = False
-            elif indicators["macd_lift"] < br_filter.get("min_macd_lift", 0.0):
+            elif indicators["macd_lift"] < br_filter.get_cache("min_macd_lift", 0.0):
                 rejection_reason = "macd_lift_too_weak"
                 allow_dca = False
-            elif indicators["rsi_slope"] < br_filter.get("min_rsi_slope", 0.0):
+            elif indicators["rsi_slope"] < br_filter.get_cache("min_rsi_slope", 0.0):
                 rejection_reason = "rsi_slope_too_flat"
                 allow_dca = False
         # --- Bottom Reversal alternate filter (from improved) ---
         # If bottom_reversal_filter.enabled, allow DCA if MACD lift, RSI slope, and RSI exceed thresholds
         allow_bottom_dca = False
-        if br_filter.get("enabled", False):
-            min_macd = br_filter.get("min_macd_lift", 0.0)
-            min_slope = br_filter.get("min_rsi_slope", 0.0)
-            rsi_floor = br_filter.get("rsi_floor", 0)
+        if br_filter.get_cache("enabled", False):
+            min_macd = br_filter.get_cache("min_macd_lift", 0.0)
+            min_slope = br_filter.get_cache("min_rsi_slope", 0.0)
+            rsi_floor = br_filter.get_cache("rsi_floor", 0)
             rsi = indicators.get("rsi", 0)
             if (
                 indicators["macd_lift"] > min_macd

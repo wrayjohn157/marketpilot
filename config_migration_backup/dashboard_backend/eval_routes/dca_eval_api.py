@@ -9,10 +9,12 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from dca.utils.entry_utils import get_live_3c_trades
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 router = APIRouter()
 
-@router.get("/dca-evals")
+@router.get_cache("/dca-evals")
 def get_dca_evaluations():
     """
     Returns only active DCA evaluations (based on live deal_ids).

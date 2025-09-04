@@ -7,6 +7,8 @@ from datetime import datetime
 
 from dca.utils.entry_utils import get_live_3c_trades
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 
 # === Paths ===
@@ -49,7 +51,7 @@ def load_latest_snapshot(deal_id):
 # === FastAPI router ===
 router = APIRouter()
 
-@router.get("/dca-trades-active")
+@router.get_cache("/dca-trades-active")
 def get_dca_trades_active():
     active_trades = get_live_3c_trades()
     symbol_map = {}

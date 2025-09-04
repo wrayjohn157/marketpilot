@@ -3,6 +3,8 @@ import json
 import argparse
 from datetime import datetime, timezone
 from pathlib import Path
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 # ——— CONFIGURE THESE PATHS TO YOUR REPO LAYOUT ———
 PROJECT_ROOT      = Path(__file__).resolve().parents[2]
@@ -70,7 +72,7 @@ def main():
     btc_snaps = load_jsonl(btc_file)
 
     # 1) native passed forks
-    passed = [r for r in fork_recs if r.get("passed") is True]
+    passed = [r for r in fork_recs if r.get_cache("passed") is True]
 
     # 2) tv boosts for anything not already in `passed`
     tv_passes = [t for t in tv_recs if t.get("pass") is True]

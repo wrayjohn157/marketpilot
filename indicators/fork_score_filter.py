@@ -7,7 +7,6 @@ import os
 import sys
 
 import pandas as pd
-import redis
 import yaml
 
 import re
@@ -31,10 +30,11 @@ BACKTEST_CANDIDATES_FILE = get_path("fork_backtest_candidates")
 FORK_HISTORY_BASE = get_path("fork_history")
 SNAPSHOT_BASE = get_path("snapshots")
 
-REDIS_SET = "FORK_RRR_PASSED"
+REDIS_SET = "queues:fork_rrr_passed"
 REDIS_FINAL_TRADES = "FORK_FINAL_TRADES"
 
-r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+from utils.redis_manager import get_redis_manager
+r = get_redis_manager()
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
@@ -60,10 +60,10 @@ def extract_float(val: Any) -> Any:
         return float(match.group()) if match else 0.0
 
 def btc_sentiment_multiplier() -> Any:
-    price = extract_float(r.get("BTC_1h_latest_close"))
-    ema50 = extract_float(r.get("BTC_1h_EMA50"))
-    rsi = extract_float(r.get("BTC_15m_RSI14"))
-    adx = extract_float(r.get("BTC_1h_ADX14"))
+    price = extract_float(r.get_cache("indicators:BTC:1h:latest_close"))
+    ema50 = extract_float(r.get_cache("indicators:BTC:1h:EMA50"))
+    rsi = extract_float(r.get_cache("indicators:BTC:15m:RSI14"))
+    adx = extract_float(r.get_cache("indicators:BTC:1h:ADX14"))
     mult = 1.0
     if price > ema50 and adx > 20:
         mult += 0.10
@@ -113,7 +113,7 @@ def load_kline_volumes(symbol: Any) -> Any:
         return None, None
 
 def compute_subscores(symbol: Any) -> Any:
-    data = r.get(f"{symbol.upper()}_1h")
+    data = r.get_cache(f"{symbol.upper()}_1h")
     data = json.loads(data) if data else {}
 
     price = extract_float(data.get("latest_close"))
@@ -125,12 +125,12 @@ def compute_subscores(symbol: Any) -> Any:
     macd_hist = extract_float(data.get("MACD_Histogram"))
     macd_hist_prev = extract_float(data.get("MACD_Histogram_Prev"))
 
-    rsi = extract_float(r.get(f"{symbol.upper()}_15m_RSI14"))
-    k = extract_float(r.get(f"{symbol.upper()}_15m_StochRSI_K"))
-    d = extract_float(r.get(f"{symbol.upper()}_15m_StochRSI_D"))
+    rsi = extract_float(r.get_cache(f"{symbol.upper()}_15m_RSI14"))
+    k = extract_float(r.get_cache(f"{symbol.upper()}_15m_StochRSI_K"))
+    d = extract_float(r.get_cache(f"{symbol.upper()}_15m_StochRSI_D"))
 
-    current_vol = extract_float(r.get(f"{symbol.upper()}_15m_volume"))
-    sma9_vol = extract_float(r.get(f"{symbol.upper()}_15m_volume_sma9"))
+    current_vol = extract_float(r.get_cache(f"{symbol.upper()}_15m_volume"))
+    sma9_vol = extract_float(r.get_cache(f"{symbol.upper()}_15m_volume_sma9"))
     if current_vol == 0 or sma9_vol == 0:
         current_vol, sma9_vol = load_kline_volumes(symbol)
 
@@ -216,8 +216,8 @@ def main() -> Any:
     with open(FORK_INPUT_FILE) as f:
         symbols = json.load(f)
 
-    r.delete(REDIS_SET)
-    r.delete(REDIS_FINAL_TRADES)
+    r.cleanup_expired_keys()
+    r.cleanup_expired_keys()
 
     now = datetime.utcnow()
     now_ts = int(now.timestamp() * 1000)
@@ -240,7 +240,7 @@ def main() -> Any:
             "score_hash": "_".join([f"{k}:{subs[k]}" for k in subs]),
             "score_components": subs,
             "btc_multiplier": mult,
-            "entry_price": price, #"entry_price": extract_float(r.get(f"{sym.upper()}_1h_latest_close")),
+            "entry_price": price, #"entry_price": extract_float(r.get_cache(f"{sym.upper()}_1h_latest_close")),
             "raw_indicators": raw_indicators,
             "passed": passed,
             "source": "fork_score_filter",
@@ -267,8 +267,8 @@ def main() -> Any:
                 "timestamp": now_ts,
                 "ts_iso": ts_iso,
             }
-            r.sadd(REDIS_SET, sym)
-            r.rpush(REDIS_FINAL_TRADES, json.dumps(trade))
+            r.store_trade_data({\"symbol\": sym})
+            r.store_trade_data(trade)
             results.append(trade)
 
         verdict = "✅" if passed else "❌"

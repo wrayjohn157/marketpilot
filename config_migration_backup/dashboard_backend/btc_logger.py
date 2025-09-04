@@ -6,7 +6,8 @@ import numpy as np
 from datetime import datetime
 from pathlib import Path
 import logging
-import redis
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 # === Setup ===
 logging.basicConfig(level=logging.INFO)
@@ -155,11 +156,11 @@ def log_btc_snapshot():
         f.write(json.dumps(snapshot) + "\n")
     
     # Push the required BTC indicators to Redis for fork_scorer:
-    r.set("BTC_1h_latest_close", latest_close_1h)
-    r.set("BTC_1h_EMA50", round(ema50_1h, 2))
-    r.set("BTC_1h_ADX14", round(adx_1h, 2))
-    r.set("BTC_15m_RSI14", round(rsi_15m, 2))
-    r.set("btc_condition", market_condition)
+    r.set_cache("indicators:BTC:1h:latest_close", latest_close_1h)
+    r.set_cache("indicators:BTC:1h:EMA50", round(ema50_1h, 2))
+    r.set_cache("indicators:BTC:1h:ADX14", round(adx_1h, 2))
+    r.set_cache("indicators:BTC:15m:RSI14", round(rsi_15m, 2))
+    r.set_cache("cache:btc_condition", market_condition)
     
     print(f"✅ Logged BTC snapshot @ {ts_iso}")
     print(f"📁 Snapshot saved to: {file_path}")

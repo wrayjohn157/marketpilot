@@ -4,7 +4,6 @@ import json
 import logging
 import sys
 
-import redis
 
 from config.config_loader import PATHS  # ✅ Use the loader
 
@@ -22,16 +21,17 @@ sys.path.append(str(PROJECT_ROOT))
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
-r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+from utils.redis_manager import get_redis_manager
+r = get_redis_manager()
 
 # === Load paths dynamically ===
 OUTPUT_FILE = get_path("final_fork_rrr_trades")
 FORK_FILE = PATHS["fork_candidates"]
-VOLUME_PASSED_SET = "VOLUME_PASSED_TOKENS"
+VOLUME_PASSED_SET = "queues:volume_passed_tokens"
 
 # Load BTC condition
 try:
-    market_condition = r.get("btc_condition") or "neutral"
+    market_condition = r.get_cache("cache:btc_condition") or "neutral"
     logging.info(f"📈 BTC Market Condition: {market_condition}")
 except Exception as e:
     market_condition = "neutral"
@@ -205,7 +205,7 @@ def check_fork_criteria(ind: Any) -> Any:
 def main() -> Any:
     approved = {}
     fork_queue = {}
-    symbols = r.smembers(VOLUME_PASSED_SET)
+    symbols = r.get_trade_data()
     logging.info(f"📊 Evaluating {len(symbols)} symbols...")
 
     for symbol in symbols:
@@ -220,7 +220,7 @@ def main() -> Any:
 
         for tf in ["15m", "1h", "4h"]:
             redis_key = f"{symbol_clean}_{tf}"
-            raw = r.get(redis_key)
+            raw = r.get_cache(redis_key)
             if not raw:
                 continue
             ind = json.loads(raw)
@@ -239,7 +239,7 @@ def main() -> Any:
             approved[symbol_clean] = {
                 "timeframes": tf_passed,
                 "indicator_data": {
-                    "1h": json.loads(r.get(f"{symbol_clean}_1h") or "{}")
+                    "1h": json.loads(r.get_cache(f"{symbol_clean}_1h") or "{}")
                 },
             }
             logging.info(f"✅ PASSED: {symbol_clean}")
@@ -248,7 +248,7 @@ def main() -> Any:
                 "timeframes_failed": [x[0] for x in tf_debug],
                 "reasons": fork_reasons,
                 "indicator_data": {
-                    "1h": json.loads(r.get(f"{symbol_clean}_1h") or "{}")
+                    "1h": json.loads(r.get_cache(f"{symbol_clean}_1h") or "{}")
                 },
             }
             logging.info(f"🌀 FORKED: {symbol_clean}")
@@ -267,9 +267,9 @@ def main() -> Any:
     with open(FORK_FILE, "w") as f:
         json.dump(fork_queue, f, indent=2)
 
-    r.set("tech_filter_count_in", len(symbols))
-    r.set("tech_filter_count_out", len(approved))
-    r.set("last_scan_tech", datetime.utcnow().isoformat())
+    r.set_cache("counters:tech_filter_count_in", len(symbols))
+    r.set_cache("counters:tech_filter_count_out", len(approved))
+    r.set_cache("last_scan_tech", datetime.utcnow().isoformat())
 
     logging.info(
         f"💾 Saved {len(approved)} approved | 🌀 Saved {len(fork_queue)} fork candidates"

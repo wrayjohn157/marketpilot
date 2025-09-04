@@ -4,6 +4,8 @@ from fastapi import APIRouter, HTTPException
 from pathlib import Path
 import yaml
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 
 CONFIG_PATH = get_path("dca_config")
@@ -23,7 +25,7 @@ def save_config(data):
 
 # === Routes ===
 
-@router.get("/dca")
+@router.get_cache("/dca")
 def read_dca_config():
     return load_config()
 

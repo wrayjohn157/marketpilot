@@ -3,13 +3,15 @@
 from fastapi import APIRouter, Query
 from pathlib import Path
 import json
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 router = APIRouter()
 
 BASE_DIR = Path("/home/signal/market7/data/snapshots")
 
 
-@router.get("/price-series")
+@router.get_cache("/price-series")
 def get_price_series(
     symbol: str = Query(..., description="e.g. ARB"),
     interval: str = Query("15m", description="e.g. 15m, 1h, 4h"),

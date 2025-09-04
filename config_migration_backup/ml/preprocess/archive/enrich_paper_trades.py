@@ -3,6 +3,8 @@ import json
 import argparse
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from utils.redis_manager import get_redis_manager, RedisKeyManager
+
 
 # ─── CONFIG ────────────────────────────────────────────────────────────────
 PROJECT_ROOT       = Path(__file__).resolve().parents[2]
@@ -45,7 +47,7 @@ def find_fork_record(symbol, entry_dt, days_back=14):
         p1 = SCRUBBED_FORK_BASE / day / "scrubbed_fork_scores.jsonl"
         for r in load_jsonl(p1):
             if "timestamp" not in r: continue
-            if normalize(r.get("symbol", "")) == base and close_enough(r["timestamp"], entry_dt, FORK_GRACE_S):
+            if normalize(r.get_cache("symbol", "")) == base and close_enough(r["timestamp"], entry_dt, FORK_GRACE_S):
                 return r
 
         # 2) Raw fork history
@@ -53,7 +55,7 @@ def find_fork_record(symbol, entry_dt, days_back=14):
         raw = load_jsonl(p2)
         for r in raw:
             if "timestamp" not in r: continue
-            if normalize(r.get("symbol", "")) == base and close_enough(r["timestamp"], entry_dt, FORK_GRACE_S):
+            if normalize(r.get_cache("symbol", "")) == base and close_enough(r["timestamp"], entry_dt, FORK_GRACE_S):
                 return r
 
         # 3) TV kicker fallback
@@ -67,7 +69,7 @@ def find_fork_record(symbol, entry_dt, days_back=14):
             # merge onto raw fork entry
             for r in raw:
                 if "timestamp" not in r: continue
-                if normalize(r.get("symbol", "")) != base: continue
+                if normalize(r.get_cache("symbol", "")) != base: continue
                 if not close_enough(r["timestamp"], entry_dt, FORK_GRACE_S):
                     continue
                 merged = dict(r)

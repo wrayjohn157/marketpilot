@@ -7,7 +7,6 @@ import logging
 from ta.momentum import RSIIndicator
 from ta.trend import MACD, ADXIndicator
 import pandas as pd
-import redis
 import requests
 
 import hashlib
