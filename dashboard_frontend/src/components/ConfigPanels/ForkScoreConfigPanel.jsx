@@ -5,7 +5,7 @@ import { FormField } from "../ui/FormField";
 import { Switch } from "../ui/Switch";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
-import axios from "axios";
+
 
 // baked-in defaults
 const defaultConfig = {
@@ -36,7 +36,7 @@ export default function ForkScoreConfigPanel() {
 
   // load on mount
   useEffect(() => {
-    axios.get("/config/fork_score/")
+    fetch("/config/fork_score/")
       .then(r => setConfig(r.data))
       .catch(() => setError("Failed to load"));
   }, []);
@@ -46,7 +46,7 @@ export default function ForkScoreConfigPanel() {
 
   const handleSave = () => {
     setSaving(true);
-    axios.post("/config/fork_score/", config)
+    fetch("/config/fork_score/", config)
       .finally(() => setSaving(false))
       .catch(() => setError("Saving failed"));
   };

@@ -1,5 +1,5 @@
 // src/components/ConfigPanels/DcaConfigPanel.jsx
-import axios from "axios";
+
 import { useEffect, useState } from "react";
 import { Button } from "../ui/Button";
 import {
@@ -128,11 +128,11 @@ export default function DcaConfigPanel() {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
 useEffect(() => {
-  axios
-    .get("/config/dca")
-    .then((res) => {
-      console.log("Loaded config", res.data);
-      setConfig(res.data);
+  fetch("/config/dca")
+    .then(res => res.json())
+    .then((data) => {
+      console.log("Loaded config", data);
+      setConfig(data);
     })
     .catch(() => setError("Failed to load config"));
 }, []);
@@ -176,8 +176,13 @@ useEffect(() => {
 
   const handleSave = () => {
     setSaving(true);
-    axios
-      .post("/config/dca", config)
+    fetch("/config/dca", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(config)
+    })
       .then(() => setSaving(false))
       .catch(() => {
         setError("Failed to save config");

@@ -1,8 +1,0 @@
-// src/lib/axiosConfig.js
-import axios from "axios";
-
-const baseURL = window.location.protocol + "//" + window.location.host;
-
-export default axios.create({
-  baseURL,
-});

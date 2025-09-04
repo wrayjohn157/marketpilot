@@ -1,6 +1,5 @@
 // src/components/ConfigPanels/SafuConfigPanel.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Card,
   CardHeader,
@@ -28,9 +27,10 @@ export default function SafuConfigPanel() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get("/config/safu")
-      .then((res) => {
-        const cfg = res.data || {};
+    fetch("/config/safu")
+      .then(res => res.json())
+      .then((data) => {
+        const cfg = data || {};
         const safe = {
           min_score: cfg.min_score ?? 0.4,
           telegram_alerts: cfg.telegram_alerts ?? true,
@@ -53,7 +53,13 @@ export default function SafuConfigPanel() {
 
   const handleSave = () => {
     setSaving(true);
-    axios.post("/config/safu", config)
+    fetch("/config/safu", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(config)
+    })
       .then(() => setSaving(false))
       .catch(() => setError("Failed to save SAFU config"));
   };

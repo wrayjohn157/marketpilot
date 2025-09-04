@@ -1,7 +1,6 @@
 // src/pages/DcaTracker.jsx
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 
 const glowMap = {
   Healthy: "hover:shadow-[0_0_20px_4px_rgba(34,197,94,0.4)]",    // Green
@@ -35,11 +34,9 @@ export default function DcaTracker() {
           else if (pct > 50) barColor = "bg-yellow-400";
 
           return (
-            <motion.div
+            <div
               key={idx}
-              whileHover={{ scale: 1.03 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className={`rounded-2xl p-6 bg-gradient-to-br from-black/10 to-black/20 ${glowMap[trade.health_status] || ""} transition-all`}
+              className={`rounded-2xl p-6 bg-gradient-to-br from-black/10 to-black/20 ${glowMap[trade.health_status] || ""} transition-all hover:scale-105 transform`}
             >
               <div className="text-xl font-bold mb-4">{trade.symbol}</div>
 
@@ -69,7 +66,7 @@ export default function DcaTracker() {
                   ${spent.toFixed(2)} / ${budget} spent
                 </div>
               </div>
-            </motion.div>
+            </div>
           );
         })}
       </div>

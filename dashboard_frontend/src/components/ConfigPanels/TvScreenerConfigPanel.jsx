@@ -1,6 +1,6 @@
 // src/components/ConfigPanels/TvScreenerConfigPanel.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+
 import {
   Card,
   CardHeader,
@@ -22,7 +22,7 @@ export default function TvScreenerConfigPanel() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get("/config/tv_screener").then((res) => {
+    fetch("/config/tv_screener").then((res) => {
       const cfg = res.data.tv_screener || {};
       const safe = {
         enabled: cfg.enabled ?? false,
@@ -37,7 +37,7 @@ export default function TvScreenerConfigPanel() {
 
   const handleSave = () => {
     setSaving(true);
-    axios.post("/config/tv_screener", { tv_screener: config })
+    fetch("/config/tv_screener", { tv_screener: config })
       .then(() => {
         setOriginal(JSON.stringify(config));
         setSaving(false);

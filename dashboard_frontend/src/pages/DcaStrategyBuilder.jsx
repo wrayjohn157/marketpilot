@@ -1,4 +1,4 @@
-import axios from "axios";
+// Using fetch API instead of axios
 import { useEffect, useState } from "react";
 import { Button } from "../components/ui/Button";
 import CandleChart from "../components/ui/CandleChart";
@@ -201,11 +201,12 @@ const DcaStrategyBuilder = () => {
   }, []);
 
   useEffect(() => {
-    axios.get("/price-series", { params: { symbol, interval } })
-      .then(res => {
-        if (Array.isArray(res.data.series)) {
-          console.log("Fetched full series data length:", res.data.series.length);
-          const mapped = res.data.series.map(d => ({
+    fetch(`/price-series?symbol=${symbol}&interval=${interval}`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data.series)) {
+          console.log("Fetched full series data length:", data.series.length);
+          const mapped = data.series.map(d => ({
             timestamp: Number(d.timestamp),
             open: d.open,
             high: d.high,
@@ -773,24 +774,31 @@ const DcaStrategyBuilder = () => {
                 return;
               }
               try {
-                const res = await axios.post("/dca/simulate", {
-                  symbol,
-                  entry_time: entryTime,  // 🔥 Already in milliseconds
-                  tf: interval,
-                  ...params
+                const res = await fetch("/dca/simulate", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    symbol,
+                    entry_time: entryTime,  // 🔥 Already in milliseconds
+                    tf: interval,
+                    ...params
+                  })
                 });
 
+                const data = await res.json();
                 let resultArray = [];
-                if (Array.isArray(res.data)) {
-                  resultArray = res.data;
-                } else if (Array.isArray(res.data?.result)) {
-                  resultArray = res.data.result;
-                } else if (Array.isArray(res.data?.result?.simulation)) {
-                  resultArray = res.data.result.simulation;
-                } else if (res.data?.result?.simulation && Array.isArray(res.data.result.simulation)) {
-                  resultArray = res.data.result.simulation;
+                if (Array.isArray(data)) {
+                  resultArray = data;
+                } else if (Array.isArray(data?.result)) {
+                  resultArray = data.result;
+                } else if (Array.isArray(data?.result?.simulation)) {
+                  resultArray = data.result.simulation;
+                } else if (data?.result?.simulation && Array.isArray(data.result.simulation)) {
+                  resultArray = data.result.simulation;
                 } else {
-                  console.error("Unexpected response format:", res.data);
+                  console.error("Unexpected response format:", data);
                   return;
                 }
 

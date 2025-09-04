@@ -1,7 +1,7 @@
 
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+
 import CandleChart from "../components/CandleChart";
 
 const DcaStrategyBuilder = () => {
@@ -27,7 +27,7 @@ const DcaStrategyBuilder = () => {
   useEffect(() => {
     const fetchPriceSeries = async () => {
       try {
-        const res = await axios.get("/price-series", {
+        const res = await fetch("/price-series", {
           params: { symbol, interval },
         });
         if (res.data?.series) {

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 
 function TradeTable() {
   const [trades, setTrades] = useState([]);
 
   useEffect(() => {
-    axios.get("/api/fork/metrics")
-      .then((res) => {
-        const deals = res.data?.metrics?.active_deals;
+    fetch("/api/fork/metrics")
+      .then(res => res.json())
+      .then((data) => {
+        const deals = data?.metrics?.active_deals;
         setTrades(Array.isArray(deals) ? deals : []);
       })
       .catch((err) => {
