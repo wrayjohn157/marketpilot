@@ -61,7 +61,7 @@ def main():
     project_root = Path(__file__).parent
 
     # Change to project root
-    import os
+import os
 
     os.chdir(project_root)
 

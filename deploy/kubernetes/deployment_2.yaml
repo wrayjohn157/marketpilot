@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: market7-ml
+  namespace: market7
+  labels:
+    app: market7-ml
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: market7-ml
+  template:
+    metadata:
+      labels:
+        app: market7-ml
+    spec:
+      containers:
+      - name: ml-pipeline
+        image: market7:latest
+        command: ["python3", "ml/ml_pipeline_runner_integrated.py"]
+        ports:
+        - containerPort: 8001
+        env:
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: market7-config
+              key: ENVIRONMENT
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: market7-config
+              key: REDIS_HOST
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: market7-config
+              key: POSTGRES_HOST
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: market7-secrets
+              key: postgres-password
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: models
+          mountPath: /app/models
+        - name: data
+          mountPath: /app/data
+      volumes:
+      - name: models
+        persistentVolumeClaim:
+          claimName: market7-models-pvc
+      - name: data
+        persistentVolumeClaim:
+          claimName: market7-data-pvc

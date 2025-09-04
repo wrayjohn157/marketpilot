@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: market7-indicators
+  namespace: market7
+  labels:
+    app: market7-indicators
+spec:
+  selector:
+    app: market7-indicators
+  ports:
+  - name: http
+    port: 8002
+    targetPort: 8002
+  type: ClusterIP

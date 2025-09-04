@@ -9,7 +9,7 @@ def should_reenter_after_safu(trade: Any, config: Any, indicators: Any, safu_sco
 Determine whether a trade qualifies for reentry DCA after SAFU was triggered.
 
 Conditions:
-- Enabled in config
+    - Enabled in config
 - Cooldown period has passed
 - MACD lift and RSI slope improving
 - SAFU score back above threshold
@@ -34,7 +34,7 @@ if btc_status not in allowed_statuses:
 
 # === Cooldown check ===
 if last_safu_time:
-elapsed_minutes = (datetime.utcnow() - last_safu_time).total_seconds() / 60
+    elapsed_minutes = (datetime.utcnow() - last_safu_time).total_seconds() / 60
 if elapsed_minutes < reentry_cfg.get("cooldown_minutes", 30):
             return False
 

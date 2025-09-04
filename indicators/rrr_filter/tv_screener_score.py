@@ -11,13 +11,13 @@ import yaml
 # === Load path config ===
 CONFIG_FILE = Path(__file__).resolve().parents[2] / "config" / "paths_config.yaml"
 with open(CONFIG_FILE) as f:
-paths = yaml.safe_load(f)
+    paths = yaml.safe_load(f)
 
 TV_CONFIG_PATH = Path(paths.get("tv_screener_config_path", "/home/signal/market7/config/tv_screener_config.yaml"))
 RAW_FILE = Path(paths.get("tv_history_path", "/home/signal/market7/output/tv_history")) / "tv_screener_raw_dict.txt"
 
 def get_tv_rating(symbol: str, screener_data: dict) -> tuple[float, bool]:
-symbol = symbol.upper()
+    symbol = symbol.upper()
 rating = screener_data.get(symbol, {}).get("15m", "").lower()
 
 if rating in ["buy", "strong_buy"]:
@@ -25,19 +25,20 @@ if rating in ["buy", "strong_buy"]:
     return 0.0, False
 
 def load_config() -> dict:
-try:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 full = yaml.safe_load(TV_CONFIG_PATH.read_text())
         return full.get("tv_screener", {})
 except Exception as e:
-logging.warning(f"[TV] Could not load TV screener config: {e}")
+    logging.warning(f"[TV] Could not load TV screener config: {e}")
         return {}
 
 def tv_screener_score(symbol: str, timeframe: str = "15m") -> float:
-cfg = load_config()
+    cfg = load_config()
 if not cfg.get("enabled", False):
         return 0.0
 
@@ -47,17 +48,18 @@ weights = cfg.get("weights", {})
     threshold = cfg.get("score_threshold", 0.6)
 
 if not RAW_FILE.exists():
-logging.warning("[TV] Screener file missing, skipping TV score")
+    logging.warning("[TV] Screener file missing, skipping TV score")
         return 0.0
 
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 data = json.loads(RAW_FILE.read_text())
 except Exception as e:
-logging.warning(f"[TV] Failed to parse raw screener file: {e}")
+    logging.warning(f"[TV] Failed to parse raw screener file: {e}")
         return 0.0
 
 entry = data.get(symbol.upper(), {})

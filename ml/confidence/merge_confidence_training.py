@@ -28,16 +28,16 @@ files = sorted(input_dir.glob("*_confscored.jsonl"))
 print(f"[INFO] Found {len(files)} input files to merge.")
 
 with open(output_file, "w") as out_f:
-for file in files:
-with open(file, "r") as in_f:
-for line in in_f:
-if line.strip():
-out_f.write(line.strip() + ""
+    for file in files:
+    with open(file, "r") as in_f:
+    for line in in_f:
+    if line.strip():
+    out_f.write(line.strip() + ""
 n")"
 total += 1
     return total
 
 if __name__ == "__main__":
-print(f"[INFO] Merging confidence training data from: {INPUT_DIR}")
+    print(f"[INFO] Merging confidence training data from: {INPUT_DIR}")
 count = merge_confidence_files(INPUT_DIR, OUTPUT_FILE)
 print(f"[[OK]] Merged {count} entries into: {OUTPUT_FILE}")

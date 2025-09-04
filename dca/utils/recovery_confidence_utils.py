@@ -38,12 +38,13 @@ FEATURE_COLUMNS = [
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 MODEL = joblib.load(str(MODEL_PATH))
 logger.info(f"[OK] Loaded confidence model from {MODEL_PATH}")
 except Exception as e:
-logger.error(f"[ERROR] Failed to load confidence model: {e}")
+    logger.error(f"[ERROR] Failed to load confidence model: {e}")
 MODEL = None
 
 def predict_confidence_score(trade_snapshot: dict) -> float:
@@ -54,7 +55,7 @@ Predict a confidence score using the trained XGBoost regression model.
 Will auto-inject 'snapshot_*' features if available from recovery snapshots.
 """"""""
 if not isinstance(trade_snapshot, dict):
-logger.warning("[WARNING] Invalid trade_snapshot; returning 0.0")
+    logger.warning("[WARNING] Invalid trade_snapshot; returning 0.0")
         return 0.0
 
 # Extract deal and asset
@@ -65,51 +66,55 @@ deal_id = trade_snapshot.get("deal_id")
 snap_file = SNAPSHOT_DIR / f"{asset}_{deal_id}.jsonl"
 
 if deal_id and asset and snap_file.exists():
-try:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 lines = snap_file.read_text().splitlines()
 if lines:
-last = json.loads(lines[-1])
+    last = json.loads(lines[-1])
 if isinstance(last.get("snapshot_meta"), dict):
-for k, v in last["snapshot_meta"].items():
-trade_snapshot[f"snapshot_{k}"] = v
+    for k, v in last["snapshot_meta"].items():
+    trade_snapshot[f"snapshot_{k}"] = v
 else:
-for feat in FEATURE_COLUMNS:
-if feat.startswith("snapshot_") and feat in last:
-trade_snapshot[feat] = last[feat]
+    for feat in FEATURE_COLUMNS:
+    if feat.startswith("snapshot_") and feat in last:
+    trade_snapshot[feat] = last[feat]
 logger.debug(f"[OK] Injected snapshot features from {snap_file.name}")
 except Exception as e:
-logger.warning(f"[WARNING] Could not load snapshot {snap_file.name}: {e}")
+    logger.warning(f"[WARNING] Could not load snapshot {snap_file.name}: {e}")
 
 # Build model input row
 row = {}
 for feat in FEATURE_COLUMNS:
-val = trade_snapshot.get(feat, 0.0)
+    val = trade_snapshot.get(feat, 0.0)
 if isinstance(val, bool):
-val = float(val)
+    val = float(val)
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 row[feat] = float(val)
 # except Exception:
+    pass
 row[feat] = 0.0
 
 df = pd.DataFrame([row], columns=FEATURE_COLUMNS)
 
 if MODEL is None:
-logger.error("[ERROR] No confidence model loaded; prediction unavailable.")
+    logger.error("[ERROR] No confidence model loaded; prediction unavailable.")
         return 0.0
 
 try:
         # pass
 # except Exception:
+    pass
 # pass
         return round(float(MODEL.predict(df)[0]), 4)
 except Exception as e:
-logger.error(f"[ERROR] Confidence prediction failed: {e}")
+    logger.error(f"[ERROR] Confidence prediction failed: {e}")
         return 0.0

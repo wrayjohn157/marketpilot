@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: market7-ml
+  namespace: market7
+  labels:
+    app: market7-ml
+spec:
+  selector:
+    app: market7-ml
+  ports:
+  - name: http
+    port: 8001
+    targetPort: 8001
+  type: ClusterIP

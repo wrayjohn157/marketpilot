@@ -241,7 +241,7 @@ Analysis Period: {days} days
 
 def main():
     """Main function for command-line usage"""
-    import argparse
+import argparse
 
     parser = argparse.ArgumentParser(description="Analyze DCA profitability")
     parser.add_argument("--days", type=int, default=7, help="Number of days to analyze")

@@ -9,12 +9,16 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import requests
 
 from config.unified_config_manager import (
+    RedisKeyManager,
+    from,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
+    get_redis_manager,
+    import,
+    utils.redis_manager,
 )
-from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 #!/usr/bin/env python3
 
@@ -44,48 +48,49 @@ EXCLUDED_BASES = [
 ]
 
 def fetch_volume_map() -> Any:
-url = "https://api.binance.com/api/v3/ticker/24hr"
+    url = "https://api.binance.com/api/v3/ticker/24hr"
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 resp = requests.get(url, timeout=10)
 resp.raise_for_status()
         return {item["symbol"]: float(item["quoteVolume"]) for item in resp.json()}
 except Exception as e:
-logging.error(f"[ERROR] Failed to fetch volume data: {e}")
+    logging.error(f"[ERROR] Failed to fetch volume data: {e}")
         return {}
 
 def main() -> Any:
-if not SYMBOL_LIST_FILE.exists():
-logging.error(f"[ERROR] Missing symbol list: {SYMBOL_LIST_FILE}")
+    if not SYMBOL_LIST_FILE.exists():
+    logging.error(f"[ERROR] Missing symbol list: {SYMBOL_LIST_FILE}")
         # return
 with open(SYMBOL_LIST_FILE, "r") as f:
-all_symbols = json.load(f)
+    all_symbols = json.load(f)
 
 volume_map = fetch_volume_map()
 qualified = []
 
 for base in all_symbols:
-if base in EXCLUDED_BASES:
-logging.info(f"[BLOCKED] Skipping {base}: excluded base token")
+    if base in EXCLUDED_BASES:
+    logging.info(f"[BLOCKED] Skipping {base}: excluded base token")
             # continue
 full_symbol = f"{base}USDT"
         vol = volume_map.get(full_symbol)
 if vol and vol >= MIN_VOLUME_USDT:
-redis_key = f"{base}_15m_klines"
+    redis_key = f"{base}_15m_klines"
 if not r.get_cache(redis_key) is not None:
-logging.warning(f"⛔ Skipping {base}: Redis key '{redis_key}' not found.")
+    logging.warning(f"⛔ Skipping {base}: Redis key '{redis_key}' not found.")
                 # continue
 qualified.append(base)
 else:
-logging.warning(f"⛔ Skipping {base}: volume {vol} below threshold")
+    logging.warning(f"⛔ Skipping {base}: volume {vol} below threshold")
 
 qualified = sorted(set(qualified))
 OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 with open(OUTPUT_FILE, "w") as f:
-json.dump(qualified, f, indent=4)
+    json.dump(qualified, f, indent=4)
 
 logging.info(f"[OK] Qualified: {len(qualified)}")
 logging.info(f"[SAVE] Saved to: {OUTPUT_FILE}")
@@ -95,10 +100,10 @@ r.set_cache("counters:last_scan_vol", timestamp)
 r.set_cache("counters:volume_filter_count", len(qualified))
 r.cleanup_expired_keys()
 for token in qualified:
-r.store_trade_data({\
+    r.store_trade_data({\
 "symbol"
 ": token})"
 logging.info("🔁 Redis set 'VOLUME_PASSED_TOKENS' populated.")
 
 if __name__ == "__main__":
-main()
+    main()

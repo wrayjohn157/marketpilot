@@ -3,9 +3,10 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 
 def parse_iso(ts: str) -> datetime:
-try:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 # With fractional seconds (e.g., 2025-05-01T20:43:22.594Z)
@@ -15,7 +16,7 @@ except ValueError:
     return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
 
 def normalize_trade_date(dt: datetime) -> datetime:
-if not isinstance(dt, datetime):
+    if not isinstance(dt, datetime):
         raise TypeError(f"normalize_trade_date expects datetime, got {type(dt)}")
 
 if dt.hour < 3:

@@ -15,12 +15,15 @@ from ta.momentum import RSIIndicator
 from ta.trend import MACD
 
 from config.unified_config_manager import (
+    from,
+    get_3commas_credentials,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
+    import,
+    utils.credential_manager,
 )
-from utils.credential_manager import get_3commas_credentials
 
 #!/usr/bin/env python3
 
@@ -33,7 +36,7 @@ SNAPSHOT_BASE = get_path("snapshots")
 
 # === Credentials ===
 with open(CONFIG_PATH) as f:
-creds = json.load(f)
+    creds = json.load(f)
 TG_BOT_TOKEN = creds["telegram_bot_token"]
 TG_CHAT_ID = creds["telegram_chat_id"]
 API_KEY = creds["3commas_api_key"]
@@ -43,7 +46,7 @@ BASE_URL = "https://api.3commas.io"
 
 # === SAFU Config ===
 with open(SAFU_CONFIG_PATH) as f:
-safu_cfg = yaml.safe_load(f)
+    safu_cfg = yaml.safe_load(f)
 THRESHOLD = safu_cfg.get("min_score", 0.4)
 ALERTS_ENABLED = safu_cfg.get("telegram_alerts", True)
 AUTO_CLOSE_ENABLED = safu_cfg.get("auto_close", False)
@@ -55,27 +58,28 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 # === Functions ===
 
 def send_telegram(msg: Any) -> Any:
-if not ALERTS_ENABLED:
+    if not ALERTS_ENABLED:
         # return
 url = f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage"
     payload = {"chat_id": TG_CHAT_ID, "text": msg, "parse_mode": "HTML"}
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 requests.post(url, json=payload, timeout=5)
 except Exception as e:
-logging.warning(f"[TG] Error: {e}")
+    logging.warning(f"[TG] Error: {e}")
 
 def generate_signature(path: str) -> str:
     return hmac.new(API_SECRET.encode(), path.encode(), hashlib.sha256).hexdigest()
 
 def fetch_open_trades() -> Any:
-page = 1
+    page = 1
 all_trades = []
 while True:
-url_path = f"/public/api/ver1/deals?bot_id={BOT_ID}&limit=100&offset={(page-1)*100}&scope=active"
+    url_path = f"/public/api/ver1/deals?bot_id={BOT_ID}&limit=100&offset={(page-1)*100}&scope=active"
 headers = {
 "ApiKey": API_KEY,
 "Signature": generate_signature(url_path),
@@ -84,11 +88,12 @@ headers = {
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 resp = requests.get(BASE_URL + url_path, headers=headers, timeout=10)
 if resp.status_code != 200:
-logging.warning(f"[3C] Fetch error {resp.status_code}: {resp.text}")
+    logging.warning(f"[3C] Fetch error {resp.status_code}: {resp.text}")
                 # break
 deals = resp.json()
             logging.info(f"[3C] Fetched page {page}: {len(deals)} deals")
@@ -97,25 +102,26 @@ if len(deals) < 100:
                 # break
 page += 1
 except Exception as e:
-logging.warning(f"[3C] Fetch failed on page {page}: {e}")
+    logging.warning(f"[3C] Fetch failed on page {page}: {e}")
             # break
     logging.info(f"[3C] Total deals returned: {len(all_trades)}")
     return all_trades
 
 def load_indicators_from_disk(symbol: Any, tf: Any = "15m") -> Any:
-date_str = datetime.utcnow().strftime("%Y-%m-%d")
+    date_str = datetime.utcnow().strftime("%Y-%m-%d")
 path = SNAPSHOT_BASE / date_str / f"{symbol}_{tf}_klines.json"
 if not path.exists():
-logging.warning(f"[Fallback] Kline file not found: {path}")
+    logging.warning(f"[Fallback] Kline file not found: {path}")
         return {}
 
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 with open(path) as f:
-raw = json.load(f)
+    raw = json.load(f)
 
 df = pd.DataFrame(raw, columns=[
 "timestamp", "open", "high", "low", "close", "volume",
@@ -141,38 +147,39 @@ volume_ma = df["volume"].rolling(20).mean()
         }
 
 except Exception as e:
-logging.warning(f"[Fallback] Error loading indicators from disk for {symbol}: {e}")
+    logging.warning(f"[Fallback] Error loading indicators from disk for {symbol}: {e}")
         return {}
 
 def fork_safu_score(token: Any, price_pct: Any) -> Any:
-score = 1.0
+    score = 1.0
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 if token["RSI14"] is not None and token["RSI14"] < 35:
-score -= WEIGHTS.get("token_rsi_below_35", 0)
+    score -= WEIGHTS.get("token_rsi_below_35", 0)
 if token["MACD_diff"] is not None and token["MACD_diff"] < 0:
-score -= WEIGHTS.get("token_macd_bearish", 0)
+    score -= WEIGHTS.get("token_macd_bearish", 0)
 if token["VWAP"] is not None and token["price"] < token["VWAP"]:
-score -= WEIGHTS.get("token_price_below_vwap", 0)
+    score -= WEIGHTS.get("token_price_below_vwap", 0)
 if token["volume_drop_pct"] is not None and token["volume_drop_pct"] > 20:
-score -= WEIGHTS.get("token_volume_drop", 0)
+    score -= WEIGHTS.get("token_volume_drop", 0)
 
 if price_pct < -6:
-score -= WEIGHTS.get("drawdown_gt_6", 0)
+    score -= WEIGHTS.get("drawdown_gt_6", 0)
 if price_pct < -7:
-score -= WEIGHTS.get("drawdown_gt_7", 0)
+    score -= WEIGHTS.get("drawdown_gt_7", 0)
 
 except Exception as e:
-logging.warning(f"[SAFU] Scoring error for token {token}: {e}")
+    logging.warning(f"[SAFU] Scoring error for token {token}: {e}")
         return 0.0
 
     return round(max(0.0, score), 3)
 
 def panic_sell(deal_id: Any) -> Any:
-url_path = f"/public/api/ver1/deals/{deal_id}/panic_sell"
+    url_path = f"/public/api/ver1/deals/{deal_id}/panic_sell"
 headers = {
 "ApiKey": API_KEY,
 "Signature": generate_signature(url_path),
@@ -181,28 +188,29 @@ headers = {
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 resp = requests.post(BASE_URL + url_path, headers=headers, timeout=10)
         return resp.status_code == 200
 except Exception as e:
-logging.warning(f"[3C] Panic sell error: {e}")
+    logging.warning(f"[3C] Panic sell error: {e}")
         return False
 
 def analyze_trade(trade: Any) -> Any:
-symbol_3c = trade["pair"]
+    symbol_3c = trade["pair"]
 symbol = symbol_3c.replace("USDT_", "")
 entry_price = float(trade.get("bought_average") or trade.get("base_order_average_price") or 0)
 current_price = float(trade.get("current_price") or 0)
 
 if entry_price == 0 or current_price == 0:
-logging.warning(f"[Skip] {symbol_3c} → Missing entry/current price")
+    logging.warning(f"[Skip] {symbol_3c} → Missing entry/current price")
         # return
 price_pct = round((current_price - entry_price) / entry_price * 100, 2)
 
 indicators = load_indicators_from_disk(symbol)
 if not indicators:
-logging.warning(f"[Skip] {symbol_3c} → No indicators available")
+    logging.warning(f"[Skip] {symbol_3c} → No indicators available")
         # return
 token = {
         "price": current_price,
@@ -216,7 +224,7 @@ score = fork_safu_score(token, price_pct)
     logging.info(f"{symbol_3c} SAFE | Score: {score} | PnL: {price_pct}%")
 
 if score < THRESHOLD:
-msg = (
+    msg = (
 f"🚨 <b>SAFU Triggered</b>"
 n""
 f"[DOWN] <b>{symbol_3c}</b> | PnL: <code>{price_pct:.2f}%</code>"
@@ -230,21 +238,22 @@ f"[WARNING] VWAP Drop: {'YES' if token['price'] < token['VWAP'] else 'NO'}"
 send_telegram(msg)
 
 if AUTO_CLOSE_ENABLED:
-success = panic_sell(trade["id"])
-logging.info(f"[AUTO-CLOSE] {symbol_3c} → {'[OK] Closed' if success else '[ERROR] Failed'}")
+    success = panic_sell(trade["id"])
+logging.info(f"[AUTO-CLOSE] {symbol_3c} -> {'[OK] Closed' if success else '[ERROR] Failed'}")
 
 def main() -> Any:
-trades = fetch_open_trades()
+    trades = fetch_open_trades()
 logging.info(f"[SEARCH] Checking {len(trades)} active deals (scope=active)...")
 for trade in trades:
-try:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 analyze_trade(trade)
 except Exception as e:
-logging.warning(f"[Trade] Error on {trade.get('pair')}: {e}")
+    logging.warning(f"[Trade] Error on {trade.get('pair')}: {e}")
 
 if __name__ == "__main__":
-main()
+    main()

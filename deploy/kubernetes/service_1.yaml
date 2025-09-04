@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: market7-trading
+  namespace: market7
+  labels:
+    app: market7-trading
+spec:
+  selector:
+    app: market7-trading
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+  type: ClusterIP

@@ -380,6 +380,6 @@ def get_trade_health_legacy(symbol: str, redis: Any = Depends(get_redis)):
 
 
 if __name__ == "__main__":
-    import uvicorn
+import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)

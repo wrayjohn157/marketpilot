@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: market7-dca
+  namespace: market7
+  labels:
+    app: market7-dca
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: market7-dca
+  template:
+    metadata:
+      labels:
+        app: market7-dca
+    spec:
+      containers:
+      - name: dca-service
+        image: market7:latest
+        command: ["python3", "dca/smart_dca_signal_integrated.py"]
+        ports:
+        - containerPort: 8003
+        env:
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: market7-config
+              key: ENVIRONMENT
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: market7-config
+              key: REDIS_HOST
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: market7-config
+              key: POSTGRES_HOST
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: market7-secrets
+              key: postgres-password
+        - name: BINANCE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: market7-secrets
+              key: binance-api-key
+        - name: BINANCE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: market7-secrets
+              key: binance-secret-key
+        - name: THREE_COMMAS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: market7-secrets
+              key: three-commas-api-key
+        - name: THREE_COMMAS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: market7-secrets
+              key: three-commas-secret-key
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "125m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: data
+          mountPath: /app/data
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: market7-logs-pvc
+      - name: data
+        persistentVolumeClaim:
+          claimName: market7-data-pvc

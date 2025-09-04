@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: market7-indicators
+  namespace: market7
+  labels:
+    app: market7-indicators
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: market7-indicators
+  template:
+    metadata:
+      labels:
+        app: market7-indicators
+    spec:
+      containers:
+      - name: indicator-service
+        image: market7:latest
+        command: ["python3", "indicators/indicator_runner_integrated.py"]
+        ports:
+        - containerPort: 8002
+        env:
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: market7-config
+              key: ENVIRONMENT
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: market7-config
+              key: REDIS_HOST
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "125m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+        volumeMounts:
+        - name: data
+          mountPath: /app/data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: market7-data-pvc

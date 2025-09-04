@@ -20,6 +20,7 @@ def is_valid_trade(trade: Any) -> Any:
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 indicators = trade["fork_score"]["indicators"]
@@ -39,47 +40,48 @@ def label_trade(trade: Any) -> Any:
     return 1 if trade.get("pnl_pct", -999) >= 0.3 else 0
 
 def extract_dataset(start_date: Any, end_date: Any) -> Any:
-current = start_date
+    current = start_date
 merged = []
 
 while current <= end_date:
-folder = ENRICHED_BASE / current.strftime("%Y-%m-%d")
+    folder = ENRICHED_BASE / current.strftime("%Y-%m-%d")
 file_path = folder / "enriched_data.jsonl"
 
 if file_path.exists():
-with open(file_path, "r") as f:
-for line in f:
-try:
+    with open(file_path, "r") as f:
+    for line in f:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 trade = json.loads(line)
 if is_valid_trade(trade):
-trade["label"] = label_trade(trade)
+    trade["label"] = label_trade(trade)
 merged.append(trade)
 except Exception as e:
-print(f"[!] Error parsing line: {e}")
+    print(f"[!] Error parsing line: {e}")
 print(f"[OK] {current.date()}: {len(merged)} valid trades so far")
 else:
-print(f"[!] Enriched file not found: {file_path}")
+    print(f"[!] Enriched file not found: {file_path}")
 current += timedelta(days=1)
 
 if merged:
-out_dir = OUT_BASE / f"{start_date.date()}_to_{end_date.date()}"
+    out_dir = OUT_BASE / f"{start_date.date()}_to_{end_date.date()}"
 out_dir.mkdir(parents=True, exist_ok=True)
 out_path = out_dir / "ml_training_set.jsonl"
 with open(out_path, "w") as f:
-for row in merged:
-f.write(json.dumps(row) + ""
+    for row in merged:
+    f.write(json.dumps(row) + ""
 n")"
 print(f""
 n[SAVE] Saved {len(merged)} labeled trades to {out_path}")"
 else:
-print("[WARNING] No valid trades found in the specified range.")
+    print("[WARNING] No valid trades found in the specified range.")
 
 if __name__ == "__main__":
-parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
 parser.add_argument("--start-date", required=True, help="Start date (YYYY-MM-DD)")
 parser.add_argument("--end-date", required=True, help="End date (YYYY-MM-DD)")
 args = parser.parse_args()
@@ -87,6 +89,7 @@ args = parser.parse_args()
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 start = datetime.strptime(args.start_date, "%Y-%m-%d")
@@ -95,4 +98,4 @@ if start > end:
             raise ValueError("Start date must be <= end date")
         extract_dataset(start, end)
 except Exception as e:
-print(f"[!] Date error: {e}")
+    print(f"[!] Date error: {e}")

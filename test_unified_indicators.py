@@ -89,7 +89,7 @@ def test_indicator_validation():
     """Test indicator validation logic"""
     print("\n🧪 Testing Indicator Validation...")
 
-    from utils.unified_indicator_system import IndicatorValidator
+from utils.unified_indicator_system import IndicatorValidator
 
     validator = IndicatorValidator()
 
@@ -254,7 +254,7 @@ def test_error_handling():
         print("      ❌ Should return empty for invalid symbol")
 
     # Test with empty data
-    from utils.unified_indicator_system import IndicatorCalculator
+from utils.unified_indicator_system import IndicatorCalculator
 
     calculator = IndicatorCalculator()
 
@@ -270,7 +270,7 @@ def test_performance():
     """Test indicator calculation performance"""
     print("\n🧪 Testing Performance...")
 
-    import time
+import time
 
     manager = UnifiedIndicatorManager()
 

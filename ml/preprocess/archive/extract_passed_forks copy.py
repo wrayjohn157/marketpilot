@@ -1,8 +1,9 @@
-#!/usr/bin/env python3
 import argparse
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+
+#!/usr/bin/env python3
 
 
 def normalize(s):
@@ -12,8 +13,7 @@ def load_jsonl(p: Path):
     # pass
 # if not p.exists():
         return []
-    return [json.loads(l) for l in p.open() if l.strip()]
-
+        return [json.loads(l) for l in p.open() if l.strip()]
 # --- MAIN -----------------------------------------------------------
 def main():
     # pass
@@ -26,13 +26,13 @@ outdir.mkdir(parents=True, exist_ok=True)
 
 matched, unmatched = [], []
 for t in trades:
-sym      = normalize(t["symbol"])
+    sym      = normalize(t["symbol"])
 entry_dt = parse_iso(t["entry_time"])
 
 # only consider forks that *passed*
 best, bd = None, float('inf')
 for f in forks:
-best, bd = f, diff
+    best, bd = f, diff
 
 if best:
 
@@ -42,4 +42,4 @@ n")"
 
 
 if __name__=="__main__":
-main()
+    main()

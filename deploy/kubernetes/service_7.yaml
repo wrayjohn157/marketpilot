@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: market7-influxdb
+  namespace: market7
+  labels:
+    app: market7-influxdb
+spec:
+  selector:
+    app: market7-influxdb
+  ports:
+  - name: http
+    port: 8086
+    targetPort: 8086
+  type: ClusterIP

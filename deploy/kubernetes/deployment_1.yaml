@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: market7-trading
+  namespace: market7
+  labels:
+    app: market7-trading
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: market7-trading
+  template:
+    metadata:
+      labels:
+        app: market7-trading
+    spec:
+      containers:
+      - name: trading-app
+        image: market7:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: market7-config
+              key: ENVIRONMENT
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: market7-config
+              key: REDIS_HOST
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: market7-config
+              key: POSTGRES_HOST
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: market7-secrets
+              key: postgres-password
+        - name: BINANCE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: market7-secrets
+              key: binance-api-key
+        - name: BINANCE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: market7-secrets
+              key: binance-secret-key
+        - name: THREE_COMMAS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: market7-secrets
+              key: three-commas-api-key
+        - name: THREE_COMMAS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: market7-secrets
+              key: three-commas-secret-key
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: data
+          mountPath: /app/data
+        - name: models
+          mountPath: /app/models
+      volumes:
+      - name: logs
+        persistentVolumeClaim:
+          claimName: market7-logs-pvc
+      - name: data
+        persistentVolumeClaim:
+          claimName: market7-data-pvc
+      - name: models
+        persistentVolumeClaim:
+          claimName: market7-models-pvc

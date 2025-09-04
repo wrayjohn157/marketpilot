@@ -156,6 +156,6 @@ def trade_health(symbol: str):
 
 @app.get("/3commas/metrics")
 def threecommas_metrics():
-    from threecommas_metrics import get_3commas_metrics
+from threecommas_metrics import get_3commas_metrics
 
     return get_3commas_metrics()

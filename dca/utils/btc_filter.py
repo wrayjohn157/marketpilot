@@ -21,31 +21,32 @@ BTC_SNAPSHOT_BASE = get_path("btc_logs") #BTC_SNAPSHOT_BASE = BASE_DIR / "dashbo
 
 # === BTC Snapshot Loader ===
 def get_latest_btc_snapshot() -> Any:
-today = datetime.utcnow().strftime("%Y-%m-%d")
+    today = datetime.utcnow().strftime("%Y-%m-%d")
 filepath = BTC_SNAPSHOT_BASE / today / "btc_snapshots.jsonl"
 if not filepath.exists():
-logging.warning(f"[BTC] Snapshot file missing: {filepath}")
+    logging.warning(f"[BTC] Snapshot file missing: {filepath}")
         return None
 
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 with open(filepath, "r") as f:
-lines = f.readlines()
+    lines = f.readlines()
 if not lines:
             return None
         return json.loads(lines[-1])
 except Exception as e:
-logging.warning(f"[BTC] Failed to read snapshot: {e}")
+    logging.warning(f"[BTC] Failed to read snapshot: {e}")
         return None
 
 # === BTC Safety Evaluator ===
 def is_btc_unsafe(cfg: Any) -> Any:
-snapshot = get_latest_btc_snapshot()
+    snapshot = get_latest_btc_snapshot()
 if not snapshot:
-logging.warning("[BTC] No snapshot available, skipping BTC filter")
+    logging.warning("[BTC] No snapshot available, skipping BTC filter")
         return False
 
 rsi = snapshot.get("rsi") #rsi = snapshot.get("RSI14")

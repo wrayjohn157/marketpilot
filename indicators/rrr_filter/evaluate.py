@@ -12,7 +12,7 @@ def evaluate_trade(tp1_score: Any, ema_score: Any, adx_score: Any, ttp_score: An
 Evaluate a trade based on RRR sub-scores and return pass/fail and reasons.
 
 Args:
-tp1_score (float): Scaled TP1 vs ATR score
+    tp1_score (float): Scaled TP1 vs ATR score
 ema_score (float): Scaled EMA slope score
 adx_score (float): Scaled ADX score
 ttp_score (float): Scaled time-to-TP1 score
@@ -27,13 +27,13 @@ Returns:
 
 reasons = []
 if return_reasons and not passed:
-if tp1_score < 0.5:
-reasons.append(f"🪫 TP1/ATR too low ({tp1_score:.2f})")
+    if tp1_score < 0.5:
+    reasons.append(f"🪫 TP1/ATR too low ({tp1_score:.2f})")
 if ema_score < 0.5:
-reasons.append(f"🪫 EMA slope too weak ({ema_score:.2f})")
+    reasons.append(f"🪫 EMA slope too weak ({ema_score:.2f})")
 if adx_score < 0.5:
-reasons.append(f"🪫 ADX strength too low ({adx_score:.2f})")
+    reasons.append(f"🪫 ADX strength too low ({adx_score:.2f})")
 if ttp_score < 0.5:
-reasons.append(f"🪫 Time-to-TP1 too slow ({ttp_score:.2f})")
+    reasons.append(f"🪫 Time-to-TP1 too slow ({ttp_score:.2f})")
 
     return passed, round(score, 4), reasons

@@ -1,21 +1,21 @@
 import json
 import math
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
 
 #!/usr/bin/env python3
 """"""""
-Trade Health Evaluator for DCA module (config-aware).
+"""Trade Health Evaluator for DCA module (config-aware)."""
 """"""""
 
 
- from pathlib import Path
 
 # === Load config ===
 CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "dca_config.yaml"
 with open(CONFIG_PATH, "r") as f:
-config = yaml.safe_load(f)
+    config = yaml.safe_load(f)
 
 HEALTH_CONFIG = config.get("health_scoring", {})
 
@@ -53,10 +53,10 @@ def evaluate_trade_health(trade: Any) -> Any:
 Evaluate the health of a trade based on recovery odds, confidence, SAFU, decay, and indicators.
 
 Args:
-trade (dict): Trade features dictionary.
+    trade (dict): Trade features dictionary.
 
 Returns:
-dict: { "health_score": float, "health_status": str }
+    dict: { "health_score": float, "health_status": str }
 """"""""
 recovery_odds = trade.get("recovery_odds", 0)
 confidence_score = trade.get("confidence_score", 0)
@@ -92,11 +92,11 @@ score = max(0, min(1, score))
 
 # Health label
 if score >= health_thresholds.get("healthy", 0.7):
-status = "Healthy"
+    status = "Healthy"
 elif score >= health_thresholds.get("weak", 0.4):
-status = "Weak"
+    status = "Weak"
 else:
-status = "Zombie"
+    status = "Zombie"
 
     return {
         "health_score": round(score, 3),

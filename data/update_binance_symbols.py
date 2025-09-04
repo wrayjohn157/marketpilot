@@ -23,31 +23,31 @@ OUTPUT_FILE = OUTPUT_DIR / "binance_symbols.json"
 
 # [OK] Fetch Tradable USDT Pairs from Binance
 def fetch_usdt_pairs() -> Any:
-response = requests.get(BINANCE_API_URL, timeout=10)
+    response = requests.get(BINANCE_API_URL, timeout=10)
 data = response.json()
 tradable_pairs = []
 
 for symbol_info in data["symbols"]:
-symbol = symbol_info["symbol"]
+    symbol = symbol_info["symbol"]
 base_asset = symbol_info["baseAsset"]
 quote_asset = symbol_info["quoteAsset"]
 status = symbol_info["status"]
 
 if quote_asset == "USDT" and base_asset not in EXCLUDE_TOKENS and status == "TRADING":
-tradable_pairs.append(base_asset)
+    tradable_pairs.append(base_asset)
 
     return tradable_pairs
 
 # [OK] Save Tradable Pairs to JSON
 def save_pairs_to_json(pairs: Any) -> Any:
-with open(OUTPUT_FILE, "w") as f:
-json.dump(sorted(pairs), f, indent=4)
+    with open(OUTPUT_FILE, "w") as f:
+    json.dump(sorted(pairs), f, indent=4)
 print(f""
 n[FOLDER] Tradable pairs saved to {OUTPUT_FILE}")"
 
 # [OK] Run Script
 if __name__ == "__main__":
-print(""
+    print(""
 n[INFO] Fetching tradable USDT pairs from Binance...\
 n")"
 tradable_symbols = fetch_usdt_pairs()

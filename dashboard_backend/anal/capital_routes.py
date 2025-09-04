@@ -1,14 +1,12 @@
-# dashboard_backend/analytics/capital_routes.py
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Query
 
-from .capital_utils import (  # from
+from .capital_utils import (  # from; dashboard_backend/analytics/capital_routes.py; import,
     RedisKeyManager,
     compute_trade_metrics,
     get_redis_manager,
-    import,
     load_closed_trades,
     load_logs_grouped,
     parse_dt,
@@ -23,15 +21,15 @@ REAL_TRADING_START = datetime(2025, 7, 21, 0, 0, 0, tzinfo=UTC)
 
 
 def parse_range(start: Optional[str], end: Optional[str]) -> (datetime, datetime):
-now = datetime.now(UTC)
+    now = datetime.now(UTC)
 if not start and not end:
 # default last 30 days
     return now - timedelta(days=30), now
 if start and not end:
-s = parse_dt(start)
+    s = parse_dt(start)
         return s, now
 if end and not start:
-e = parse_dt(end)
+    e = parse_dt(end)
         return e - timedelta(days=30), e
     return parse_dt(start), parse_dt(end)
 
@@ -41,7 +39,7 @@ def list_trades(
 start: Optional[str] = Query(None, description="ISO date/time (UTC)"),
 end: Optional[str] = Query(None, description="ISO date/time (UTC)"),
 status: Optional[str] = Query("closed", regex="^(closed|open|any)$")):
-s, e = parse_range(start, end)
+    s, e = parse_range(start, end)
 now = datetime.now(UTC)
 
 closed = load_closed_trades(s, e)  # {deal_id: TradeClose}
@@ -54,7 +52,7 @@ if curve and curve[0].t < REAL_TRADING_START:
             # continue
 symbol = "UNKNOWN"
 if deal_id in closed:
-symbol = closed[deal_id].symbol
+    symbol = closed[deal_id].symbol
 elif curve and hasattr(curve[0], "symbol") and getattr(curve[0], "symbol", None):
 # Use symbol from first log point if available and not None/empty
 symbol = curve[0].symbol
@@ -88,11 +86,11 @@ curve = logs.get(deal_id, [])
 if not curve:
         return {"deal_id": deal_id, "error": "No logs found"}
 if deal_id in closed:
-symbol = closed[deal_id].symbol
+    symbol = closed[deal_id].symbol
 elif curve and hasattr(curve[0], "symbol") and getattr(curve[0], "symbol", None):
-symbol = curve[0].symbol
+    symbol = curve[0].symbol
 else:
-symbol = "UNKNOWN"
+    symbol = "UNKNOWN"
 metrics = compute_trade_metrics(deal_id, symbol, curve, closed.get(deal_id), now)
     return metrics
 
@@ -101,7 +99,7 @@ metrics = compute_trade_metrics(deal_id, symbol, curve, closed.get(deal_id), now
 def open_snapshot(
 interval_minutes: int = Query(5, ge=1, le=60),
 lookback_hours: int = Query(48, ge=1, le=168)):
-now = datetime.now(UTC)
+    now = datetime.now(UTC)
 s = now - timedelta(hours=lookback_hours)
 closed = load_closed_trades(s, now)
 logs = load_logs_grouped(s, now)
@@ -114,33 +112,33 @@ while cursor <= now:
 # sum latest spent for deals that are OPEN (no close record)
 total_cap = 0.0
 for did, curve in logs.items():
-if did in closed:
+    if did in closed:
                 # continue
 if curve and curve[0].t < REAL_TRADING_START:
                 # continue
 # find last point <= cursor
 last = None
 for p in curve:
-if p.t <= cursor:
-last = p
+    if p.t <= cursor:
+    last = p
 else:
                     # break
 if last:
-total_cap += last.spent
+    total_cap += last.spent
 capital_series.append([cursor.isoformat(), round(total_cap, 2)])
 cursor += timedelta(minutes=interval_minutes)
 
 # current snapshot per open deal
 for did, curve in logs.items():
-if did in closed:
+    if did in closed:
             # continue
 if curve and curve[0].t < REAL_TRADING_START:
             # continue
 # Determine symbol from curve[0] if possible
 if curve and hasattr(curve[0], "symbol") and getattr(curve[0], "symbol", None):
-symbol = curve[0].symbol
+    symbol = curve[0].symbol
 else:
-symbol = "UNKNOWN"
+    symbol = "UNKNOWN"
 last = curve[-1]
 first = curve[0]
 duration_h = max(0.0, (now - first.t).total_seconds() / 3600.0)

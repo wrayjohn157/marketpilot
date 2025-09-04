@@ -32,16 +32,17 @@ ttp_score = analyze_time_to_tp1(klines)
 redis_key = f"{symbol}_1h"
 existing_data = r.get_cache(redis_key)
 if existing_data:
-try:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 existing_data = json.loads(existing_data)
 except json.JSONDecodeError:
-existing_data = {}
+    existing_data = {}
 else:
-existing_data = {}
+    existing_data = {}
 
 existing_data["Time_to_TP1"] = ttp_score
 r.store_indicators(redis_key, existing_data)
@@ -55,10 +56,10 @@ print(f"[OK] Saved Time_to_TP1 for {symbol}: {ttp_score}")
     print(f" - EMA Score:  {ema_score:.3f}")
     print(f" - ADX Score:  {adx_score:.3f}")
     print(f" - TTP Score:  {ttp_score:.3f}")
-    print(f" - Final Score: {score:.3f} → {'[OK] PASS' if passed else '[ERROR] FAIL'}")
+    print(f" - Final Score: {score:.3f} -> {'[OK] PASS' if passed else '[ERROR] FAIL'}")
 if not passed and reasons:
-for reason in reasons:
-print(f"    🪫 {reason}")
+    for reason in reasons:
+    print(f"    🪫 {reason}")
 
     return {
         "symbol": symbol,
@@ -78,14 +79,14 @@ print(f"    🪫 {reason}")
 
 # Optional CLI debug runner
 if __name__ == "__main__":
-symbol = "ETH"
+    symbol = "ETH"
 
 # Load klines
 kline_key = f"{symbol}_15m_klines"
 klines_raw = r.lrange(kline_key, 0, -1)
 klines = [json.loads(k) for k in klines_raw] if klines_raw else []
 if not klines or len(klines) < 20:
-print(f"[WARNING] Insufficient klines for {symbol}")
+    print(f"[WARNING] Insufficient klines for {symbol}")
 exit()
 
 # Load indicators

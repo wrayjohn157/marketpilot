@@ -9,9 +9,10 @@ INPUT_DIR = Path("/home/signal/market7/ml/datasets/recovery_training")
 OUTPUT_FILE = INPUT_DIR / "merged_recovery_dataset.jsonl"
 
 def is_nonempty_jsonl(path: Any) -> Any:
-try:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 with open(path, "r") as f:
@@ -20,35 +21,36 @@ with open(path, "r") as f:
         return False
 
 def merge_jsonl_files() -> Any:
-merged = []
+    merged = []
 files = sorted(INPUT_DIR.glob("*_recovery.jsonl"))
 
 print(f"[SEARCH] Found {len(files)} candidate files.")
 for file in files:
-if not is_nonempty_jsonl(file):
-print(f"[WARNING] Skipping empty file: {file.name}")
+    if not is_nonempty_jsonl(file):
+    print(f"[WARNING] Skipping empty file: {file.name}")
             # continue
 with open(file, "r") as f:
-for line in f:
-line = line.strip()
+    for line in f:
+    line = line.strip()
 if line:
-try:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 json.loads(line)  # validate JSON
 merged.append(line)
 except json.JSONDecodeError:
-print(f"[ERROR] Invalid JSON in {file.name}, skipping line.")
+    print(f"[ERROR] Invalid JSON in {file.name}, skipping line.")
 
 print(f"[OK] Merged {len(merged)} records from {len(files)} files.")
 with open(OUTPUT_FILE, "w") as out:
-for line in merged:
-out.write(line + ""
+    for line in merged:
+    out.write(line + ""
 n")"
 
 print(f"📦 Output saved to: {OUTPUT_FILE}")
 
 if __name__ == "__main__":
-merge_jsonl_files()
+    merge_jsonl_files()

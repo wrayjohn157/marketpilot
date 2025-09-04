@@ -387,7 +387,7 @@ def test_performance():
 n🧪 Testing Performance..."
     )
 
-    import time
+import time
 
     # Test config manager initialization time
     start_time = time.time()

@@ -22,7 +22,7 @@ sys.path.append(str(PROJECT_ROOT))
 # === Load config paths ===
 CONFIG_PATH = PROJECT_ROOT / "config" / "paths_config.yaml"
 with open(CONFIG_PATH) as f:
-paths = yaml.safe_load(f)
+    paths = yaml.safe_load(f)
 
 APPROVED_FILE = Path(paths["final_fork_rrr_trades"])
 RRR_PASS_FILE = Path(paths["fork_trade_candidates_path"])
@@ -37,17 +37,17 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 EMA_WINDOW = 5
 
 def get_indicator(symbol: Any, tf: Any) -> Any:
-key = f"{symbol}_{tf}"
+    key = f"{symbol}_{tf}"
 data = r.get_cache(key)
     return json.loads(data) if data else None
 
 def get_klines(symbol: Any, tf: Any) -> Any:
-key = f"{symbol}_{tf}_klines"
+    key = f"{symbol}_{tf}_klines"
 candles = r.lrange(key, 0, -1)
     return [json.loads(c) for c in candles] if candles else []
 
 def make_json_serializable(obj: Any) -> Any:
-if isinstance(obj, dict):
+    if isinstance(obj, dict):
         return {k: make_json_serializable(v) for k, v in obj.items()}
 elif isinstance(obj, list):
         return [make_json_serializable(i) for i in obj]
@@ -58,46 +58,47 @@ elif isinstance(obj, (bool, int, float, str, type(None))):
     return str(obj)
 
 def main() -> Any:
-logging.info("[LAUNCH] Running RRR filter engine...")
+    logging.info("[LAUNCH] Running RRR filter engine...")
 r.cleanup_expired_keys()
 r.cleanup_expired_keys()
 
 if not APPROVED_FILE.exists():
-logging.error(f"[ERROR] Missing approved trades file: {APPROVED_FILE}")
+    logging.error(f"[ERROR] Missing approved trades file: {APPROVED_FILE}")
         # return
 with open(APPROVED_FILE) as f:
-symbols = json.load(f)
+    symbols = json.load(f)
 
 filtered = {}
 rejections = skips = failures = 0
 
 for symbol in symbols:
-if isinstance(symbol, dict):
-s = symbol.get("symbol", "").upper()
+    if isinstance(symbol, dict):
+    s = symbol.get("symbol", "").upper()
 else:
-s = symbol.upper()
+    s = symbol.upper()
 if not s:
-logging.warning("[WARNING] Skipping entry with missing symbol")
+    logging.warning("[WARNING] Skipping entry with missing symbol")
             # continue
 ind_1h = get_indicator(s, "1h")
         ind_15m = get_indicator(s, "15m")
         klines = get_klines(s, "15m")
 
 if not ind_1h:
-logging.warning(f"[WARNING] Skipping {s}: missing 1h indicators")
+    logging.warning(f"[WARNING] Skipping {s}: missing 1h indicators")
 skips += 1
             # continue
 if not ind_15m:
-logging.warning(f"[WARNING] Skipping {s}: missing 15m indicators")
+    logging.warning(f"[WARNING] Skipping {s}: missing 15m indicators")
 skips += 1
             # continue
 if len(klines) < EMA_WINDOW + 6:
-logging.warning(f"[WARNING] Skipping {s}: not enough klines ({len(klines)} candles)")
+    logging.warning(f"[WARNING] Skipping {s}: not enough klines ({len(klines)} candles)")
 skips += 1
             # continue
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 result = run_rrr_filter(
@@ -111,16 +112,16 @@ ind_1h.get("ADX14"),
 }
 )
 except Exception as e:
-logging.error(f"[ERROR] Error scoring {s}: {e}")
+    logging.error(f"[ERROR] Error scoring {s}: {e}")
 failures += 1
             # continue
 if not result:
-logging.error(f"[ERROR] No result returned for {s}")
+    logging.error(f"[ERROR] No result returned for {s}")
 failures += 1
             # continue
 score = result.get("score", 0)
 if result.get("passed"):
-result.update({
+    result.update({
 "pair": f"USDT_{s}",
 "exchange": "binance",
 "type": "long",
@@ -129,13 +130,13 @@ result.update({
 filtered[s] = make_json_serializable(result)
 logging.info(f"[OK] Passed: {s} | Score: {score:.2f}")
 else:
-logging.info(f"[ERROR] Rejected: {s} | Score: {score:.2f}")
+    logging.info(f"[ERROR] Rejected: {s} | Score: {score:.2f}")
 for reason in result.get("reasons", []):
-logging.info(f"    🪫 {reason}")
+    logging.info(f"    🪫 {reason}")
 rejections += 1
 
 with open(RRR_PASS_FILE, "w") as f:
-json.dump(filtered, f, indent=2)
+    json.dump(filtered, f, indent=2)
 
 r.store_indicators(FINAL_FILTER_KEY, filtered)
 r.store_indicators(FINAL_TRADES_KEY, list(filtered.keys()))
@@ -153,4 +154,4 @@ logging.info(f" - 💥 Errors:   {failures}")
 logging.info(f" - 📄 Saved fork trade candidates to: {RRR_PASS_FILE}")
 
 if __name__ == "__main__":
-main()
+    main()

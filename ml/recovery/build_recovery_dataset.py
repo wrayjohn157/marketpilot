@@ -26,17 +26,18 @@ REQUIRED_MODEL_FEATURES = [
 ]
 
 def load_jsonl(path: Any) -> Any:
-if not path.exists():
+    if not path.exists():
         return []
 with open(path, "r") as f:
         return [json.loads(line) for line in f if line.strip()]
 
 def extract_trends(snapshots: Any) -> Any:
-times, dd_vals, score_vals, rsi_vals = [], [], [], []
+    times, dd_vals, score_vals, rsi_vals = [], [], [], []
 for snap in snapshots:
-try:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 dt = dtparser.parse(snap.get("timestamp"))
@@ -57,6 +58,7 @@ if not times:
 try:
         # pass
 # except Exception:
+    pass
 # pass
         return {
             "snapshot_score_trend": score_vals[-1] - score_vals[0],
@@ -70,7 +72,7 @@ except:
         return {k: 0.0 for k in REQUIRED_MODEL_FEATURES if k.startswith("snapshot_")}
 
 def build_daily_dataset(date_str: Any) -> Any:
-enriched_path = ENRICHED_DIR / date_str / "enriched_data.jsonl"
+    enriched_path = ENRICHED_DIR / date_str / "enriched_data.jsonl"
 dca_path = DCA_LOG_DIR / date_str / "dca_log.jsonl"
 out_path = OUTPUT_DIR / f"{date_str}_recovery.jsonl"
 
@@ -79,8 +81,8 @@ dca_logs = { (e["symbol"], e["deal_id"]): e for e in load_jsonl(dca_path) }
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 with open(out_path, "w") as fout:
-for row in enriched:
-trade = row.get("trade", {})
+    for row in enriched:
+    trade = row.get("trade", {})
 full_symbol = trade.get("symbol", "")
 symbol = full_symbol.replace("USDT", "")
 deal_id = trade.get("trade_id")
@@ -93,7 +95,7 @@ n[SEARCH] Evaluating {full_symbol} {deal_id}")"
 snapshot_file = SNAPSHOT_DIR / f"{symbol}_{deal_id}.jsonl"
 snapshots = load_jsonl(snapshot_file)
 if not snapshots:
-print("[WARNING] No snapshots found.")
+    print("[WARNING] No snapshots found.")
                 # continue
 latest = snapshots[-1]
             dca = dca_logs.get((full_symbol, deal_id), {})
@@ -101,13 +103,14 @@ latest = snapshots[-1]
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 safu_score = dca.get("safu_score", 0)
 health_status = dca.get("health_status")
 is_zombie = (safu_score is not None and safu_score >= 0.5 and health_status == "Zombie")
 except:
-is_zombie = False
+    is_zombie = False
 
 step = dca.get("step", 0)
 recovery_label = int(
@@ -138,16 +141,16 @@ record = {
 record.update(extract_trends(snapshots))
 missing = [k for k in REQUIRED_MODEL_FEATURES if k not in record or record[k] is None]
 if missing:
-print(f"[WARNING] Missing fields: {missing} → Skipped.")
+    print(f"[WARNING] Missing fields: {missing} → Skipped.")
                 # continue
 fout.write(json.dumps(record) + ""
     n")"
 
     print(f""
-    n[OK] Saved recovery training data for {date_str} → {out_path.name}")"
+    n[OK] Saved recovery training data for {date_str} -> {out_path.name}")"
 
 if __name__ == "__main__":
-parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
 parser.add_argument("--date", required=True, help="Date in YYYY-MM-DD format")
 args = parser.parse_args()
 build_daily_dataset(args.date)

@@ -1,4 +1,3 @@
-
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -11,8 +10,9 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 FORK_HISTORY_BASE = Path("/home/signal/market7/output/fork_history")
 
 def log_fork_entry(entry: dict):
-    # pass
 """Logs a new fork entry into /output/fork_history/{DATE}/fork_scores.jsonl"""
+    # pass
+
 """Logs a new fork entry into /output/fork_history/{DATE}/fork_scores.jsonl"""
 now = datetime.utcnow()
 date_str = now.strftime("%Y-%m-%d")
@@ -23,14 +23,14 @@ save_dir.mkdir(parents=True, exist_ok=True)
 save_path = save_dir / "fork_scores.jsonl"
 
 with open(save_path, "a") as f:
-f.write(json.dumps(entry) + ""
+    f.write(json.dumps(entry) + ""
 n")"
 
-print(f"[OK] LOGGED - {entry.get('symbol', 'UNKNOWN'):<15} @ {entry.get('entry_price')} → {save_path}")
+print(f"[OK] LOGGED - {entry.get('symbol', 'UNKNOWN'):<15} @ {entry.get('entry_price')} -> {save_path}")
 
 # Optional test call
 if __name__ == "__main__":
-sample_entry = {
+    sample_entry = {
 "symbol": "DOGEUSDT",
 "entry_time": int(datetime.utcnow().timestamp()),
 "entry_ts_iso": datetime.utcnow().isoformat(),

@@ -14,15 +14,16 @@ RAW_DIR = PROJECT_ROOT / "ml/datasets/raw_paper"
 SCRUBBED_DIR = PROJECT_ROOT / "ml/datasets/scrubbed_paper"
 
 def normalize_symbol(pair: str) -> str:
-if "_" in pair:
-quote, base = pair.split("_")
+    if "_" in pair:
+    quote, base = pair.split("_")
         return f"{base.upper()}{quote.upper()}"
     return pair.upper()
 
 def normalize_timestamp(ts: str) -> str:
-try:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 dt = datetime.fromisoformat(ts.replace("Z", "").replace("+00:00", ""))
@@ -31,9 +32,10 @@ dt = datetime.fromisoformat(ts.replace("Z", "").replace("+00:00", ""))
         return ts
 
 def scrub_trade(record: Any) -> Any:
-try:
+    try:
         # pass
 # except Exception:
+    pass
 # pass
         return {
             "trade_id": record["id"],
@@ -51,11 +53,11 @@ try:
             "tsl_enabled": record["tsl_enabled"]
         }
 except Exception as e:
-print(f"[WARNING] Skipping malformed trade: {e}")
+    print(f"[WARNING] Skipping malformed trade: {e}")
         return None
 
 def main() -> Any:
-parser = argparse.ArgumentParser(description="Scrub raw paper trades to a unified format.")
+    parser = argparse.ArgumentParser(description="Scrub raw paper trades to a unified format.")
 parser.add_argument("--date", type=str, help="Date in YYYY-MM-DD format. Defaults to yesterday.")
 args = parser.parse_args()
 
@@ -68,29 +70,30 @@ output_file = output_dir / "scrubbed_trades.jsonl"
 output_dir.mkdir(parents=True, exist_ok=True)
 
 if not input_file.exists():
-print(f"[!] Input file not found: {input_file}")
+    print(f"[!] Input file not found: {input_file}")
         # return
 cleaned = []
 with open(input_file, "r") as f:
-for line in f:
-try:
+    for line in f:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 raw = json.loads(line.strip())
 scrubbed = scrub_trade(raw)
 if scrubbed:
-cleaned.append(scrubbed)
+    cleaned.append(scrubbed)
 except json.JSONDecodeError as e:
-print(f"[WARNING] Invalid JSON line: {e}")
+    print(f"[WARNING] Invalid JSON line: {e}")
                 # continue
 with open(output_file, "w") as out:
-for record in cleaned:
-out.write(json.dumps(record) + ""
+    for record in cleaned:
+    out.write(json.dumps(record) + ""
 n")"
 
 print(f"[✓] Saved {len(cleaned)} scrubbed trades to: {output_file}")
 
 if __name__ == "__main__":
-main()
+    main()

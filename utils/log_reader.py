@@ -19,7 +19,7 @@ Reads the latest dca_log.jsonl file for the given date (or today by default)
 and returns the most recent entry per deal_id.
 """"""""
 if date is None:
-date = dt.datetime.now().strftime("%Y-%m-%d")
+    date = dt.datetime.now().strftime("%Y-%m-%d")
 
 log_path = DCA_LOG_BASE / date / "dca_log.jsonl"
 if not log_path.exists():
@@ -28,10 +28,11 @@ if not log_path.exists():
 latest_by_deal = {}
 
 with open(log_path, "r") as f:
-for line in f:
-try:
+    for line in f:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 entry = json.loads(line)
@@ -42,7 +43,7 @@ if not deal_id or not ts:
 # Keep latest per deal_id
 existing = latest_by_deal.get(deal_id)
 if not existing or ts > existing["timestamp"]:
-latest_by_deal[deal_id] = entry
+    latest_by_deal[deal_id] = entry
 
 except json.JSONDecodeError:
                 # continue

@@ -34,16 +34,18 @@ EXPECTED_FEATURES = [
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 MODEL = joblib.load(RECOVERY_MODEL_PATH)
 except Exception as e:
-print(f"[ERROR] Failed to load recovery model: {e}")
+    print(f"[ERROR] Failed to load recovery model: {e}")
 MODEL = None
 
 def get_latest_snapshot(symbol: str, deal_id: int):
-    # pass
 """Load the latest row from the recovery snapshot for a trade."""
+    # pass
+
 """Load the latest row from the recovery snapshot for a trade."""
 file = SNAPSHOT_PATH / f"{symbol.replace('USDT_', '')}_{deal_id}.jsonl"
 if not file.exists():
@@ -51,10 +53,11 @@ if not file.exists():
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 with open(file, "r") as f:
-lines = f.readlines()
+    lines = f.readlines()
 if lines:
             return json.loads(lines[-1])
 # except Exception:
@@ -68,29 +71,30 @@ def predict_recovery_odds(snapshot_row: dict) -> float:
 if not snapshot_row:
         return 0.0
 if MODEL is None:
-print("[WARN] No recovery model loaded; cannot predict odds.")
+    print("[WARN] No recovery model loaded; cannot predict odds.")
         return 0.0
 
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 row = snapshot_row.copy()
 meta = row.pop("snapshot_meta", {})
 for k, v in meta.items():
-row[f"snapshot_{k}"] = v
+    row[f"snapshot_{k}"] = v
 
 # Fill missing fields
 row = {k: v for k, v in row.items() if isinstance(v, (int, float, bool))}
 for feat in EXPECTED_FEATURES:
-if feat not in row:
-row[feat] = 0.0
+    if feat not in row:
+    row[feat] = 0.0
 
 df = pd.DataFrame([row], columns=EXPECTED_FEATURES)
 proba = MODEL.predict_proba(df)[0][1]  # probability of "good recovery"
         return round(float(proba), 4)
 
 except Exception as e:
-print(f"[WARN] Recovery odds prediction failed: {e}")
+    print(f"[WARN] Recovery odds prediction failed: {e}")
         return 0.0

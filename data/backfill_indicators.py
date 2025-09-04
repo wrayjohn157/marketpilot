@@ -39,14 +39,15 @@ level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 
 # === Load symbols ===
 with open(SYMBOLS_FILE) as f:
-SYMBOLS = json.load(f)
+    SYMBOLS = json.load(f)
 
 # === Helpers ===
 def fetch_klines(symbol: Any, interval: Any, end_ts: Any, limit: Any = KLINE_LIMIT) -> Any:
-url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}&endTime={end_ts}"
+    url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}&endTime={end_ts}"
 try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 r = requests.get(url, timeout=10)
@@ -78,13 +79,14 @@ df = df.astype(
 )
         return df
 except Exception as e:
-logging.warning(f"[ERROR] {symbol} {interval}: {e}")
+    logging.warning(f"[ERROR] {symbol} {interval}: {e}")
         return None
 
 def compute_indicators(df: Any) -> Any:
-try:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 indicators = {
@@ -116,57 +118,58 @@ indicators["timestamp"] = int(df["time"].iloc[-1] // 1000)
 
     return indicators
 except Exception as e:
-logging.warning(f"[WARNING] Indicator calc failed: {e}")
+    logging.warning(f"[WARNING] Indicator calc failed: {e}")
         return None
 
 def save_snapshot(symbol: Any, tf: Any, date_str: Any, indicators: Any) -> Any:
-day_folder = SNAPSHOT_DIR / date_str
+    day_folder = SNAPSHOT_DIR / date_str
 day_folder.mkdir(parents=True, exist_ok=True)
 jsonl_file = day_folder / f"{symbol}_{tf}.jsonl"
 with open(jsonl_file, "a") as f:
-f.write(json.dumps(indicators) + ""
+    f.write(json.dumps(indicators) + ""
 n")"
 
 # === Main ===
 
 def process_symbol_tf(symbol: Any, tf: Any) -> Any:
-interval_ms = {
+    interval_ms = {
 "1h": 60 * 60 * 1000,
 "4h": 4 * 60 * 60 * 1000,
 }[tf]
 full_symbol = symbol.upper() + "USDT"
 day = START_DATE
 while day <= END_DATE:
-for i in range(0, 24 if tf == "1h" else 6, int(tf[:-1])):
-hour_time = day + pd.Timedelta(hours=i)
+    for i in range(0, 24 if tf == "1h" else 6, int(tf[:-1])):
+    hour_time = day + pd.Timedelta(hours=i)
 end_ts = int(hour_time.timestamp() * 1000)
 df = fetch_klines(full_symbol, tf, end_ts)
 if df is not None and len(df) >= 100:
-indicators = compute_indicators(df)
+    indicators = compute_indicators(df)
 if indicators:
-save_snapshot(symbol, tf, day.strftime("%Y-%m-%d"), indicators)
+    save_snapshot(symbol, tf, day.strftime("%Y-%m-%d"), indicators)
 logging.info(f"[OK] {symbol} {tf} {hour_time}")
 else:
-logging.info(f"⏭ Skipped {symbol} {tf} {hour_time} (insufficient data)")
+    logging.info(f"⏭ Skipped {symbol} {tf} {hour_time} (insufficient data)")
 time.sleep(0.1)
 day += pd.Timedelta(days=1)
 
 def run_backfill() -> Any:
-max_workers = 10
+    max_workers = 10
 for tf in TIMEFRAMES:
-if tf == "15m":
+    if tf == "15m":
             continue  # Skip 15m for now
 with ThreadPoolExecutor(max_workers=max_workers) as executor:
-futures = [executor.submit(process_symbol_tf, symbol, tf) for symbol in SYMBOLS]
+    futures = [executor.submit(process_symbol_tf, symbol, tf) for symbol in SYMBOLS]
 for future in as_completed(futures):
-try:
+    try:
     # pass
 # except Exception:
+    pass
 # pass
 # pass
 future.result()
 except Exception as e:
-logging.error(f"Thread failed: {e}")
+    logging.error(f"Thread failed: {e}")
 
 if __name__ == "__main__":
-run_backfill()
+    run_backfill()
