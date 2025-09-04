@@ -1,0 +1,309 @@
+# Unified ML Pipeline Configuration
+# SAAS-ready configuration for machine learning infrastructure
+
+# === Pipeline Settings ===
+pipeline:
+  max_workers: 10
+  timeout_seconds: 3600
+  retry_attempts: 3
+  retry_delay: 60
+
+# === Data Management ===
+data_management:
+  base_path: "ml/datasets"
+  feature_store_path: "ml/features"
+  model_registry_path: "ml/models"
+  max_dataset_size: 1000000
+  compression: true
+  encryption: true
+
+# === Model Training ===
+model_training:
+  default_params:
+    xgb_classifier:
+      n_estimators: 100
+      max_depth: 4
+      learning_rate: 0.1
+      random_state: 42
+      use_label_encoder: false
+      eval_metric: "logloss"
+    xgb_regressor:
+      n_estimators: 100
+      max_depth: 4
+      learning_rate: 0.1
+      random_state: 42
+      objective: "reg:squarederror"
+  
+  validation:
+    test_split: 0.2
+    validation_split: 0.2
+    cross_validation_folds: 5
+    stratify: true
+  
+  feature_engineering:
+    enable_technical_indicators: true
+    enable_interaction_features: true
+    enable_polynomial_features: false
+    max_polynomial_degree: 2
+
+# === Model Types ===
+model_types:
+  safu_exit:
+    type: "binary_classification"
+    target_column: "safu_label"
+    features:
+      - "entry_score"
+      - "current_score"
+      - "safu_score"
+      - "recovery_odds"
+      - "confidence_score"
+      - "rsi"
+      - "macd_histogram"
+      - "adx"
+      - "tp1_shift"
+      - "be_improvement"
+      - "drawdown_pct"
+      - "macd_lift"
+      - "rsi_slope"
+      - "btc_rsi"
+      - "btc_adx"
+      - "btc_macd_histogram"
+    metrics:
+      - "accuracy"
+      - "precision"
+      - "recall"
+      - "f1_score"
+      - "auc"
+  
+  recovery_odds:
+    type: "binary_classification"
+    target_column: "recovery_label"
+    features:
+      - "entry_score"
+      - "current_score"
+      - "safu_score"
+      - "confidence_score"
+      - "rsi"
+      - "macd_histogram"
+      - "adx"
+      - "tp1_shift"
+      - "be_improvement"
+      - "drawdown_pct"
+      - "macd_lift"
+      - "rsi_slope"
+    metrics:
+      - "accuracy"
+      - "precision"
+      - "recall"
+      - "f1_score"
+      - "auc"
+  
+  confidence_score:
+    type: "regression"
+    target_column: "confidence_score_ml"
+    features:
+      - "step"
+      - "entry_score"
+      - "current_score"
+      - "tp1_shift"
+      - "safu_score"
+      - "rsi"
+      - "macd_histogram"
+      - "adx"
+      - "macd_lift"
+      - "rsi_slope"
+      - "drawdown_pct"
+      - "snapshot_score_trend"
+      - "snapshot_rsi_trend"
+      - "snapshot_max_drawdown"
+      - "snapshot_min_score"
+      - "snapshot_min_rsi"
+      - "snapshot_time_to_max_drawdown_min"
+    metrics:
+      - "r2_score"
+      - "mse"
+      - "mae"
+      - "rmse"
+  
+  dca_spend:
+    type: "regression"
+    target_column: "volume_sent"
+    features:
+      - "entry_score"
+      - "current_score"
+      - "drawdown_pct"
+      - "safu_score"
+      - "macd_lift"
+      - "rsi"
+      - "rsi_slope"
+      - "adx"
+      - "tp1_shift"
+      - "recovery_odds"
+      - "confidence_score"
+      - "zombie_tagged"
+      - "btc_rsi"
+      - "btc_macd_histogram"
+      - "btc_adx"
+      - "btc_status_bullish"
+      - "btc_status_bearish"
+      - "btc_status_neutral"
+      - "btc_status_nan"
+    metrics:
+      - "r2_score"
+      - "mse"
+      - "mae"
+      - "rmse"
+  
+  trade_success:
+    type: "binary_classification"
+    target_column: "label"
+    features:
+      - "ind_ema50"
+      - "ind_rsi"
+      - "ind_adx"
+      - "ind_atr"
+      - "ind_stoch_rsi_k"
+      - "ind_stoch_rsi_d"
+      - "ind_macd"
+      - "ind_macd_signal"
+      - "ind_macd_hist"
+      - "ind_macd_hist_prev"
+      - "ind_macd_lift"
+      - "btc_rsi"
+      - "btc_adx"
+      - "btc_macd_histogram"
+      - "btc_ema_50"
+      - "btc_ema_200"
+      - "btc_market_condition_num"
+    metrics:
+      - "accuracy"
+      - "precision"
+      - "recall"
+      - "f1_score"
+      - "auc"
+
+# === Data Quality ===
+data_quality:
+  min_quality_score: 0.5
+  max_missing_percentage: 0.3
+  outlier_detection_method: "iqr"
+  outlier_threshold: 1.5
+  required_columns_check: true
+  data_type_validation: true
+
+# === Feature Engineering ===
+feature_engineering:
+  technical_indicators:
+    rsi:
+      enabled: true
+      window: 14
+      oversold_threshold: 30
+      overbought_threshold: 70
+    macd:
+      enabled: true
+      fast_period: 12
+      slow_period: 26
+      signal_period: 9
+    adx:
+      enabled: true
+      window: 14
+      strong_trend_threshold: 25
+      weak_trend_threshold: 20
+  
+  interaction_features:
+    enabled: true
+    max_interactions: 5
+    correlation_threshold: 0.8
+  
+  polynomial_features:
+    enabled: false
+    max_degree: 2
+    include_bias: false
+
+# === Model Registry ===
+model_registry:
+  versioning_strategy: "timestamp"
+  max_versions_per_model: 10
+  auto_cleanup: true
+  metadata_tracking: true
+  model_comparison: true
+
+# === Model Serving ===
+model_serving:
+  cache_predictions: true
+  cache_ttl: 3600
+  batch_predictions: true
+  max_batch_size: 1000
+  timeout: 30
+
+# === Monitoring ===
+monitoring:
+  enable_metrics: true
+  enable_logging: true
+  enable_alerting: true
+  metrics_interval: 300
+  log_level: "INFO"
+  
+  model_performance:
+    track_accuracy: true
+    track_latency: true
+    track_throughput: true
+    alert_thresholds:
+      accuracy_drop: 0.1
+      latency_increase: 2.0
+      error_rate: 0.05
+  
+  data_drift:
+    enabled: true
+    detection_method: "statistical"
+    threshold: 0.1
+    window_size: 1000
+
+# === Multi-Tenant Support ===
+multi_tenant:
+  enabled: true
+  tenant_isolation: true
+  shared_models: false
+  tenant_specific_features: true
+  resource_limits:
+    max_models_per_tenant: 50
+    max_datasets_per_tenant: 100
+    max_training_jobs_per_tenant: 10
+
+# === Security ===
+security:
+  encryption_at_rest: true
+  encryption_in_transit: true
+  access_control: true
+  audit_logging: true
+  data_anonymization: false
+  gdpr_compliance: true
+
+# === API Configuration ===
+api:
+  enabled: true
+  base_url: "/api/v1/ml"
+  rate_limiting: true
+  max_requests_per_minute: 100
+  authentication_required: true
+  cors_enabled: true
+  
+  endpoints:
+    train: "/train"
+    predict: "/predict"
+    models: "/models"
+    datasets: "/datasets"
+    health: "/health"
+
+# === Logging ===
+logging:
+  level: "INFO"
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+  file: "logs/ml_pipeline.log"
+  max_size: "10MB"
+  backup_count: 5
+  
+  structured_logging: true
+  log_predictions: true
+  log_training_metrics: true
+  log_data_quality: true

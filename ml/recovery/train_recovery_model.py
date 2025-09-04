@@ -9,8 +9,7 @@ from sklearn.model_selection import train_test_split
 import argparse
 import joblib
 
-from
- xgboost import XGBClassifier
+from xgboost import XGBClassifier
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 

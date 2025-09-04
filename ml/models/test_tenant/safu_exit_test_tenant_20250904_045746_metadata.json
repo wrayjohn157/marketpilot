@@ -1,0 +1,6 @@
+{
+  "model_id": "safu_exit_test_tenant_20250904_045746",
+  "model_type": "safu_exit",
+  "tenant_id": "test_tenant",
+  "config": {
+    "model_type": 

@@ -11,8 +11,7 @@ from utils.credential_manager import get_3commas_credentials
 
 
 #!/usr/bin/env python3
-from
- datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 
 # === Updated Dynamic Paths ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7

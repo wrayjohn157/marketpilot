@@ -10,8 +10,7 @@ import argparse
 import joblib
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+from pathlib import Path
 
 # === Setup Logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")

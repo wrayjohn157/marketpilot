@@ -10,8 +10,7 @@ import argparse
 import joblib
 
 #!/usr/bin/env python3
-from
- pathlib import Path
+from pathlib import Path
 
 def load_dataset(path: Any) -> Any:
     with open(path, "r") as f:

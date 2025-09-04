@@ -1,0 +1,6 @@
+{
+  "model_id": "trade_success_test_tenant_20250904_045746",
+  "model_type": "trade_success",
+  "tenant_id": "test_tenant",
+  "config": {
+    "model_type": 
