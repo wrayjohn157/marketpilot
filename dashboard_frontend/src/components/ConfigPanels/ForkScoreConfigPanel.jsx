@@ -109,6 +109,11 @@ export default function ForkScoreConfigPanel() {
      .replace(/_/g, " ")
      .replace(/\b\w/g, c => c.toUpperCase());
 
+  // Pretty label for general use
+  const prettyLabel = k =>
+    k.replace(/_/g, " ")
+     .replace(/\b\w/g, c => c.toUpperCase());
+
   if (!config) return <p className="p-4 text-sm">Loading…</p>;
 
   return (

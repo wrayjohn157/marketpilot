@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import { Menu, X, HelpCircle, PlayCircle } from "lucide-react";
 
 const links = [
-  { label: "Dashboard", icon: "📊", path: "/dashboard" },
+  { label: "Dashboard", icon: "📊", path: "/trade-dashboard" },
   { label: "Active Trades", icon: "📈", path: "/active-trades" },
   { label: "Scan Review", icon: "🔍", path: "/scan-review" },
   { label: "DCA Tracker", icon: "📊", path: "/dca-tracker" },
