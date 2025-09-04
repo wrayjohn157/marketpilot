@@ -1,0 +1,28 @@
+[flake8]
+max-line-length = 88
+extend-ignore = 
+    E203,  # whitespace before ':'
+    E501,  # line too long (handled by black)
+    W503,  # line break before binary operator
+    E402,  # module level import not at top of file
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    .eggs,
+    *.egg,
+    build,
+    dist,
+    archive,
+    .mypy_cache,
+    .pytest_cache,
+per-file-ignores =
+    __init__.py:F401
+max-complexity = 10
+select = 
+    C,
+    E,
+    F,
+    W,
+    B,
+    B950

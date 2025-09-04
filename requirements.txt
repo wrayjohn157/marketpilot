@@ -21,6 +21,13 @@ jinja2
 # === Dev Tools ===
 black
 flake8
+isort
+mypy
+pytest
+pytest-cov
+pytest-mock
+pytest-asyncio
+pytest-xdist
 
 # === Redis (if used for caching or backend) ===
 redis
