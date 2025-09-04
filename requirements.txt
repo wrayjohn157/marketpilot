@@ -1,17 +1,43 @@
 # === Core Packages ===
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
 python-multipart
 aiohttp
 requests
 PyYAML
+gunicorn
 
 # === ML & Data ===
 scikit-learn
 xgboost
 pandas
 numpy
+ta
+matplotlib
+seaborn
+plotly
+dash
+dash-bootstrap-components
+
+# === Database & Storage ===
+redis
+psycopg2-binary
+influxdb-client
+
+# === Security & Authentication ===
+cryptography
+python-jose[cryptography]
+passlib[bcrypt]
+
+# === Monitoring & Logging ===
+prometheus-client
+structlog
+sentry-sdk[fastapi]
+
+# === Task Queue ===
+celery
+flower
 
 # === Dashboard / Frontend (Optional: Dev-only) ===
 # If you ever run the frontend locally
@@ -28,9 +54,7 @@ pytest-cov
 pytest-mock
 pytest-asyncio
 pytest-xdist
-
-# === Redis (if used for caching or backend) ===
-redis
+pre-commit
 
 # === Date Handling ===
 python-dateutil

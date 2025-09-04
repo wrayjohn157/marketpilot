@@ -15,7 +15,6 @@ from typing import Dict, List
 sys.path.append(str(Path(__file__).parent))
 
 from utils.redis_manager import (
-from utils.redis_manager import get_redis_manager
     RedisDataManager,
     RedisConfig,
     RedisKeyManager,
@@ -51,7 +50,8 @@ def test_redis_connection():
 
 def test_key_management():
     """Test Redis key management and namespacing"""
-    print("\n🧪 Testing Key Management...")
+    print("\
+n🧪 Testing Key Management...")
     
     redis_manager = get_redis_manager()
     
@@ -80,7 +80,8 @@ def test_key_management():
 
 def test_indicator_operations():
     """Test indicator data operations"""
-    print("\n🧪 Testing Indicator Operations...")
+    print("\
+n🧪 Testing Indicator Operations...")
     
     redis_manager = get_redis_manager()
     
@@ -121,7 +122,8 @@ def test_indicator_operations():
 
 def test_counter_operations():
     """Test counter operations"""
-    print("\n🧪 Testing Counter Operations...")
+    print("\
+n🧪 Testing Counter Operations...")
     
     redis_manager = get_redis_manager()
     
@@ -149,7 +151,8 @@ def test_counter_operations():
 
 def test_cache_operations():
     """Test cache operations"""
-    print("\n🧪 Testing Cache Operations...")
+    print("\
+n🧪 Testing Cache Operations...")
     
     redis_manager = get_redis_manager()
     
@@ -182,7 +185,8 @@ def test_cache_operations():
 
 def test_trade_data_operations():
     """Test trade data operations"""
-    print("\n🧪 Testing Trade Data Operations...")
+    print("\
+n🧪 Testing Trade Data Operations...")
     
     redis_manager = get_redis_manager()
     
@@ -226,7 +230,8 @@ def test_trade_data_operations():
 
 def test_lock_operations():
     """Test distributed lock operations"""
-    print("\n🧪 Testing Lock Operations...")
+    print("\
+n🧪 Testing Lock Operations...")
     
     redis_manager = get_redis_manager()
     
@@ -251,7 +256,8 @@ def test_lock_operations():
 
 def test_bulk_operations():
     """Test bulk operations"""
-    print("\n🧪 Testing Bulk Operations...")
+    print("\
+n🧪 Testing Bulk Operations...")
     
     redis_manager = get_redis_manager()
     
@@ -287,7 +293,8 @@ def test_bulk_operations():
 
 def test_monitoring():
     """Test Redis monitoring"""
-    print("\n🧪 Testing Redis Monitoring...")
+    print("\
+n🧪 Testing Redis Monitoring...")
     
     monitor = get_redis_monitor()
     
@@ -316,7 +323,8 @@ def test_monitoring():
 
 def test_cleanup():
     """Test cleanup operations"""
-    print("\n🧪 Testing Cleanup Operations...")
+    print("\
+n🧪 Testing Cleanup Operations...")
     
     redis_manager = get_redis_manager()
     
@@ -337,7 +345,8 @@ def test_cleanup():
 
 def test_performance():
     """Test Redis performance"""
-    print("\n🧪 Testing Redis Performance...")
+    print("\
+n🧪 Testing Redis Performance...")
     
     redis_manager = get_redis_manager()
     
@@ -389,7 +398,8 @@ async def main():
     try:
         # Test Redis connection first
         if not test_redis_connection():
-            print("\n❌ Redis not available - cannot run tests")
+            print("\
+n❌ Redis not available - cannot run tests")
             return
         
         test_key_management()
@@ -403,8 +413,10 @@ async def main():
         test_cleanup()
         test_performance()
         
-        print("\n✅ All tests completed successfully!")
-        print("\n📋 Key Features Demonstrated:")
+        print("\
+n✅ All tests completed successfully!")
+        print("\
+n📋 Key Features Demonstrated:")
         print("• Optimized Redis operations with connection pooling")
         print("• Proper key namespacing and data structure usage")
         print("• TTL management for automatic cleanup")
@@ -414,7 +426,8 @@ async def main():
         print("• Health monitoring and alerting")
         print("• Memory usage tracking and cleanup")
         
-        print("\n🚀 Benefits of Redis Manager:")
+        print("\
+n🚀 Benefits of Redis Manager:")
         print("• Eliminates scattered Redis usage patterns")
         print("• Provides consistent API across all systems")
         print("• Includes proper error handling and monitoring")
@@ -422,7 +435,8 @@ async def main():
         print("• Enables automatic cleanup and memory management")
         print("• Reduces Redis memory usage and improves performance")
         
-        print("\n📈 Next Steps:")
+        print("\
+n📈 Next Steps:")
         print("1. Run migrate_redis_usage.py to update all files")
         print("2. Test the migrated files in your environment")
         print("3. Configure Redis for production use")
@@ -430,7 +444,8 @@ async def main():
         print("5. Implement Redis persistence and backup")
         
     except Exception as e:
-        print(f"\n❌ Test failed: {e}")
+        print(f"\
+n❌ Test failed: {e}")
         import traceback
         traceback.print_exc()
 

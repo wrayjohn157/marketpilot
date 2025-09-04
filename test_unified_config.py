@@ -15,8 +15,6 @@ from typing import Dict, List
 sys.path.append(str(Path(__file__).parent))
 
 from config.unified_config_manager import (
-from config.unified_config_manager import get_path
-from config.unified_config_manager import get_config
     UnifiedConfigManager,
     EnvironmentDetector,
     SmartDefaults,
@@ -53,7 +51,8 @@ def test_environment_detection():
 
 def test_smart_defaults():
     """Test smart defaults generation"""
-    print("\n🧪 Testing Smart Defaults...")
+    print("\
+n🧪 Testing Smart Defaults...")
     
     # Test path defaults
     defaults = SmartDefaults.get_default_paths(Environment.DEVELOPMENT, Path("/workspace"))
@@ -79,7 +78,8 @@ def test_smart_defaults():
 
 def test_config_validation():
     """Test config validation"""
-    print("\n🧪 Testing Config Validation...")
+    print("\
+n🧪 Testing Config Validation...")
     
     validator = ConfigValidator()
     
@@ -121,7 +121,8 @@ def test_config_validation():
 
 def test_unified_config_manager():
     """Test unified config manager"""
-    print("\n🧪 Testing Unified Config Manager...")
+    print("\
+n🧪 Testing Unified Config Manager...")
     
     # Test with development environment
     config_manager = UnifiedConfigManager(Environment.DEVELOPMENT)
@@ -174,7 +175,8 @@ def test_unified_config_manager():
 
 def test_convenience_functions():
     """Test convenience functions"""
-    print("\n🧪 Testing Convenience Functions...")
+    print("\
+n🧪 Testing Convenience Functions...")
     
     # Test get_config_manager
     manager = get_config_manager()
@@ -211,7 +213,8 @@ def test_convenience_functions():
 
 def test_config_saving():
     """Test config saving functionality"""
-    print("\n🧪 Testing Config Saving...")
+    print("\
+n🧪 Testing Config Saving...")
     
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
@@ -258,7 +261,8 @@ def test_config_saving():
 
 def test_environment_specific_paths():
     """Test environment-specific path resolution"""
-    print("\n🧪 Testing Environment-Specific Paths...")
+    print("\
+n🧪 Testing Environment-Specific Paths...")
     
     environments = [Environment.DEVELOPMENT, Environment.STAGING, Environment.PRODUCTION, Environment.TESTING]
     
@@ -287,7 +291,8 @@ def test_environment_specific_paths():
 
 def test_error_handling():
     """Test error handling"""
-    print("\n🧪 Testing Error Handling...")
+    print("\
+n🧪 Testing Error Handling...")
     
     config_manager = UnifiedConfigManager()
     
@@ -327,7 +332,8 @@ def test_error_handling():
 
 def test_performance():
     """Test performance"""
-    print("\n🧪 Testing Performance...")
+    print("\
+n🧪 Testing Performance...")
     
     import time
     
@@ -383,8 +389,10 @@ async def main():
         test_error_handling()
         test_performance()
         
-        print("\n✅ All tests completed successfully!")
-        print("\n📋 Key Features Demonstrated:")
+        print("\
+n✅ All tests completed successfully!")
+        print("\
+n📋 Key Features Demonstrated:")
         print("• Environment detection with multiple fallback strategies")
         print("• Smart defaults for all environments")
         print("• Comprehensive config validation")
@@ -395,7 +403,8 @@ async def main():
         print("• Robust error handling")
         print("• Good performance characteristics")
         
-        print("\n🚀 Benefits of Unified Config System:")
+        print("\
+n🚀 Benefits of Unified Config System:")
         print("• Eliminates hardcoded paths and scattered configs")
         print("• Provides environment-aware configuration")
         print("• Includes smart defaults and validation")
@@ -403,7 +412,8 @@ async def main():
         print("• Enables easy deployment across environments")
         print("• Reduces maintenance overhead with centralized management")
         
-        print("\n📈 Next Steps:")
+        print("\
+n📈 Next Steps:")
         print("1. Run migrate_to_unified_config.py to update all files")
         print("2. Test the migrated files in your environment")
         print("3. Add environment-specific configurations")
@@ -411,7 +421,8 @@ async def main():
         print("5. Create config management UI for easy editing")
         
     except Exception as e:
-        print(f"\n❌ Test failed: {e}")
+        print(f"\
+n❌ Test failed: {e}")
         import traceback
         traceback.print_exc()
 

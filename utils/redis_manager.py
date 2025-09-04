@@ -12,7 +12,6 @@ from dataclasses import dataclass
 from enum import Enum
 from redis.connection import ConnectionPool
 from redis.exceptions import RedisError, ConnectionError, TimeoutError
-from utils.redis_manager import get_redis_manager, RedisKeyManager
 
 
 

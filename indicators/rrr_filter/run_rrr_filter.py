@@ -15,47 +15,47 @@ from
 r = get_redis_manager()
 
 def run_rrr_filter(symbol: Any, klines: Any, atr: Any, adx: Any, ema_values: Any) -> Any:
-    # TP1 vs ATR score
-    tp1_target = 0.5
-    tp1_score = min(max(tp1_target / atr, 0), 1) if atr else 0.0
+# TP1 vs ATR score
+tp1_target = 0.5
+tp1_score = min(max(tp1_target / atr, 0), 1) if atr else 0.0
 
-    # EMA slope score
-    ema_slope = calculate_ema_slope(ema_values)
-    ema_score = min(max(ema_slope / 0.02, 0), 1)
+# EMA slope score
+ema_slope = calculate_ema_slope(ema_values)
+ema_score = min(max(ema_slope / 0.02, 0), 1)
 
-    # ADX strength score
-    adx_score = min(max((adx - 15) / 10, 0), 1) if adx else 0.0
+# ADX strength score
+adx_score = min(max((adx - 15) / 10, 0), 1) if adx else 0.0
 
-    # Time-to-TP1 score
-    ttp_score = analyze_time_to_tp1(klines)
+# Time-to-TP1 score
+ttp_score = analyze_time_to_tp1(klines)
 
-    # Update Redis (merge Time_to_TP1 into existing data)
-    redis_key = f"{symbol}_1h"
-    existing_data = r.get_cache(redis_key)
-    if existing_data:
-        try:
-            existing_data = json.loads(existing_data)
-        except json.JSONDecodeError:
-            existing_data = {}
-    else:
-        existing_data = {}
+# Update Redis (merge Time_to_TP1 into existing data)
+redis_key = f"{symbol}_1h"
+existing_data = r.get_cache(redis_key)
+if existing_data:
+try:
+existing_data = json.loads(existing_data)
+except json.JSONDecodeError:
+existing_data = {}
+else:
+existing_data = {}
 
-    existing_data["Time_to_TP1"] = ttp_score
-    r.store_indicators(redis_key, existing_data)
-    print(f"✅ Saved Time_to_TP1 for {symbol}: {ttp_score}")
+existing_data["Time_to_TP1"] = ttp_score
+r.store_indicators(redis_key, existing_data)
+print(f"[OK] Saved Time_to_TP1 for {symbol}: {ttp_score}")
 
-    # Evaluate
+# Evaluate
     passed, score, reasons = evaluate_trade(tp1_score, ema_score, adx_score, ttp_score)
 
-    print(f"🔎 RRR Evaluation for {symbol}")
+    print(f"[SEARCH] RRR Evaluation for {symbol}")
     print(f" - TP1 Score:  {tp1_score:.3f}")
     print(f" - EMA Score:  {ema_score:.3f}")
     print(f" - ADX Score:  {adx_score:.3f}")
     print(f" - TTP Score:  {ttp_score:.3f}")
-    print(f" - Final Score: {score:.3f} → {'✅ PASS' if passed else '❌ FAIL'}")
-    if not passed and reasons:
-        for reason in reasons:
-            print(f"    🪫 {reason}")
+    print(f" - Final Score: {score:.3f} → {'[OK] PASS' if passed else '[ERROR] FAIL'}")
+if not passed and reasons:
+for reason in reasons:
+print(f"    🪫 {reason}")
 
     return {
         "symbol": symbol,
@@ -75,30 +75,31 @@ def run_rrr_filter(symbol: Any, klines: Any, atr: Any, adx: Any, ema_values: Any
 
 # Optional CLI debug runner
 if __name__ == "__main__":
-    symbol = "ETH"
+symbol = "ETH"
 
-    # Load klines
-    kline_key = f"{symbol}_15m_klines"
-    klines_raw = r.lrange(kline_key, 0, -1)
-    klines = [json.loads(k) for k in klines_raw] if klines_raw else []
-    if not klines or len(klines) < 20:
-        print(f"⚠️ Insufficient klines for {symbol}")
-        exit()
+# Load klines
+kline_key = f"{symbol}_15m_klines"
+klines_raw = r.lrange(kline_key, 0, -1)
+klines = [json.loads(k) for k in klines_raw] if klines_raw else []
+if not klines or len(klines) < 20:
+print(f"[WARNING] Insufficient klines for {symbol}")
+exit()
 
-    # Load indicators
-    info_key = f"{symbol}_1h"
-    info_raw = r.get_cache(info_key)
-    info = json.loads(info_raw) if info_raw else {}
+# Load indicators
+info_key = f"{symbol}_1h"
+info_raw = r.get_cache(info_key)
+info = json.loads(info_raw) if info_raw else {}
 
-    atr = info.get("ATR")
-    adx = info.get("ADX14")
-    ema_values = [info.get("EMA50"), info.get("EMA200")]
+atr = info.get("ATR")
+adx = info.get("ADX14")
+ema_values = [info.get("EMA50"), info.get("EMA200")]
 
-    print(f"\n⚙️ Running RRR filter for {symbol}")
-    print(f" - ATR: {atr}")
-    print(f" - ADX: {adx}")
-    print(f" - EMA50: {ema_values[0]}")
-    print(f" - EMA200: {ema_values[1]}")
-    print("")
+print(f""
+n[CONFIG]️ Running RRR filter for {symbol}")"
+print(f" - ATR: {atr}")
+print(f" - ADX: {adx}")
+print(f" - EMA50: {ema_values[0]}")
+print(f" - EMA200: {ema_values[1]}")
+print("")
 
-    run_rrr_filter(symbol, klines, atr, adx, ema_values)
+run_rrr_filter(symbol, klines, atr, adx, ema_values)

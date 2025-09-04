@@ -57,7 +57,11 @@ def extract_float(val: Any) -> Any:
         s_clean = s.replace("np.float64(", "").replace(")", "")
         return float(s_clean)
     except:
-        match = re.search(r"[-+]?\d*\.\d+|\d+", s)
+        match = re.search(r"[-+]?\
+d*\
+.\
+d+|\
+d+", s)
         return float(match.group()) if match else 0.0
 
 def btc_sentiment_multiplier() -> Any:
@@ -207,7 +211,8 @@ def write_to_history_log(entry: Any, date_str: Any) -> Any:
     path = FORK_HISTORY_BASE / date_str / "fork_scores.jsonl"
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "a") as f:
-        f.write(json.dumps(entry) + "\n")
+        f.write(json.dumps(entry) + "\
+n")
 
 def main() -> Any:
     if not FORK_INPUT_FILE.exists():
@@ -268,7 +273,9 @@ def main() -> Any:
                 "timestamp": now_ts,
                 "ts_iso": ts_iso,
             }
-            r.store_trade_data({\"symbol\": sym})
+            r.store_trade_data({\
+"symbol\
+": sym})
             r.store_trade_data(trade)
             results.append(trade)
 
@@ -279,7 +286,9 @@ def main() -> Any:
             f"    • {k.replace('_',' ').title():25}: {'✅' if subs[k] >= 1 else '❌' if subs[k] == 0 else f'{subs[k]:.3f}'}"
             for k in subs
         ]
-        logging.info("\n" + "\n".join(log_lines))
+        logging.info("\
+n" + "\
+n".join(log_lines))
 
     with open(OUTPUT_FILE, "w") as f:
         json.dump(results, f, indent=2)

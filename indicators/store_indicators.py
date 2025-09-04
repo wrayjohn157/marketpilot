@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 # === Load config paths ===
 CONFIG_PATH = "/home/signal/market7/config/paths_config.yaml"
 with open(CONFIG_PATH) as f:
-    paths = yaml.safe_load(f)
+paths = yaml.safe_load(f)
 
 # Input file path
 INPUT_FILE = Path(paths["dashboard_cache"]) / "market_scan.json"
@@ -28,27 +28,27 @@ REDIS_DB = 0
 
 # Redis connection
 try:
-    r = get_redis_manager()
+r = get_redis_manager()
 except Exception as e:
-    logging.error(f"Redis connection error: {e}")
-    exit(1)
+logging.error(f"Redis connection error: {e}")
+exit(1)
 
 def store_to_redis() -> Any:
-    if not INPUT_FILE.exists():
-        logging.error(f"❌ Input file not found: {INPUT_FILE}")
+if not INPUT_FILE.exists():
+logging.error(f"[ERROR] Input file not found: {INPUT_FILE}")
         return
 
-    with open(INPUT_FILE, "r") as f:
-        data = json.load(f)
+with open(INPUT_FILE, "r") as f:
+data = json.load(f)
 
-    count = 0
-    for symbol, timeframes in data.items():
-        for tf, indicators in timeframes.items():
-            key = RedisKeyManager.indicator(symbol, tf)
-            r.store_indicators(key, indicators)
-            count += 1
+count = 0
+for symbol, timeframes in data.items():
+for tf, indicators in timeframes.items():
+key = RedisKeyManager.indicator(symbol, tf)
+r.store_indicators(key, indicators)
+count += 1
 
-    logging.info(f"✅ Stored {count} indicator entries to Redis.")
+logging.info(f"[OK] Stored {count} indicator entries to Redis.")
 
 if __name__ == "__main__":
-    store_to_redis()
+store_to_redis()
