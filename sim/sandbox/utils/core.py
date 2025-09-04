@@ -22,6 +22,7 @@ from modules.fork_safu_evaluator import get_safu_exit_decision, load_safu_exit_m
 from modules.fork_safu_evaluator import get_safu_score
 from utils.local_indicators import fetch_binance_klines, compute_all_indicators
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from config.unified_config_manager import get_config
 
 
 """

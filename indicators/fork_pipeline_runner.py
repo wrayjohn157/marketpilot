@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
 from utils.redis_manager import get_redis_manager, RedisKeyManager
+from config.unified_config_manager import get_config
 
 
 
@@ -24,15 +25,15 @@ INDICATOR_WEIGHTS = {
 }
 MIN_SCORE = 0.65
 
-FORK_INPUT_FILE = str(Path(PATHS["base_path"]) / "output" / "fork_candidates.json")
+FORK_INPUT_FILE = str(get_path("base") / "output" / "fork_candidates.json")
 FINAL_OUTPUT_FILE = get_path("final_fork_rrr_trades")
-BACKTEST_CANDIDATES_FILE = str(Path(PATHS["base_path"]) / "output" / "fork_backtest_candidates.json")
-FORK_HISTORY_BASE = Path(PATHS["fork_history_path"])
-SNAPSHOT_BASE = Path(PATHS["snapshots_path"])
+BACKTEST_CANDIDATES_FILE = str(get_path("base") / "output" / "fork_backtest_candidates.json")
+FORK_HISTORY_BASE = get_path("fork_history")
+SNAPSHOT_BASE = get_path("snapshots")
 
 REDIS_SET = "queues:fork_score_approved"
 REDIS_FINAL_TRADES = "fork_score:final"
-r = redis.Redis()
+r = get_redis_manager()
 
 # ===== FUNCTIONS =====
 def score_from_indicators(indicators: Any) -> Any:
@@ -140,7 +141,7 @@ def main() -> Any:
                 "score_hash": score_hash,
                 "timestamp": now_ts
             }
-            r.store_trade_data({\"symbol\": symbol})
+            r.store_trade_data({"symbol": symbol})
             r.store_trade_data(trade)
             results.append(trade)
             logging.info(f"✅ {symbol.upper()} | Score: {score:.3f} | {subscores}")

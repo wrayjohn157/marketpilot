@@ -8,6 +8,7 @@ from config.unified_config_manager import get_path, get_config, get_all_paths, g
 
 router = APIRouter()
 from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 r = get_redis_manager()
 
 # === Paths ===

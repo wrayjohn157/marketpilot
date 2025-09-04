@@ -90,7 +90,7 @@ class TechFilter:
     
     def __init__(self, config: PipelineConfig):
         self.config = config
-        self.redis = redis.Redis(host="localhost", port=6379, decode_responses=True)
+        self.redis = get_redis_manager()
         
         # Dynamic thresholds based on market condition
         self.thresholds = {
@@ -166,7 +166,7 @@ class ForkScorer:
     
     def __init__(self, config: PipelineConfig):
         self.config = config
-        self.redis = redis.Redis(host="localhost", port=6379, decode_responses=True)
+        self.redis = get_redis_manager()
         
         # Dynamic weights based on market condition
         self.weights = {
@@ -311,7 +311,7 @@ class TradeExecutor:
     
     def __init__(self, config: PipelineConfig):
         self.config = config
-        self.redis = redis.Redis(host="localhost", port=6379, decode_responses=True)
+        self.redis = get_redis_manager()
         
         # Load credentials
         try:
@@ -438,7 +438,7 @@ class UnifiedTradingPipeline:
     async def _get_indicators(self, symbol: str) -> Optional[Dict[str, Any]]:
         """Get indicators for symbol from Redis"""
         try:
-            redis = redis.Redis(host="localhost", port=6379, decode_responses=True)
+            redis = get_redis_manager()
             data = redis.get(f"{symbol.upper()}_1h")
             if data:
                 return json.loads(data)

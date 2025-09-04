@@ -49,6 +49,7 @@ FORK_METRICS_FILE = Path(
 
 # === Redis ===
 from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 r = get_redis_manager()
 
 def get_snapshot_dir() -> Any:

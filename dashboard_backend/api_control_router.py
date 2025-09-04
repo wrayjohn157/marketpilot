@@ -6,10 +6,11 @@ from pathlib import Path
 import yaml
 import os
 from utils.redis_manager import get_redis_manager, RedisKeyManager
+from config.unified_config_manager import get_path
 
 
 
-CONFIG_PATH = PATHS["dca"] / "config" / "dca_config.yaml"
+CONFIG_PATH = get_path("dca") / "config" / "dca_config.yaml"
 
 router = APIRouter()
 

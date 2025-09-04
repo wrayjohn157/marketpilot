@@ -7,6 +7,7 @@ import sys
 from dateutil import parser as dtparser
 import argparse
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from config.unified_config_manager import get_config
 
 
 #!/usr/bin/env python3
@@ -53,7 +54,7 @@ def find_closest_btc_snapshot(ts: Any, btc_snapshots: Any) -> Any:
     }
 
 def load_latest_snapshot(symbol: Any, deal_id: Any) -> Any:
-    path = PATHS["recovery_snapshots"] / f"{symbol}_{deal_id}.jsonl"
+    path = get_path("recovery_snapshots") / f"{symbol}_{deal_id}.jsonl"
     if not path.exists():
         return {}
     try:
@@ -67,9 +68,9 @@ def load_latest_snapshot(symbol: Any, deal_id: Any) -> Any:
 
 # === Main logic ===
 def main(date_str: Any) -> Any:
-    dca_path = PATHS["dca_log"] / date_str / "dca_log.jsonl"
-    enriched_path = PATHS["enriched"] / date_str / "enriched_data.jsonl"
-    out_path = PATHS["dca_spend"] / f"{date_str}.jsonl" #out_path = PATHS["ml_dataset"] / "dca_spend" / f"{date_str}.jsonl"
+    dca_path = get_path("dca_log") / date_str / "dca_log.jsonl"
+    enriched_path = get_path("enriched") / date_str / "enriched_data.jsonl"
+    out_path = get_path("dca_spend") / f"{date_str}.jsonl" #out_path = get_path("ml_dataset") / "dca_spend" / f"{date_str}.jsonl"
 
     if not dca_path.exists() or not enriched_path.exists():
         print("Missing required input file(s)")
@@ -77,7 +78,7 @@ def main(date_str: Any) -> Any:
 
     dca_logs = load_jsonl(dca_path)
     enriched_logs = index_by_deal_id(load_jsonl(enriched_path))
-    fired_steps = load_jsonl(PATHS["dca_tracking"])
+    fired_steps = load_jsonl(get_path("dca_tracking"))
     fired_lookup = {(x["deal_id"], x["step"]): x for x in fired_steps}
     btc_snapshots, _ = load_btc_context(date_str)
 

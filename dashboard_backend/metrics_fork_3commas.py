@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import hmac
 import hashlib
 from utils.credential_manager import get_3commas_credentials
+from utils.redis_manager import get_redis_manager
 
 
 # Load 3Commas API credentials from credentials.json
@@ -17,7 +18,7 @@ API_SECRET = creds["3commas_api_secret"]
 BOT_ID = 16017224
 
 # Connect to Redis (for open deal data)
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = get_redis_manager()
 
 def get_open_deals(bot_id):
     keys = r.get_key_stats()

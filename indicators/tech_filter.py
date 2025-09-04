@@ -22,11 +22,12 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
 from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 r = get_redis_manager()
 
 # === Load paths dynamically ===
 OUTPUT_FILE = get_path("final_fork_rrr_trades")
-FORK_FILE = PATHS["fork_candidates"]
+FORK_FILE = get_path("fork_candidates")
 VOLUME_PASSED_SET = "queues:volume_passed_tokens"
 
 # Load BTC condition

@@ -51,6 +51,7 @@ from dca.utils.spend_predictor import predict_spend_volume, adjust_volume
 from dca.utils.trade_health_evaluator import evaluate_trade_health
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
 from utils.redis_manager import get_redis_manager, RedisKeyManager
+from config.unified_config_manager import get_config
 
 
 

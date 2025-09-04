@@ -33,6 +33,7 @@ from dca.utils.trade_health_evaluator import evaluate_trade_health
 from dca.utils.spend_predictor import predict_spend_volume, adjust_volume
 from dca.utils.zombie_utils import is_zombie_trade
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from config.unified_config_manager import get_config
 
 
 # === Configuration ===

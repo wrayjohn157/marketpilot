@@ -94,7 +94,7 @@ class RedisDataManager:
             socket_connect_timeout=config.socket_connect_timeout,
             health_check_interval=config.health_check_interval
         )
-        self.redis = redis.Redis(connection_pool=self.pool, decode_responses=True)
+        self.redis = get_redis_manager()
         self.logger = logging.getLogger(__name__)
     
     def health_check(self) -> bool:

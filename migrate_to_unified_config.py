@@ -265,6 +265,7 @@ SAFU_CONFIG_PATH = get_path("fork_safu_config")
 #### After:
 ```python
 from config.unified_config_manager import get_path, get_config
+from config.unified_config_manager import get_config
 CONFIG_PATH = get_path("tv_screener_config")
 BASE_DIR = get_path("base")
 SAFU_CONFIG_PATH = get_path("fork_safu_config")

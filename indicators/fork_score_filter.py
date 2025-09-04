@@ -24,7 +24,7 @@ sys.path.append(str(PROJECT_ROOT))
 # --- Load paths from config_loader ---
 
 CONFIG_PATH = get_path("base") / "config" / "fork_score_config.yaml"
-FORK_INPUT_FILE = PATHS["fork_candidates"]
+FORK_INPUT_FILE = get_path("fork_candidates")
 OUTPUT_FILE = get_path("final_fork_rrr_trades")
 BACKTEST_CANDIDATES_FILE = get_path("fork_backtest_candidates")
 FORK_HISTORY_BASE = get_path("fork_history")
@@ -34,6 +34,7 @@ REDIS_SET = "queues:fork_rrr_passed"
 REDIS_FINAL_TRADES = "FORK_FINAL_TRADES"
 
 from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 r = get_redis_manager()
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"

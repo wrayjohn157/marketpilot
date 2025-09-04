@@ -20,6 +20,7 @@ import re
 import shutil
 import textwrap
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from config.unified_config_manager import get_config
 
 
 #!/usr/bin/env python3
@@ -41,7 +42,7 @@ log = logging.getLogger("lev")
 # Load spot bases (used to resolve snapshot keys like "1INCH" or "1000SATS")
 def _load_spot_bases() -> set[str]:
     try:
-        fp = PATHS.get("filtered_pairs")
+        fp = get_path("get")("filtered_pairs")
         if fp:
             data = json.loads(Path(fp).read_text())
             if isinstance(data, list):

@@ -15,6 +15,8 @@ from ta.trend import MACD, ADXIndicator
 
 from utils.credential_manager import get_3commas_credentials, CredentialError
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 
 
 logger = logging.getLogger(__name__)
@@ -49,12 +51,7 @@ class ThreeCommasAPI:
         """Get Redis client."""
         if self._redis_client is None:
             try:
-                self._redis_client = redis.Redis(
-                    host="localhost", 
-                    port=6379, 
-                    db=0, 
-                    decode_responses=True
-                )
+                self._redis_client = get_redis_manager()
             except redis.ConnectionError as e:
                 logger.warning(f"Failed to connect to Redis: {e}")
                 self._redis_client = None

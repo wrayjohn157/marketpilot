@@ -39,6 +39,7 @@ FINAL_TRADES_KEY = "queues:final_trades"
 FINAL_FILTER_KEY = "FINAL_RRR_FILTERED_TRADES"
 SENT_TRADES_KEY = "sessions:sent_trades"
 from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 r = get_redis_manager()
 
 # === Constants ===

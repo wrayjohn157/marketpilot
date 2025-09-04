@@ -10,6 +10,7 @@ import requests
 from datetime import datetime, timedelta
 from utils.credential_manager import get_3commas_credentials
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from config.unified_config_manager import get_config
 
 
 

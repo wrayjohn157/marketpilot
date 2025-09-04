@@ -27,7 +27,7 @@ SNAPSHOT_BASE = Path("/home/signal/market6/data/snapshots")
 REDIS_SET = "queues:fork_rrr_passed"
 REDIS_FINAL_TRADES = "FORK_FINAL_TRADES"
 
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = get_redis_manager()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 # === Load base config ===

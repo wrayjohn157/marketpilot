@@ -69,7 +69,7 @@ def main() -> Any:
     r = None
     if use_redis:
         try:
-            r = redis.Redis(host=args.redis_host, port=args.redis_port, db=args.redis_db, decode_responses=True)
+            r = get_redis_manager()
             # quick ping
             r.ping()
         except Exception as e:

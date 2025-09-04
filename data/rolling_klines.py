@@ -8,6 +8,8 @@ import requests
 
 import time
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 
 
 # /home/signal/market7/data/rolling_klines.py
@@ -27,7 +29,7 @@ sys.path.append(str(PROJECT_ROOT))
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 # === Redis config ===
-r = redis.Redis(host="localhost", port=6379, db=0)
+r = get_redis_manager()
 
 # === Timeframes + settings ===
 TIMEFRAMES = ["15m", "1h", "4h"]
@@ -36,7 +38,7 @@ REFRESH_INTERVAL = 60
 
 # === Paths ===
 FILTERED_FILE = get_path("filtered_pairs")
-BINANCE_SYMBOLS_FILE = PATHS["binance_symbols"]
+BINANCE_SYMBOLS_FILE = get_path("binance_symbols")
 SNAPSHOTS_BASE = get_path("snapshots")
 FORK_METRICS_FILE = get_path("dashboard_cache") / "fork_metrics.json"
 

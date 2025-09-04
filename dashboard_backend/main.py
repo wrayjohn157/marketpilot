@@ -37,6 +37,7 @@ from sim_routes.sim_dca_strategies import router as sim_dca_strategy_router
 from eval_routes.price_series_api import router as price_series_router
 from sim_routes.dca_simulate_route import router as dca_simulate_router
 from dashboard_backend.sim_routes.sim_dca_config_api import router as sim_dca_router
+from config.unified_config_manager import get_path
 #from .anal.capital_routes import router as capital_router #from dashboard_backend.anal.capital_routes import router as capital_router
 
 app.include_router(dca_router)
@@ -96,7 +97,7 @@ def get_btc_context():
 
 @app.get("/fork/metrics")
 def serve_cached_metrics():
-    path = PATHS["dashboard_cache"] / "fork_metrics.json"
+    path = get_path("dashboard_cache") / "fork_metrics.json"
     try:
         with open(path) as f:
             return json.load(f)

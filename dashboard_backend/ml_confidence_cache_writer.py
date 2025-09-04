@@ -10,17 +10,19 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from dca.utils.entry_utils import get_live_3c_trades
+from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_path
 
 # === Config ===
 REDIS_KEY = "confidence_list"
 # normalized from your `dca_log_base:` in paths_config.yaml
-LOG_BASE = PATHS["dca_log"]
+LOG_BASE = get_path("dca_log")
 # where to dump the JSON fallback cache
-CACHE_PATH = PATHS["dashboard_cache"] / "ml_confidence.json"
+CACHE_PATH = get_path("dashboard_cache") / "ml_confidence.json"
 MAX_ENTRIES = 50  # keep only the top-20 highest-confidence active trades
 DAYS_BACK = 5
 
-REDIS = redis.Redis(host="localhost", port=6379, db=0)
+REDIS = get_redis_manager()
 
 
 def load_active_deal_ids():

@@ -9,6 +9,8 @@ from fork.utils.fork_entry_logger import log_fork_entry
 import subprocess
 from utils.credential_manager import get_3commas_credentials
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 
 
 
@@ -41,7 +43,7 @@ THREECOMMAS_BASE_URL = "https://api.3commas.io"
 
 # === Logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+r = get_redis_manager()
 
 # === Load Credentials ===
 with open(CRED_PATH, "r") as f:

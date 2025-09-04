@@ -8,6 +8,7 @@ from pathlib import Path
 
 from unified_fork_metrics import get_fork_trade_metrics
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from config.unified_config_manager import get_config
 
 
 OUTPUT_PATH = get_path("base") / "dashboard_backend" / "cache" / "fork_metrics.json"

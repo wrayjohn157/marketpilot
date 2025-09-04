@@ -9,6 +9,7 @@ import requests
 
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
 from utils.redis_manager import get_redis_manager, RedisKeyManager
+from config.unified_config_manager import get_config
 
 
 
@@ -31,7 +32,7 @@ OUTPUT_FILE = get_path("filtered_pairs")
 MIN_VOLUME_USDT = 3_000_000
 
 # === Redis setup ===
-r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+r = get_redis_manager()
 
 # === Excluded base tokens ===
 EXCLUDED_BASES = [

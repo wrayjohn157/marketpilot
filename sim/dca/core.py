@@ -9,6 +9,7 @@ from dca_trades_api import adjust_volume  # example: replace with your real func
 from dca_trades_api import should_dca  # example: replace with your real function
 import argparse
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from config.unified_config_manager import get_config
 
 
 # dashboard_backend/dca/core.py

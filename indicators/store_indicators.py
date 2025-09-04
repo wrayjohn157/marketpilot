@@ -28,7 +28,7 @@ REDIS_DB = 0
 
 # Redis connection
 try:
-    r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
+    r = get_redis_manager()
 except Exception as e:
     logging.error(f"Redis connection error: {e}")
     exit(1)

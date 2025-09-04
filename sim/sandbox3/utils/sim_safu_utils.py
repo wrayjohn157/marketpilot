@@ -10,6 +10,7 @@ import yaml
 
 from .sim_safu_utils import sim_get_safu_score, load_sim_safu_indicators
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from config.unified_config_manager import get_config
 
 
 from

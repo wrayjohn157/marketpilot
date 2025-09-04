@@ -15,6 +15,8 @@ import hmac
 import subprocess
 from utils.credential_manager import get_3commas_credentials
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 
 
 
@@ -71,7 +73,7 @@ class ForkRunner:
             Redis client or None if connection fails
         """
         try:
-            return redis.Redis(host="localhost", port=6379, decode_responses=True)
+            return get_redis_manager()
         except redis.ConnectionError as e:
             logger.warning(f"Failed to connect to Redis: {e}")
             return None
@@ -269,7 +271,7 @@ class ForkRunner:
 
 def main() -> Any:
     """Main entry point."""
-    config_path = PATHS.get("fork_config", Path("config/fork_config.yaml"))
+    config_path = get_path("get")("fork_config", Path("config/fork_config.yaml"))
     runner = ForkRunner(config_path)
     runner.run()
 

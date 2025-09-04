@@ -32,7 +32,7 @@ RRR_PASS_FILE = Path(paths["fork_trade_candidates_path"])
 FINAL_FILTER_KEY = "FINAL_RRR_FILTERED_TRADES"
 FINAL_TRADES_KEY = "queues:final_trades"
 
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = get_redis_manager()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 EMA_WINDOW = 5

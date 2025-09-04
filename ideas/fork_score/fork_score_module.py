@@ -13,7 +13,7 @@ from utils.redis_manager import get_redis_manager, RedisKeyManager
 # === Setup ===
 CONFIG_PATH = Path("/home/signal/market6/config/fork_score_config.yaml")
 SNAPSHOT_BASE = Path("/home/signal/market6/data/snapshots")
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = get_redis_manager()
 
 # === Utilities ===
 def extract_float(val):

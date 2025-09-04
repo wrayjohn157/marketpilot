@@ -17,6 +17,7 @@ from utils.credential_manager import get_3commas_credentials
 #!/usr/bin/env python3
 
 from datetime import datetime
+from utils.redis_manager import get_redis_manager
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ FORK_HISTORY = Path("/home/signal/market7/output/fork_history")
 BTC_LOG_PATH = Path("/home/signal/market7/live/btc_logs")
 
 # === Redis Setup ===
-REDIS = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+REDIS = get_redis_manager()
 
 # === 3Commas Trade Fetch (Paginated) ===
 def get_live_3c_trades() -> Any:

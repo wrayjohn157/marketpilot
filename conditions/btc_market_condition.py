@@ -10,13 +10,15 @@ sys.path.append(str(BASE_DIR))
 
 from data.rolling_indicators import fetch_binance_klines, compute_ema, compute_adx
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 
 
 # === Logging ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 # === Redis Client ===
-redis_client = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+redis_client = get_redis_manager()
 
 def determine_btc_market():
     """

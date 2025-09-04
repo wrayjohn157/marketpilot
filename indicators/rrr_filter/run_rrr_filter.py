@@ -12,7 +12,7 @@ from
  .evaluate import evaluate_trade
 
 # Redis setup
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = get_redis_manager()
 
 def run_rrr_filter(symbol: Any, klines: Any, atr: Any, adx: Any, ema_values: Any) -> Any:
     # TP1 vs ATR score

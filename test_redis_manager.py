@@ -15,6 +15,7 @@ from typing import Dict, List
 sys.path.append(str(Path(__file__).parent))
 
 from utils.redis_manager import (
+from utils.redis_manager import get_redis_manager
     RedisDataManager,
     RedisConfig,
     RedisKeyManager,

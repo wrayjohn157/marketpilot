@@ -5,6 +5,7 @@ import logging
 
 import yaml
 from utils.credential_manager import get_3commas_credentials
+from config.unified_config_manager import get_path
 
 
 """Centralized configuration management for Market7."""

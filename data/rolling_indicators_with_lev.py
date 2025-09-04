@@ -14,6 +14,7 @@ import requests
 import time
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
 from utils.redis_manager import get_redis_manager, RedisKeyManager
+from config.unified_config_manager import get_config
 
 
 
@@ -53,7 +54,7 @@ PERP_FILTERED_IDS = Path("/home/signal/market7/lev/data/perps/filtered_perps.jso
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
+r = get_redis_manager()
 
 # Logging
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()

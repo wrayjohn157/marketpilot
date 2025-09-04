@@ -15,6 +15,8 @@ from typing import Dict, List
 sys.path.append(str(Path(__file__).parent))
 
 from config.unified_config_manager import (
+from config.unified_config_manager import get_path
+from config.unified_config_manager import get_config
     UnifiedConfigManager,
     EnvironmentDetector,
     SmartDefaults,

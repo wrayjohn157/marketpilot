@@ -13,6 +13,7 @@ import argparse
 import re
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
 from utils.redis_manager import get_redis_manager, RedisKeyManager
+from config.unified_config_manager import get_config
 
 
 
@@ -66,7 +67,7 @@ sys.path.append(str(PROJECT_ROOT))
 
 # Default paths (can be overridden by CLI)
 DEFAULT_CONFIG_PATH = Path("lev/signals/config/fork_config.yaml")
-FORK_INPUT_FILE = PATHS["fork_candidates"]
+FORK_INPUT_FILE = get_path("fork_candidates")
 DEFAULT_OUTPUT_FILE = get_path("final_fork_rrr_trades")
 DEFAULT_BACKTEST_CANDIDATES_FILE = get_path("fork_backtest_candidates")
 FORK_HISTORY_BASE = get_path("fork_history")
@@ -378,9 +379,7 @@ def main() -> Any:
 
     if not args.no_redis:
         try:
-            r = redis.Redis(
-                host=args.redis_host, port=args.redis_port, decode_responses=True
-            )
+            r = get_redis_manager()
             # quick ping to confirm availability (optional, ignore failures)
             try:
                 r.get_cache("__ping__")

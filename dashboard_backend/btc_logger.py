@@ -20,7 +20,7 @@ BINANCE_URL_1H = f"https://api.binance.com/api/v3/klines?symbol={SYMBOL}&interva
 BINANCE_URL_15M = f"https://api.binance.com/api/v3/klines?symbol={SYMBOL}&interval={INTERVAL_15M}&limit={LIMIT}"
 
 # Initialize Redis connection
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = get_redis_manager()
 
 # === Fetch Klines from Binance ===
 def get_binance_klines(url):

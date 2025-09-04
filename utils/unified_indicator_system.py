@@ -22,6 +22,7 @@ from ta.trend import EMAIndicator, ADXIndicator, MACD, PSARIndicator, IchimokuIn
 from ta.volatility import AverageTrueRange, BollingerBands, KeltnerChannel
 from ta.volume import VolumeSMAIndicator, VolumePriceTrendIndicator
 from ta.others import DailyReturnIndicator
+from utils.redis_manager import get_redis_manager
 
 
 
@@ -139,7 +140,7 @@ class IndicatorCalculator:
     
     def __init__(self):
         self.validator = IndicatorValidator()
-        self.redis = redis.Redis(host="localhost", port=6379, decode_responses=True)
+        self.redis = get_redis_manager()
     
     def fetch_klines(self, symbol: str, interval: str, limit: int = 200) -> Optional[pd.DataFrame]:
         """Fetch klines from Binance with error handling"""
@@ -356,7 +357,7 @@ class UnifiedIndicatorManager:
     
     def __init__(self):
         self.calculator = IndicatorCalculator()
-        self.redis = redis.Redis(host="localhost", port=6379, decode_responses=True)
+        self.redis = get_redis_manager()
     
     def get_trend_indicators(self, symbol: str) -> Dict[str, IndicatorResult]:
         """Get trend indicators from 1h timeframe"""

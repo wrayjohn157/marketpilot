@@ -9,6 +9,8 @@ import hmac
 import time
 from utils.credential_manager import get_3commas_credentials
 from config.unified_config_manager import get_path, get_config, get_all_paths, get_all_configs
+from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 
 
 
@@ -25,7 +27,7 @@ REGISTRY_PATH = get_path("live_logs") / "fork_registry.json"
 CRED_PATH = get_path("paper_cred")
 
 # Redis Setup
-REDIS = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+REDIS = get_redis_manager()
 
 # Constants
 DEDUP_EXPIRY_SECONDS = 3600 * 6  # 6 hours

@@ -16,6 +16,7 @@ SYMBOLS_PATH = BASE_DIR / "lev" / "data" / "perps" / "lev_symbols.json"
 
 # Redis connection
 from utils.redis_manager import get_redis_manager
+from config.unified_config_manager import get_config
 r = get_redis_manager()
 
 # Binance API template
