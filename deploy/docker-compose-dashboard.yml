@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Dashboard Frontend
+  dashboard:
+    build:
+      context: ../dashboard_frontend
+      dockerfile: Dockerfile
+    container_name: marketpilot-dashboard
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    restart: unless-stopped
+    networks:
+      - marketpilot-network
+
+  # Redis for caching and queues
+  redis:
+    image: redis:7-alpine
+    container_name: marketpilot-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - marketpilot-network
+
+  # PostgreSQL for persistent data
+  postgres:
+    image: postgres:15-alpine
+    container_name: marketpilot-postgres
+    environment:
+      POSTGRES_DB: marketpilot
+      POSTGRES_USER: marketpilot
+      POSTGRES_PASSWORD: marketpilot_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marketpilot"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - marketpilot-network
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  marketpilot-network:
+    driver: bridge
