@@ -1,0 +1,8 @@
+{
+  "3commas_api_key": "your_paper_trading_api_key_here",
+  "3commas_api_secret": "your_paper_trading_api_secret_here",
+  "3commas_bot_id": "your_paper_trading_bot_id_here",
+  "3commas_bot_id2": "your_second_paper_trading_bot_id_here",
+  "3commas_email_token": "your_paper_trading_email_token_here",
+  "3commas_account_id": "your_paper_trading_account_id_here"
+}

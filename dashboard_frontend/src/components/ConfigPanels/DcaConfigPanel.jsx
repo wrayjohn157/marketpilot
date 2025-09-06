@@ -132,7 +132,7 @@ useEffect(() => {
     .then(res => res.json())
     .then((data) => {
       console.log("Loaded config", data);
-      setConfig(data);
+      setConfig(data.config); // Extract the actual config from the API response
     })
     .catch(() => setError("Failed to load config"));
 }, []);
@@ -196,7 +196,18 @@ useEffect(() => {
     }
   };
 
-  if (!config) return <div>Loading...</div>;
+  if (!config) {
+    return (
+      <Card className="p-6">
+        <CardHeader>
+          <CardTitle className="text-2xl">🎛️ DCA Config</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-400">Loading configuration...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6">

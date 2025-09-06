@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Minus, Signal, MoveUpRight, Frown, Smile, Meh } from "lucide-react";
+import apiClient from "../lib/api";
 
 export default function MarketSentiment() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch("/api/btc/context")
-      .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
+    apiClient.getBTCContext()
       .then((res) => {
         setData({
           status: res.status?.toUpperCase() || "UNKNOWN",

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
 import LoadingSpinner from "../components/layout/LoadingSpinner";
+import apiClient from "../lib/api";
 
 export default function BTCRiskPanel() {
   const [btcData, setBtcData] = useState(null);
@@ -11,9 +12,7 @@ export default function BTCRiskPanel() {
     const fetchBTCData = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/btc/context");
-        if (!response.ok) throw new Error("Failed to fetch BTC data");
-        const data = await response.json();
+        const data = await apiClient.getBTCContext();
         setBtcData(data);
       } catch (err) {
         setError(err.message);

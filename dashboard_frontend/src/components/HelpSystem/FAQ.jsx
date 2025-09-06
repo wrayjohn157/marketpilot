@@ -242,7 +242,7 @@ const FAQ = () => {
             Email Support
           </a>
           <a
-            href="http://localhost:8000/docs"
+            href="http://155.138.202.35:8001/docs"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"

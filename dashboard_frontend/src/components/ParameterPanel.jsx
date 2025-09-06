@@ -6,8 +6,8 @@ import { FormField } from './ui/FormField';
 import { Switch } from './ui/Switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select';
 
-const ParameterPanel = ({ 
-  parameters = {}, 
+const ParameterPanel = ({
+  parameters = {},
   onParametersChange = () => {},
   onRunSimulation = () => {},
   onRunOptimization = () => {},

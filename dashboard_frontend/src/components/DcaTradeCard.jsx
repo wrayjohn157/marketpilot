@@ -6,6 +6,7 @@ import { Button } from "./ui/Button";
 import { Card, CardContent } from "./ui/Card";
 import { Sparkline } from "./ui/Sparkline";
 import { PriceProgressBar } from "./ui/PriceProgressBar";
+import apiClient from "../lib/api";
 
 export default function DcaTradeCard({ trade }) {
   const [liveTrade, setLiveTrade] = useState(trade);
@@ -37,21 +38,21 @@ export default function DcaTradeCard({ trade }) {
   const refreshPrice = async () => {
     setIsRefreshing(true);
     try {
-      const res = await fetch(`/refresh-price/${deal_id}`);
-      const data = await res.json();
+      const data = await apiClient.refreshPrice(deal_id);
 
-      if (data?.current_price) {
+      if (data?.current_price && !data.error) {
         setLiveTrade(prev => ({
           ...prev,
           current_price: data.current_price,
           open_pnl: data.open_pnl ?? prev.open_pnl,
           pnl_pct: data.pnl_pct ?? prev.pnl_pct,
         }));
+        console.log(`✅ Refreshed price for ${symbol}: $${data.current_price}`);
       } else {
         console.error("⚠️ Invalid refresh payload:", data);
       }
     } catch (e) {
-      console.error("❌ Network error during refresh:", e);
+      console.error("❌ Error refreshing price:", e);
     } finally {
       setIsRefreshing(false);
     }

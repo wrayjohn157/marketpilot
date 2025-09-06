@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
+import apiClient from "../lib/api";
 
 function TradeTable() {
   const [trades, setTrades] = useState([]);
 
   useEffect(() => {
-    fetch("/api/fork/metrics")
-      .then(res => res.json())
+    apiClient.getActiveTrades()
       .then((data) => {
-        const deals = data?.metrics?.active_deals;
+        const deals = data?.trades;
         setTrades(Array.isArray(deals) ? deals : []);
       })
       .catch((err) => {

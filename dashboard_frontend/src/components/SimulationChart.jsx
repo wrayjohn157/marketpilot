@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
 
 // Chart component for DCA simulation visualization
-const SimulationChart = ({ 
-  data = [], 
-  dcaPoints = [], 
+const SimulationChart = ({
+  data = [],
+  dcaPoints = [],
   entryPoint = null,
   height = 400,
   width = '100%',
@@ -59,7 +59,7 @@ const SimulationChart = ({
     const pricePadding = priceRange * 0.1;
 
     // Price scale
-    const priceScale = (price) => 
+    const priceScale = (price) =>
       chartHeight - ((price - (minPrice - pricePadding)) / (priceRange + pricePadding * 2)) * chartHeight;
 
     // Time scale
@@ -98,7 +98,7 @@ const SimulationChart = ({
       // Draw body
       const bodyHeight = Math.abs(closeY - openY);
       const bodyY = Math.min(openY, closeY);
-      
+
       if (bodyHeight > 0) {
         ctx.fillRect(x - 2, bodyY, 4, bodyHeight);
       } else {
@@ -113,10 +113,10 @@ const SimulationChart = ({
     // Draw DCA points
     dcaPoints.forEach(point => {
       const pointTime = new Date(point.timestamp);
-      const pointIndex = chartData.findIndex(candle => 
+      const pointIndex = chartData.findIndex(candle =>
         Math.abs(candle.timestamp - pointTime) < 1000 * 60 * 60 // Within 1 hour
       );
-      
+
       if (pointIndex >= 0) {
         const x = padding + timeScale(pointIndex);
         const y = padding + priceScale(point.price);
@@ -143,10 +143,10 @@ const SimulationChart = ({
     // Draw entry point
     if (entryPoint) {
       const entryTime = new Date(entryPoint.timestamp);
-      const entryIndex = chartData.findIndex(candle => 
+      const entryIndex = chartData.findIndex(candle =>
         Math.abs(candle.timestamp - entryTime) < 1000 * 60 * 60
       );
-      
+
       if (entryIndex >= 0) {
         const x = padding + timeScale(entryIndex);
         const y = padding + priceScale(entryPoint.price);
@@ -226,7 +226,7 @@ const SimulationChart = ({
             className="w-full border border-gray-700 rounded cursor-crosshair"
             style={{ width: '100%', height: `${height}px` }}
           />
-          
+
           {/* Chart overlay for hover effects */}
           {hoveredCandle && (
             <div className="absolute top-4 left-4 bg-gray-800 text-white p-2 rounded text-sm">
@@ -239,7 +239,7 @@ const SimulationChart = ({
             </div>
           )}
         </div>
-        
+
         {/* Chart legend */}
         <div className="flex items-center justify-center mt-4 space-x-6 text-sm">
           <div className="flex items-center space-x-2">

@@ -165,7 +165,7 @@ const HelpModal = ({ isOpen, onClose }) => {
               <h3 className="text-sm font-medium text-gray-900 mb-2">Quick Links</h3>
               <div className="space-y-2">
                 <a
-                  href="http://localhost:8000/docs"
+                  href="http://155.138.202.35:8001/docs"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center text-sm text-blue-600 hover:text-blue-800"

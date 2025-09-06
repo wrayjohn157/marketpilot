@@ -1,290 +1,121 @@
 #!/bin/bash
-"""
-Market7 Universal Deployment Script
-Automatically detects environment and deploys accordingly
-"""
+# One-Click MarketPilot Deployment Script
+# Run this on your new VPS for complete setup
 
-set -e
+set -e  # Exit on any error
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+echo "🚀 MarketPilot One-Click Deployment Starting..."
 
-# Functions
-log() {
-    echo -e "${BLUE}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $1"
-}
+# Get the current IP address
+CURRENT_IP=$(curl -s ifconfig.me)
+echo "🌐 Detected IP: $CURRENT_IP"
 
-success() {
-    echo -e "${GREEN}✅ $1${NC}"
-}
+# Step 1: Install all dependencies
+echo "📦 Installing dependencies..."
+chmod +x install_dependencies.sh
+./install_dependencies.sh
 
-warning() {
-    echo -e "${YELLOW}⚠️  $1${NC}"
-}
+# Step 2: Clean up unnecessary files
+echo "🧹 Cleaning up files..."
+chmod +x cleanup_for_migration.sh
+./cleanup_for_migration.sh
 
-error() {
-    echo -e "${RED}❌ $1${NC}"
-    exit 1
-}
+# Step 3: Create necessary directories
+echo "📁 Creating directories..."
+mkdir -p config/credentials
+mkdir -p logs
 
-# Detect environment
-detect_environment() {
-    log "🔍 Detecting deployment environment..."
+# Step 4: Update frontend configuration with current IP
+echo "🔧 Updating frontend configuration..."
+cd dashboard_frontend
 
-    # Check for Docker
-    if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; then
-        DOCKER_AVAILABLE=true
-        log "Docker and Docker Compose detected"
-    else
-        DOCKER_AVAILABLE=false
-        log "Docker not available"
-    fi
+# Update API URL in environment files
+sed -i "s/REACT_APP_API_URL=.*/REACT_APP_API_URL=http:\/\/$CURRENT_IP:3001/" .env.production
+sed -i "s/REACT_APP_API_URL=.*/REACT_APP_API_URL=http:\/\/$CURRENT_IP:3001/" .env.development
 
-    # Check for Kubernetes
-    if command -v kubectl &> /dev/null && kubectl cluster-info &> /dev/null; then
-        KUBERNETES_AVAILABLE=true
-        log "Kubernetes cluster detected"
-    else
-        KUBERNETES_AVAILABLE=false
-        log "Kubernetes not available"
-    fi
+# Update API base URL in the source code
+sed -i "s|http://155.138.202.35:3001|http://$CURRENT_IP:3001|g" src/lib/api.js
 
-    # Check for systemd
-    if command -v systemctl &> /dev/null; then
-        SYSTEMD_AVAILABLE=true
-        log "Systemd detected"
-    else
-        SYSTEMD_AVAILABLE=false
-        log "Systemd not available"
-    fi
+# Build frontend
+echo "🏗️ Building frontend..."
+npm install
+npm run build
 
-    # Determine best deployment method
-    if [ "$KUBERNETES_AVAILABLE" = true ]; then
-        DEPLOYMENT_METHOD="kubernetes"
-        log "🎯 Selected deployment method: Kubernetes"
-    elif [ "$DOCKER_AVAILABLE" = true ]; then
-        DEPLOYMENT_METHOD="docker"
-        log "🎯 Selected deployment method: Docker Compose"
-    elif [ "$SYSTEMD_AVAILABLE" = true ]; then
-        DEPLOYMENT_METHOD="native"
-        log "🎯 Selected deployment method: Native (Systemd)"
-    else
-        DEPLOYMENT_METHOD="manual"
-        log "🎯 Selected deployment method: Manual"
-    fi
-}
+# Update Nginx configuration with current IP
+echo "🔧 Updating Nginx configuration..."
+sed -i "s/155.138.202.35/$CURRENT_IP/g" nginx-with-proxy.conf
 
-# Deploy with Docker Compose
-deploy_docker() {
-    log "🐳 Deploying with Docker Compose..."
+# Build and start frontend container
+echo "🐳 Starting frontend container..."
+docker stop marketpilot-frontend 2>/dev/null || true
+docker rm marketpilot-frontend 2>/dev/null || true
+docker run -d --name marketpilot-frontend -p 3001:80 -v $(pwd)/build:/usr/share/nginx/html -v $(pwd)/nginx-with-proxy.conf:/etc/nginx/conf.d/default.conf nginx
 
-    # Check if docker-compose.yml exists
-    if [ ! -f "deploy/docker-compose.yml" ]; then
-        error "docker-compose.yml not found"
-    fi
+cd ..
 
-    # Copy environment template if .env doesn't exist
-    if [ ! -f ".env" ]; then
-        log "Creating .env file from template..."
-        cp deploy/.env.template .env
-        warning "Please edit .env file with your configuration before continuing"
-        read -p "Press Enter to continue after editing .env..."
-    fi
+# Step 5: Create systemd service for backend
+echo "⚙️ Creating backend service..."
+sudo tee /etc/systemd/system/marketpilot-backend.service > /dev/null <<EOF
+[Unit]
+Description=MarketPilot Backend API
+After=network.target redis.service
 
-    # Start services
-    log "Starting Docker Compose services..."
-    docker-compose -f deploy/docker-compose.yml up -d
+[Service]
+Type=simple
+User=$USER
+WorkingDirectory=$(pwd)
+Environment=PATH=$(pwd)/venv/bin
+ExecStart=$(pwd)/venv/bin/python modular_dashboard_api.py
+Restart=always
+RestartSec=10
 
-    # Wait for services to be ready
-    log "Waiting for services to be ready..."
-    sleep 30
+[Install]
+WantedBy=multi-user.target
+EOF
 
-    # Check health
-    if curl -f http://localhost:8000/health &> /dev/null; then
-        success "Docker Compose deployment successful"
-    else
-        warning "Health check failed, but services may still be starting"
-    fi
-}
+# Reload systemd and start backend
+echo "🔄 Starting backend service..."
+sudo systemctl daemon-reload
+sudo systemctl enable marketpilot-backend
+sudo systemctl start marketpilot-backend
 
-# Deploy with Kubernetes
-deploy_kubernetes() {
-    log "☸️  Deploying with Kubernetes..."
+# Step 6: Wait for services to start
+echo "⏳ Waiting for services to start..."
+sleep 10
 
-    # Check if kubectl is configured
-    if ! kubectl cluster-info &> /dev/null; then
-        error "Kubernetes cluster not accessible"
-    fi
+# Step 7: Health check
+echo "🏥 Running health check..."
+if curl -s http://localhost:8001/health > /dev/null; then
+    echo "✅ Backend health check passed"
+else
+    echo "❌ Backend health check failed"
+    echo "📋 Backend logs:"
+    sudo journalctl -u marketpilot-backend --no-pager -n 20
+fi
 
-    # Apply configurations
-    log "Applying Kubernetes configurations..."
-    kubectl apply -f deploy/kubernetes/namespace.yaml
-    kubectl apply -f deploy/kubernetes/configmap.yaml
-    kubectl apply -f deploy/kubernetes/secret.yaml
-    kubectl apply -f deploy/kubernetes/pvc.yaml
-    kubectl apply -f deploy/kubernetes/deployment.yaml
-    kubectl apply -f deploy/kubernetes/service.yaml
-    kubectl apply -f deploy/kubernetes/ingress.yaml
+if curl -s http://localhost:3001 > /dev/null; then
+    echo "✅ Frontend health check passed"
+else
+    echo "❌ Frontend health check failed"
+    echo "📋 Frontend logs:"
+    docker logs marketpilot-frontend
+fi
 
-    # Wait for deployments
-    log "Waiting for deployments to be ready..."
-    kubectl wait --for=condition=available --timeout=300s deployment/market7-trading -n market7
-
-    # Check status
-    kubectl get pods -n market7
-    success "Kubernetes deployment successful"
-}
-
-# Deploy natively
-deploy_native() {
-    log "🖥️  Deploying natively..."
-
-    # Run setup script
-    if [ -f "deploy/setup.sh" ]; then
-        log "Running setup script..."
-        chmod +x deploy/setup.sh
-        ./deploy/setup.sh
-    else
-        error "Setup script not found"
-    fi
-
-    # Start services
-    log "Starting systemd services..."
-    sudo systemctl start market7-trading
-    sudo systemctl enable market7-trading
-
-    # Check status
-    if systemctl is-active --quiet market7-trading; then
-        success "Native deployment successful"
-    else
-        error "Service failed to start"
-    fi
-}
-
-# Deploy manually
-deploy_manual() {
-    log "🔧 Manual deployment instructions..."
-
-    echo "Since no automated deployment method is available, please follow these steps:"
-    echo ""
-    echo "1. Install Python 3.8+ and pip"
-    echo "2. Install Redis and PostgreSQL"
-    echo "3. Create virtual environment: python3 -m venv venv"
-    echo "4. Activate virtual environment: source venv/bin/activate"
-    echo "5. Install dependencies: pip install -r requirements.txt"
-    echo "6. Configure credentials in config/credentials/"
-    echo "7. Run the application: python3 main_orchestrator.py"
-    echo ""
-    echo "For detailed instructions, see deploy/README.md"
-}
-
-# Show deployment status
-show_status() {
-    log "📊 Deployment Status"
-    echo "=================="
-
-    case $DEPLOYMENT_METHOD in
-        "docker")
-            echo "🐳 Docker Compose Services:"
-            docker-compose -f deploy/docker-compose.yml ps
-            echo ""
-            echo "🌐 Health Check:"
-            curl -s http://localhost:8000/health | jq . 2>/dev/null || echo "Health check endpoint not available"
-            ;;
-        "kubernetes")
-            echo "☸️  Kubernetes Pods:"
-            kubectl get pods -n market7
-            echo ""
-            echo "☸️  Kubernetes Services:"
-            kubectl get services -n market7
-            ;;
-        "native")
-            echo "🖥️  Systemd Services:"
-            systemctl status market7-trading --no-pager
-            ;;
-        *)
-            echo "Manual deployment - check application logs"
-            ;;
-    esac
-}
-
-# Main function
-main() {
-    log "🚀 Market7 Universal Deployment Script"
-    log "====================================="
-
-    # Parse command line arguments
-    case "${1:-deploy}" in
-        "deploy")
-            detect_environment
-
-            case $DEPLOYMENT_METHOD in
-                "docker")
-                    deploy_docker
-                    ;;
-                "kubernetes")
-                    deploy_kubernetes
-                    ;;
-                "native")
-                    deploy_native
-                    ;;
-                "manual")
-                    deploy_manual
-                    ;;
-            esac
-            ;;
-        "status")
-            detect_environment
-            show_status
-            ;;
-        "stop")
-            log "🛑 Stopping services..."
-            case $DEPLOYMENT_METHOD in
-                "docker")
-                    docker-compose -f deploy/docker-compose.yml down
-                    ;;
-                "kubernetes")
-                    kubectl delete -f deploy/kubernetes/
-                    ;;
-                "native")
-                    sudo systemctl stop market7-trading
-                    ;;
-            esac
-            success "Services stopped"
-            ;;
-        "logs")
-            log "📋 Showing logs..."
-            case $DEPLOYMENT_METHOD in
-                "docker")
-                    docker-compose -f deploy/docker-compose.yml logs -f
-                    ;;
-                "kubernetes")
-                    kubectl logs -f deployment/market7-trading -n market7
-                    ;;
-                "native")
-                    journalctl -u market7-trading -f
-                    ;;
-            esac
-            ;;
-        "help")
-            echo "Usage: $0 [deploy|status|stop|logs|help]"
-            echo ""
-            echo "Commands:"
-            echo "  deploy  - Deploy the application (default)"
-            echo "  status  - Show deployment status"
-            echo "  stop    - Stop all services"
-            echo "  logs    - Show application logs"
-            echo "  help    - Show this help message"
-            ;;
-        *)
-            error "Unknown command: $1. Use 'help' for usage information."
-            ;;
-    esac
-}
-
-# Run main function
-main "$@"
+# Step 8: Display access information
+echo ""
+echo "🎉 MarketPilot Deployment Complete!"
+echo "=================================="
+echo "🌐 Frontend: http://$CURRENT_IP:3001"
+echo "🔧 Backend API: http://$CURRENT_IP:8001"
+echo "📚 API Docs: http://$CURRENT_IP:8001/docs"
+echo ""
+echo "🔑 Next Steps:"
+echo "1. Copy your credentials to config/credentials/"
+echo "2. Restart backend: sudo systemctl restart marketpilot-backend"
+echo "3. Check logs: sudo journalctl -u marketpilot-backend -f"
+echo ""
+echo "🛠️ Management Commands:"
+echo "• Backend: sudo systemctl start/stop/restart marketpilot-backend"
+echo "• Frontend: docker start/stop/restart marketpilot-frontend"
+echo "• Logs: sudo journalctl -u marketpilot-backend -f"
+echo "• Status: sudo systemctl status marketpilot-backend"

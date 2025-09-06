@@ -70,14 +70,14 @@ export default function TvScreenerConfigPanel() {
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       const response = await fetch("/config/tv_screener", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config)
       });
-      
+
       if (response.ok) {
         setSuccess("Configuration saved successfully!");
         setTimeout(() => setSuccess(null), 3000);
@@ -95,11 +95,11 @@ export default function TvScreenerConfigPanel() {
     if (!window.confirm("Are you sure you want to reset to default configuration? This will overwrite all current settings.")) {
       return;
     }
-    
+
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       // Load defaults from server
       const response = await fetch("/config/tv_screener/default");
@@ -151,7 +151,7 @@ export default function TvScreenerConfigPanel() {
             />
             <label className="text-sm">Enabled</label>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <Switch
               checked={config.disable_if_btc_unhealthy}
@@ -159,7 +159,7 @@ export default function TvScreenerConfigPanel() {
             />
             <label className="text-sm">Disable if BTC Unhealthy</label>
           </div>
-          
+
           <FormField label="Score Threshold">
             <Input
               type="number"

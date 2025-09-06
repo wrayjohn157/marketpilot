@@ -49,14 +49,14 @@ export default function ForkScoreConfigPanel() {
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       const response = await fetch("/config/fork_score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config)
       });
-      
+
       if (response.ok) {
         setSuccess("Configuration saved successfully!");
         setTimeout(() => setSuccess(null), 3000);
@@ -74,11 +74,11 @@ export default function ForkScoreConfigPanel() {
     if (!window.confirm("Are you sure you want to reset to default configuration? This will overwrite all current settings.")) {
       return;
     }
-    
+
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       // Load defaults from server
       const response = await fetch("/config/fork_score/default");

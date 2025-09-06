@@ -9,10 +9,10 @@ import logging
 import os
 import platform
 import socket
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import yaml
 
@@ -108,13 +108,13 @@ class EnvironmentDetector:
     def _get_base_path(environment: Environment) -> Path:
         """Get base path based on environment"""
         if environment == Environment.DEVELOPMENT:
-            return Path("/workspace")
+            return Path("/home/signal/marketpilot")
         elif environment == Environment.STAGING:
-            return Path("/opt/market7")
+            return Path("/opt/marketpilot")
         elif environment == Environment.PRODUCTION:
-            return Path("/home/signal/market7")
+            return Path("/home/signal/marketpilot")
         else:  # TESTING
-            return Path("/tmp/market7_test")
+            return Path("/tmp/marketpilot_test")
 
     @staticmethod
     def _is_docker() -> bool:
@@ -809,19 +809,19 @@ if __name__ == "__main__":
     print(f"Is Development: {env_info.is_development}")
 
     # Get paths
-    print(f"\nPaths:")
+    print("\nPaths:")
     for key, path in config_manager.get_all_paths().items():
         print(f"  {key}: {path}")
 
     # Get configs
-    print(f"\nConfigs:")
+    print("\nConfigs:")
     for key, config in config_manager.get_all_configs().items():
         print(f"  {key}: {len(config)} items")
 
     # Check validation
     if config_manager.is_valid():
-        print(f"\n✅ All configs are valid")
+        print("\n✅ All configs are valid")
     else:
-        print(f"\n❌ Config validation issues:")
+        print("\n❌ Config validation issues:")
         for issue in config_manager.get_validation_issues():
             print(f"  - {issue}")

@@ -94,14 +94,14 @@ export default function SafuConfigPanel() {
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       const response = await fetch("/config/safu", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config)
       });
-      
+
       if (response.ok) {
         setSuccess("Configuration saved successfully!");
         setTimeout(() => setSuccess(null), 3000);
@@ -119,11 +119,11 @@ export default function SafuConfigPanel() {
     if (!window.confirm("Are you sure you want to reset to default configuration? This will overwrite all current settings.")) {
       return;
     }
-    
+
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       // Load defaults from server
       const response = await fetch("/config/safu/default");
@@ -177,7 +177,7 @@ export default function SafuConfigPanel() {
               className="bg-gray-800 border-gray-600 text-white"
             />
           </FormField>
-          
+
           <div className="flex items-center space-x-2">
             <Switch
               checked={config.telegram_alerts}
@@ -185,7 +185,7 @@ export default function SafuConfigPanel() {
             />
             <label className="text-sm">Telegram Alerts</label>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <Switch
               checked={config.auto_close}
@@ -224,7 +224,7 @@ export default function SafuConfigPanel() {
               />
               <label className="text-sm">Enabled</label>
             </div>
-            
+
             <FormField label="Require BTC Status">
               <select
                 value={config.safu_reentry?.require_btc_status}
@@ -236,7 +236,7 @@ export default function SafuConfigPanel() {
                 ))}
               </select>
             </FormField>
-            
+
             <FormField label="Cooldown Minutes">
               <Input
                 type="number"
@@ -245,7 +245,7 @@ export default function SafuConfigPanel() {
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </FormField>
-            
+
             <FormField label="Min MACD Lift">
               <Input
                 type="number"
@@ -255,7 +255,7 @@ export default function SafuConfigPanel() {
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </FormField>
-            
+
             <FormField label="Min RSI Slope">
               <Input
                 type="number"
@@ -265,7 +265,7 @@ export default function SafuConfigPanel() {
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </FormField>
-            
+
             <FormField label="Min SAFU Score">
               <Input
                 type="number"
@@ -275,7 +275,7 @@ export default function SafuConfigPanel() {
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </FormField>
-            
+
             <FormField label="Allow if TP1 Shift Under %">
               <Input
                 type="number"

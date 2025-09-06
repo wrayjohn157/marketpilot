@@ -1,13 +1,32 @@
 import { useEffect, useState } from "react";
+import apiClient from "../lib/api";
 
 export default function AccountSummary() {
   const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("/fork/metrics")
-      .then((res) => res.json())
-      .then((data) => setSummary(data.summary))
-      .catch((err) => console.error("Error loading account summary:", err));
+    const fetchSummary = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await apiClient.getAccountSummary();
+
+        if (data.error) {
+          setError(data.error);
+        } else {
+          setSummary(data.summary);
+        }
+      } catch (err) {
+        setError(err.message);
+        console.error("Error loading account summary:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummary();
   }, []);
 
   const normalizeTo = 24957;
@@ -30,6 +49,24 @@ export default function AccountSummary() {
     if (!summary) return 0;
     return normalizeTo + summary.total_pnl;
   };
+
+  if (loading) {
+    return (
+      <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+        <h3 className="text-lg font-semibold mb-2 text-white">Account Summary</h3>
+        <div className="text-gray-400">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+        <h3 className="text-lg font-semibold mb-2 text-white">Account Summary</h3>
+        <div className="text-red-400">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">

@@ -3,7 +3,7 @@
  * Handles all API calls with proper error handling and retry logic
  */
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://155.138.202.35:3001';
 
 class ApiClient {
   constructor() {
@@ -74,16 +74,65 @@ class ApiClient {
   }
 
   /**
-   * Get active trades
+   * Get active trades (Market7 compatible)
    */
   async getActiveTrades() {
     try {
-      return await this.request('/api/trades/active');
+      return await this.request('/dca-trades-active');
     } catch (error) {
       console.error('Failed to fetch active trades:', error);
       return {
         dca_trades: [],
         count: 0,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Get DCA evaluations for trade cards
+   */
+  async getDCAEvaluations() {
+    try {
+      return await this.request('/dca-evals');
+    } catch (error) {
+      console.error('Failed to fetch DCA evaluations:', error);
+      return {
+        evaluations: [],
+        count: 0,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Refresh price for specific deal
+   */
+  async refreshPrice(dealId) {
+    try {
+      return await this.request(`/refresh-price/${dealId}`);
+    } catch (error) {
+      console.error(`Failed to refresh price for deal ${dealId}:`, error);
+      return {
+        deal_id: dealId,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Panic sell trade
+   */
+  async panicSell(dealId) {
+    try {
+      return await this.request('/panic-sell', {
+        method: 'POST',
+        body: JSON.stringify({ deal_id: dealId })
+      });
+    } catch (error) {
+      console.error(`Failed to panic sell deal ${dealId}:`, error);
+      return {
+        success: false,
         error: error.message
       };
     }
@@ -131,11 +180,12 @@ class ApiClient {
   }
 
   /**
-   * Get fork metrics
+   * Get fork metrics (legacy - use getAccountSummary instead)
    */
   async getForkMetrics() {
     try {
-      return await this.request('/api/fork/metrics');
+      // Redirect to account summary since fork metrics doesn't exist
+      return await this.getAccountSummary();
     } catch (error) {
       console.error('Failed to fetch fork metrics:', error);
       return {
@@ -153,16 +203,18 @@ class ApiClient {
   }
 
   /**
-   * Get ML confidence data
+   * Get ML confidence data (Market7 compatible)
    */
   async getMLConfidence() {
     try {
-      return await this.request('/api/ml/confidence');
+      return await this.request('/ml/confidence');
     } catch (error) {
       console.error('Failed to fetch ML confidence:', error);
       return {
         error: error.message,
-        confidence: 0
+        confidence: 0,
+        confidence_percentage: 0,
+        status: 'error'
       };
     }
   }
