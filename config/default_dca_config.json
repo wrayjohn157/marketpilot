@@ -1,0 +1,60 @@
+{
+  "max_trade_usdt": 2000,
+  "base_order_usdt": 200,
+  "drawdown_trigger_pct": 1.2,
+  "safu_score_threshold": 0.5,
+  "score_decay_min": 0.2,
+  "buffer_zone_pct": 0.0,
+  "require_indicator_health": true,
+  "indicator_thresholds": {
+    "rsi": 30.0,
+    "macd_histogram": -0.001,
+    "adx": 25.0
+  },
+  "use_btc_filter": false,
+  "btc_indicators": {
+    "rsi_max": 70.0,
+    "macd_histogram_max": 0.001,
+    "adx_max": 50.0
+  },
+  "so_volume_table": [
+    100,
+    150,
+    200,
+    300,
+    500
+  ],
+  "tp1_targets": [
+    1.0,
+    2.0,
+    3.0,
+    5.0
+  ],
+  "zombie_tag": 0.1,
+  "min_drawdown_pct": 0.5,
+  "max_drawdown_pct": 10.0,
+  "max_score": 1.0,
+  "require_zero_recovery_odds": false,
+  "max_macd_lift": 0.01,
+  "max_rsi_slope": 5.0,
+  "use_ml_spend_model": false,
+  "spend_adjustment_rules": {
+    "min_volume": 0.5,
+    "max_multiplier": 2.0
+  },
+  "tp1_shift_soft_cap": 0.8,
+  "low_dd_pct_limit": 2.0,
+  "log_verbose": false,
+  "enforce_price_below_last_step": true,
+  "trailing_step_guard": true,
+  "min_pct_gap_from_last_dca": 0.5,
+  "adaptive_step_spacing": true,
+  "require_macd_cross": false,
+  "macd_cross_lookback": 5,
+  "bottom_reversal_filter": {
+    "local_price_reversal_window": 10,
+    "lookback_bars": 20,
+    "rsi_floor": 25.0,
+    "candles_required": 5
+  }
+}
