@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 
 # === Updated Dynamic Paths ===
-PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
+PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/marketpilot
 RAW_DIR = PROJECT_ROOT / "ml/datasets/raw_paper"
 SCRUBBED_DIR = PROJECT_ROOT / "ml/datasets/scrubbed_paper"
 

@@ -36,9 +36,9 @@ cd monitoring
 ### 2. Configure Remote Access (Optional)
 Edit your `/etc/hosts` file or DNS:
 ```
-your-server-ip grafana.market7.local
-your-server-ip prometheus.market7.local
-your-server-ip alerts.market7.local
+your-server-ip grafana.marketpilot.local
+your-server-ip prometheus.marketpilot.local
+your-server-ip alerts.marketpilot.local
 ```
 
 ### 3. Access Dashboards
@@ -49,12 +49,12 @@ your-server-ip alerts.market7.local
 ## 📊 Available Dashboards
 
 ### 1. System Overview
-- **URL**: `/d/market7-overview`
+- **URL**: `/d/marketpilot-overview`
 - **Description**: High-level system health and resource usage
 - **Metrics**: CPU, Memory, Service Status, Database Health
 
 ### 2. Trading Metrics
-- **URL**: `/d/market7-trading`
+- **URL**: `/d/marketpilot-trading`
 - **Description**: Trading system performance and errors
 - **Metrics**: API Response Times, Error Rates, Trading Errors, DCA Performance
 
@@ -111,7 +111,7 @@ GRAFANA_ADMIN_PASSWORD=admin123
 
 # Database
 POSTGRES_PASSWORD=postgres
-POSTGRES_DB=market7
+POSTGRES_DB=marketpilot
 
 # SMTP (for email alerts)
 SMTP_PASSWORD=your_smtp_password
@@ -169,14 +169,14 @@ docker-compose -f docker-compose.monitoring.yml restart
 ### 1. DNS Configuration
 Configure your domain to point to your server:
 ```
-grafana.market7.local    -> your-server-ip
-prometheus.market7.local -> your-server-ip
-alerts.market7.local     -> your-server-ip
+grafana.marketpilot.local    -> your-server-ip
+prometheus.marketpilot.local -> your-server-ip
+alerts.marketpilot.local     -> your-server-ip
 ```
 
 ### 2. SSL Certificates
 Traefik automatically handles SSL certificates using Let's Encrypt:
-- **Email**: admin@market7.local
+- **Email**: admin@marketpilot.local
 - **Storage**: `/etc/traefik/certs/acme.json`
 - **Challenge**: HTTP challenge
 

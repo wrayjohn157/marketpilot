@@ -62,7 +62,7 @@ def get_redis_client():
 def make_3commas_request(path: str, params: Dict = None) -> requests.Response:
     """
     Make authenticated request to 3Commas API
-    Following market7 architecture with proper error handling
+    Following marketpilot architecture with proper error handling
     """
     try:
         creds = get_3commas_credentials()
@@ -353,7 +353,7 @@ def calculate_trade_health(deal: Dict) -> float:
 
 def calculate_confidence_score(deal: Dict) -> float:
     """Calculate ML confidence score (0-100)"""
-    # Placeholder - in market7 this used ML models
+    # Placeholder - in marketpilot this used ML models
     # For now, base on trade performance and volume
     pnl_pct = float(deal.get("final_profit_percentage", 0))
 

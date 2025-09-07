@@ -71,7 +71,7 @@ GRAFANA_ADMIN_PASSWORD=admin123
 
 # Database Configuration
 POSTGRES_PASSWORD=postgres
-POSTGRES_DB=market7
+POSTGRES_DB=marketpilot
 
 # SMTP Configuration (for alerts)
 SMTP_PASSWORD=your_smtp_password
@@ -80,7 +80,7 @@ SMTP_PASSWORD=your_smtp_password
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
 
 # Domain Configuration
-DOMAIN=market7.local
+DOMAIN=marketpilot.local
 EOF
     print_warning "Please edit monitoring/.env with your actual configuration values"
 fi
@@ -142,9 +142,9 @@ echo "  • Alertmanager: http://localhost:9093"
 echo "  • Traefik Dashboard: http://localhost:8080"
 echo ""
 echo "🌐 For remote access, configure your DNS:"
-echo "  • grafana.market7.local -> your-server-ip"
-echo "  • prometheus.market7.local -> your-server-ip"
-echo "  • alerts.market7.local -> your-server-ip"
+echo "  • grafana.marketpilot.local -> your-server-ip"
+echo "  • prometheus.marketpilot.local -> your-server-ip"
+echo "  • alerts.marketpilot.local -> your-server-ip"
 echo ""
 echo "📋 Next steps:"
 echo "  1. Configure your DNS to point to this server"

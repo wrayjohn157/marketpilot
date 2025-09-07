@@ -12,11 +12,11 @@ from dateutil import parser as dateparser
 
 
 # === Config Root Paths ===
-SCRUBBED_DIR = Path("/home/signal/market7/ml/datasets/scrubbed_paper")
-FORK_DIR = Path("/home/signal/market7/output/fork_history")
-TV_DIR = Path("/home/signal/market7/output/tv_history")
-BTC_DIR = Path("/home/signal/market7/dashboard_backend/btc_logs")
-OUTPUT_BASE = Path("/home/signal/market7/ml/datasets/enriched")
+SCRUBBED_DIR = Path("/home/signal/marketpilot/ml/datasets/scrubbed_paper")
+FORK_DIR = Path("/home/signal/marketpilot/output/fork_history")
+TV_DIR = Path("/home/signal/marketpilot/output/tv_history")
+BTC_DIR = Path("/home/signal/marketpilot/dashboard_backend/btc_logs")
+OUTPUT_BASE = Path("/home/signal/marketpilot/ml/datasets/enriched")
 
 def load_jsonl(path: Any) -> Any:
         if not path.exists():

@@ -1,4 +1,4 @@
-# /market7/dashboard_backend/threecommas_metrics.py
+# /home/signal/marketpilot/dashboard_backend/threecommas_metrics.py
 
 import hashlib
 import hmac
@@ -10,7 +10,7 @@ from pathlib import Path
 import requests
 
 # === Config Loader ===
-sys.path.append(str(Path(__file__).resolve().parent.parent))  # Up to /market7
+sys.path.append(str(Path(__file__).resolve().parent.parent))  # Up to /home/signal/marketpilot
 from config.unified_config_manager import (
     get_all_configs,
     get_all_paths,

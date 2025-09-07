@@ -7,7 +7,7 @@ from pathlib import Path
 from config.unified_config_manager import get_path
 
 # === Updated Dynamic Paths ===
-PROJECT_ROOT = Path(__file__).resolve().parents[2]  # ~/market7
+PROJECT_ROOT = Path(__file__).resolve().parents[3]  # ~/marketpilot
 FORK_HISTORY_BASE = PROJECT_ROOT / "output/fork_history"
 SCRUBBED_BASE = PROJECT_ROOT / "ml/datasets/fork_pulls"
 
