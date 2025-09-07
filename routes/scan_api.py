@@ -3,13 +3,15 @@ Scan API Routes
 Handles scan review and analysis
 """
 
-from fastapi import APIRouter
-from datetime import datetime
-from typing import List, Dict, Any
 import logging
+from datetime import datetime
+from typing import Any, Dict, List
+
+from fastapi import APIRouter
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
 
 @router.get("/api/scan/results")
 def get_scan_results() -> Dict[str, Any]:
@@ -26,7 +28,7 @@ def get_scan_results() -> Dict[str, Any]:
                 "change_24h": 2.5,
                 "indicators": {"rsi": 65, "macd": 0.001},
                 "notes": "Strong bullish signal",
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(datetime.UTC).isoformat(),
             },
             {
                 "id": "scan_002",
@@ -37,23 +39,26 @@ def get_scan_results() -> Dict[str, Any]:
                 "change_24h": 1.8,
                 "indicators": {"rsi": 58, "macd": 0.0005},
                 "notes": "Moderate bullish signal",
-                "timestamp": datetime.utcnow().isoformat()
-            }
+                "timestamp": datetime.now(datetime.UTC).isoformat(),
+            },
         ]
-        
+
         return {
             "stats": {
                 "total_scans": len(mock_scans),
                 "avg_score": sum(s["score"] for s in mock_scans) / len(mock_scans),
                 "success_rate": 0.85,
-                "last_updated": datetime.utcnow().isoformat()
+                "last_updated": datetime.now(datetime.UTC).isoformat(),
             },
             "scans": mock_scans,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
         }
     except Exception as e:
         logger.error(f"Failed to get scan results: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to fetch scan results: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to fetch scan results: {e}"
+        )
+
 
 @router.get("/api/scan/stats")
 def get_scan_stats() -> Dict[str, Any]:
@@ -64,8 +69,8 @@ def get_scan_stats() -> Dict[str, Any]:
             "successful_scans": 127,
             "success_rate": 0.847,
             "avg_processing_time": 2.3,
-            "last_scan": datetime.utcnow().isoformat(),
-            "timestamp": datetime.utcnow().isoformat()
+            "last_scan": datetime.now(datetime.UTC).isoformat(),
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
         }
     except Exception as e:
         logger.error(f"Failed to get scan stats: {e}")

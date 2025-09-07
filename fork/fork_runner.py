@@ -121,7 +121,7 @@ def get_active_trades() -> Any:
 
 # === BTC Status from file ===
 def get_latest_btc_status() -> Any:
-    today = datetime.utcnow().strftime("%Y-%m-%d")
+    today = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
     btc_log_path = BTC_LOGS_DIR / today / "btc_snapshots.jsonl"
     if not btc_log_path.exists():
         return "neutral"

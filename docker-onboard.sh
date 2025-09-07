@@ -41,19 +41,19 @@ check_docker() {
         log_info "Visit: https://docs.docker.com/get-docker/"
         exit 1
     fi
-    
+
     if ! docker info &> /dev/null; then
         log_error "Docker is not running. Please start Docker first."
         exit 1
     fi
-    
+
     log_success "Docker is available"
 }
 
 # Create Docker Compose file for development
 create_dev_compose() {
     log_header "Creating Development Docker Compose"
-    
+
     cat > docker-compose.dev.yml << 'EOF'
 version: '3.8'
 
@@ -198,7 +198,7 @@ EOF
 # Create development Dockerfile
 create_dev_dockerfile() {
     log_header "Creating Development Dockerfile"
-    
+
     cat > Dockerfile.dev << 'EOF'
 FROM python:3.12-slim
 
@@ -245,7 +245,7 @@ EOF
 # Create production Docker Compose
 create_prod_compose() {
     log_header "Creating Production Docker Compose"
-    
+
     cat > docker-compose.prod.yml << 'EOF'
 version: '3.8'
 
@@ -345,7 +345,7 @@ EOF
 # Create production Dockerfile
 create_prod_dockerfile() {
     log_header "Creating Production Dockerfile"
-    
+
     cat > Dockerfile.prod << 'EOF'
 FROM python:3.12-slim as builder
 
@@ -410,7 +410,7 @@ EOF
 # Create environment files
 create_env_files() {
     log_header "Creating Environment Files"
-    
+
     # Development environment
     cat > .env.dev << 'EOF'
 # Development Environment
@@ -470,7 +470,7 @@ EOF
 # Create startup scripts
 create_docker_scripts() {
     log_header "Creating Docker Startup Scripts"
-    
+
     # Development start script
     cat > start-dev.sh << 'EOF'
 #!/bin/bash
@@ -563,22 +563,22 @@ main() {
     echo "This script will set up MarketPilot using Docker"
     echo "for maximum portability across any machine."
     echo ""
-    
+
     # Check Docker
     check_docker
-    
+
     # Create Docker configurations
     create_dev_compose
     create_dev_dockerfile
     create_prod_compose
     create_prod_dockerfile
-    
+
     # Create environment files
     create_env_files
-    
+
     # Create startup scripts
     create_docker_scripts
-    
+
     # Final instructions
     log_header "Docker Onboarding Complete! 🎉"
     echo ""

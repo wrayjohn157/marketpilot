@@ -63,7 +63,7 @@ class IntegratedIndicatorManager:
 
             results = {
                 "symbol": symbol,
-                "timestamp": int(datetime.utcnow().timestamp()),
+                "timestamp": int(datetime.now(datetime.UTC).timestamp()),
                 "indicators": {},
                 "errors": [],
             }
@@ -98,7 +98,7 @@ class IntegratedIndicatorManager:
             logger.error(f"Failed to calculate indicators for {symbol}: {e}")
             return {
                 "symbol": symbol,
-                "timestamp": int(datetime.utcnow().timestamp()),
+                "timestamp": int(datetime.now(datetime.UTC).timestamp()),
                 "indicators": {},
                 "errors": [str(e)],
             }
@@ -215,7 +215,7 @@ class IntegratedIndicatorManager:
                 "indicators_calculated", results["successful"]
             )
             self.redis_manager.set_counter(
-                "indicators_timestamp", int(datetime.utcnow().timestamp())
+                "indicators_timestamp", int(datetime.now(datetime.UTC).timestamp())
             )
 
             logger.info("🎉 Indicator Cycle complete")
@@ -230,7 +230,7 @@ class IntegratedIndicatorManager:
         try:
             results_file = (
                 get_path("snapshots")
-                / f"indicators_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
+                / f"indicators_{datetime.now(datetime.UTC).strftime('%Y%m%d_%H%M%S')}.json"
             )
             results_file.parent.mkdir(parents=True, exist_ok=True)
 

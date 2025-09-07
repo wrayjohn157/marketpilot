@@ -45,7 +45,7 @@ SNAPSHOTS_BASE = get_path("snapshots")
 FORK_METRICS_FILE = get_path("dashboard_cache") / "fork_metrics.json"
 
 def get_snapshot_dir() -> Any:
-    path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
+    path = SNAPSHOTS_BASE / datetime.now(datetime.UTC).strftime("%Y-%m-%d")
 path.mkdir(parents=True, exist_ok=True)
     return path
 

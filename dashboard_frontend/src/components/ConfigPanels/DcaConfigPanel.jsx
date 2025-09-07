@@ -11,7 +11,6 @@ import {
 import { FormField } from "../ui/FormField";
 import { Input } from "../ui/Input";
 import { Switch } from "../ui/Switch";
-import { useState as useReactState } from "react";
 
 const prettyLabel = (key) =>
   key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
@@ -105,7 +104,7 @@ const defaultConfig = {
 };
 
 function CollapsibleSection({ title, children, defaultOpen = false }) {
-  const [open, setOpen] = useReactState(defaultOpen);
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="border border-gray-700 rounded mb-2">
       <button
@@ -132,7 +131,9 @@ useEffect(() => {
     .then(res => res.json())
     .then((data) => {
       console.log("Loaded config", data);
-      setConfig(data);
+      // Handle wrapped config response
+      const configData = data.config || data;
+      setConfig(configData);
     })
     .catch(() => setError("Failed to load config"));
 }, []);
@@ -218,26 +219,26 @@ useEffect(() => {
 
         <CollapsibleSection title="🔪 Indicator Thresholds">
           <FieldGrid>
-            <NumericField label="RSI" value={config.indicator_thresholds.rsi} onChange={(v) => updateNestedField("indicator_thresholds", "rsi", null, v)} />
-            <NumericField label="MACD Histogram" value={config.indicator_thresholds.macd_histogram} onChange={(v) => updateNestedField("indicator_thresholds", "macd_histogram", null, v)} />
-            <NumericField label="ADX" value={config.indicator_thresholds.adx} onChange={(v) => updateNestedField("indicator_thresholds", "adx", null, v)} />
+            <NumericField label="RSI" value={config.indicator_thresholds.rsi} onChange={(v) => updateField("indicator_thresholds", "rsi", v)} />
+            <NumericField label="MACD Histogram" value={config.indicator_thresholds.macd_histogram} onChange={(v) => updateField("indicator_thresholds", "macd_histogram", v)} />
+            <NumericField label="ADX" value={config.indicator_thresholds.adx} onChange={(v) => updateField("indicator_thresholds", "adx", v)} />
           </FieldGrid>
         </CollapsibleSection>
 
         <CollapsibleSection title="📉 BTC Market Guard">
           <FieldGrid>
             <SwitchField label="Use BTC Filter" checked={config.use_btc_filter} onChange={(v) => updateRoot("use_btc_filter", v)} />
-            <NumericField label="RSI Max" value={config.btc_indicators.rsi_max} onChange={(v) => updateNestedField("btc_indicators", "rsi_max", null, v)} />
-            <NumericField label="MACD Histogram Max" value={config.btc_indicators.macd_histogram_max} onChange={(v) => updateNestedField("btc_indicators", "macd_histogram_max", null, v)} />
-            <NumericField label="ADX Max" value={config.btc_indicators.adx_max} onChange={(v) => updateNestedField("btc_indicators", "adx_max", null, v)} />
+            <NumericField label="RSI Max" value={config.btc_indicators.rsi_max} onChange={(v) => updateField("btc_indicators", "rsi_max", v)} />
+            <NumericField label="MACD Histogram Max" value={config.btc_indicators.macd_histogram_max} onChange={(v) => updateField("btc_indicators", "macd_histogram_max", v)} />
+            <NumericField label="ADX Max" value={config.btc_indicators.adx_max} onChange={(v) => updateField("btc_indicators", "adx_max", v)} />
           </FieldGrid>
         </CollapsibleSection>
 
         <CollapsibleSection title="🔀 Recovery Trajectory">
           <FieldGrid>
             <SwitchField label="Use Trajectory Check" checked={config.use_trajectory_check} onChange={(v) => updateRoot("use_trajectory_check", v)} />
-            <NumericField label="MACD Lift Min" value={config.trajectory_thresholds.macd_lift_min} onChange={(v) => updateNestedField("trajectory_thresholds", "macd_lift_min", null, v)} />
-            <NumericField label="RSI Slope Min" value={config.trajectory_thresholds.rsi_slope_min} onChange={(v) => updateNestedField("trajectory_thresholds", "rsi_slope_min", null, v)} />
+            <NumericField label="MACD Lift Min" value={config.trajectory_thresholds.macd_lift_min} onChange={(v) => updateField("trajectory_thresholds", "macd_lift_min", v)} />
+            <NumericField label="RSI Slope Min" value={config.trajectory_thresholds.rsi_slope_min} onChange={(v) => updateField("trajectory_thresholds", "rsi_slope_min", v)} />
           </FieldGrid>
         </CollapsibleSection>
 
@@ -260,7 +261,7 @@ useEffect(() => {
           <FieldGrid>
             <SwitchField label="Use Confidence Override" checked={config.use_confidence_override} onChange={(v) => updateRoot("use_confidence_override", v)} />
             {Object.entries(config.confidence_dca_guard).map(([k, v]) => (
-              <NumericField key={k} label={prettyLabel(k)} value={v} onChange={(val) => updateNestedField("confidence_dca_guard", k, null, val)} />
+              <NumericField key={k} label={prettyLabel(k)} value={v} onChange={(val) => updateField("confidence_dca_guard", k, val)} />
             ))}
             <SwitchField label="Use Soft Confidence Override" checked={config.soft_confidence_override?.enabled} onChange={(v) => updateField("soft_confidence_override", "enabled", v)} />
           </FieldGrid>
@@ -282,12 +283,12 @@ useEffect(() => {
             <NumericField
               label="Min Confidence Delta"
               value={config.step_repeat_guard?.min_conf_delta}
-              onChange={(val) => updateNestedField("step_repeat_guard", "min_conf_delta", null, val)}
+              onChange={(val) => updateField("step_repeat_guard", "min_conf_delta", val)}
             />
             <NumericField
               label="Min TP1 Delta"
               value={config.step_repeat_guard?.min_tp1_delta}
-              onChange={(val) => updateNestedField("step_repeat_guard", "min_tp1_delta", null, val)}
+              onChange={(val) => updateField("step_repeat_guard", "min_tp1_delta", val)}
             />
           </FieldGrid>
         </CollapsibleSection>
@@ -311,22 +312,22 @@ useEffect(() => {
         <CollapsibleSection title="💀 Zombie Tag Detection">
           <FieldGrid>
             <SwitchField label="Enabled" checked={config.zombie_tag.enabled} onChange={(v) => updateField("zombie_tag", "enabled", v)} />
-            <NumericField label="Min Drawdown %" value={config.zombie_tag.min_drawdown_pct} onChange={(v) => updateNestedField("zombie_tag", "min_drawdown_pct", null, v)} />
-            <NumericField label="Max Drawdown %" value={config.zombie_tag.max_drawdown_pct} onChange={(v) => updateNestedField("zombie_tag", "max_drawdown_pct", null, v)} />
-            <NumericField label="Max Score" value={config.zombie_tag.max_score} onChange={(v) => updateNestedField("zombie_tag", "max_score", null, v)} />
-            <SwitchField label="Require Zero Recovery Odds" checked={config.zombie_tag.require_zero_recovery_odds} onChange={(v) => updateNestedField("zombie_tag", "require_zero_recovery_odds", null, v)} />
-            <NumericField label="Max MACD Lift" value={config.zombie_tag.max_macd_lift} onChange={(v) => updateNestedField("zombie_tag", "max_macd_lift", null, v)} />
-            <NumericField label="Max RSI Slope" value={config.zombie_tag.max_rsi_slope} onChange={(v) => updateNestedField("zombie_tag", "max_rsi_slope", null, v)} />
+            <NumericField label="Min Drawdown %" value={config.zombie_tag.min_drawdown_pct} onChange={(v) => updateField("zombie_tag", "min_drawdown_pct", v)} />
+            <NumericField label="Max Drawdown %" value={config.zombie_tag.max_drawdown_pct} onChange={(v) => updateField("zombie_tag", "max_drawdown_pct", v)} />
+            <NumericField label="Max Score" value={config.zombie_tag.max_score} onChange={(v) => updateField("zombie_tag", "max_score", v)} />
+            <SwitchField label="Require Zero Recovery Odds" checked={config.zombie_tag.require_zero_recovery_odds} onChange={(v) => updateField("zombie_tag", "require_zero_recovery_odds", v)} />
+            <NumericField label="Max MACD Lift" value={config.zombie_tag.max_macd_lift} onChange={(v) => updateField("zombie_tag", "max_macd_lift", v)} />
+            <NumericField label="Max RSI Slope" value={config.zombie_tag.max_rsi_slope} onChange={(v) => updateField("zombie_tag", "max_rsi_slope", v)} />
           </FieldGrid>
         </CollapsibleSection>
 
         <CollapsibleSection title="🤖 ML Spend Model">
           <FieldGrid>
             <SwitchField label="Use ML Spend Model" checked={config.use_ml_spend_model} onChange={(v) => updateRoot("use_ml_spend_model", v)} />
-            <NumericField label="Min Volume" value={config.spend_adjustment_rules.min_volume} onChange={(v) => updateNestedField("spend_adjustment_rules", "min_volume", null, v)} />
-            <NumericField label="Max Multiplier" value={config.spend_adjustment_rules.max_multiplier} onChange={(v) => updateNestedField("spend_adjustment_rules", "max_multiplier", null, v)} />
-            <NumericField label="TP1 Shift Soft Cap" value={config.spend_adjustment_rules.tp1_shift_soft_cap} onChange={(v) => updateNestedField("spend_adjustment_rules", "tp1_shift_soft_cap", null, v)} />
-            <NumericField label="Low DD % Limit" value={config.spend_adjustment_rules.low_dd_pct_limit} onChange={(v) => updateNestedField("spend_adjustment_rules", "low_dd_pct_limit", null, v)} />
+            <NumericField label="Min Volume" value={config.spend_adjustment_rules.min_volume} onChange={(v) => updateField("spend_adjustment_rules", "min_volume", v)} />
+            <NumericField label="Max Multiplier" value={config.spend_adjustment_rules.max_multiplier} onChange={(v) => updateField("spend_adjustment_rules", "max_multiplier", v)} />
+            <NumericField label="TP1 Shift Soft Cap" value={config.spend_adjustment_rules.tp1_shift_soft_cap} onChange={(v) => updateField("spend_adjustment_rules", "tp1_shift_soft_cap", v)} />
+            <NumericField label="Low DD % Limit" value={config.spend_adjustment_rules.low_dd_pct_limit} onChange={(v) => updateField("spend_adjustment_rules", "low_dd_pct_limit", v)} />
           </FieldGrid>
         </CollapsibleSection>
 
@@ -345,7 +346,7 @@ useEffect(() => {
         <CollapsibleSection title="🚥 Trailing Step Guard">
           <FieldGrid>
             <SwitchField label="Enabled" checked={config.trailing_step_guard?.enabled} onChange={(v) => updateField("trailing_step_guard", "enabled", v)} />
-            <NumericField label="Min % Gap From Last DCA" value={config.trailing_step_guard?.min_pct_gap_from_last_dca} onChange={(v) => updateNestedField("trailing_step_guard", "min_pct_gap_from_last_dca", null, v)} />
+            <NumericField label="Min % Gap From Last DCA" value={config.trailing_step_guard?.min_pct_gap_from_last_dca} onChange={(v) => updateField("trailing_step_guard", "min_pct_gap_from_last_dca", v)} />
           </FieldGrid>
         </CollapsibleSection>
 
@@ -376,7 +377,7 @@ useEffect(() => {
                   ? config.bottom_reversal_filter.rsi_slope_min
                   : 0.1
               }
-              onChange={v => updateNestedField("bottom_reversal_filter", "rsi_slope_min", null, v)}
+              onChange={v => updateField("bottom_reversal_filter", "rsi_slope_min", v)}
             />
             <NumericField
               label="Min MACD Lift"
@@ -385,7 +386,7 @@ useEffect(() => {
                   ? config.bottom_reversal_filter.macd_lift_min
                   : 0.0
               }
-              onChange={v => updateNestedField("bottom_reversal_filter", "macd_lift_min", null, v)}
+              onChange={v => updateField("bottom_reversal_filter", "macd_lift_min", v)}
               step={0.00001}
             />
             <NumericField
@@ -395,7 +396,7 @@ useEffect(() => {
                   ? config.bottom_reversal_filter.lookback_bars
                   : 3
               }
-              onChange={v => updateNestedField("bottom_reversal_filter", "lookback_bars", null, v)}
+              onChange={v => updateField("bottom_reversal_filter", "lookback_bars", v)}
             />
             <NumericField
               label="Local Price Reversal Window"
@@ -404,7 +405,7 @@ useEffect(() => {
                   ? config.bottom_reversal_filter.local_price_reversal_window
                   : 3
               }
-              onChange={v => updateNestedField("bottom_reversal_filter", "local_price_reversal_window", null, v)}
+              onChange={v => updateField("bottom_reversal_filter", "local_price_reversal_window", v)}
             />
             <NumericField
               label="RSI Floor"
@@ -413,7 +414,7 @@ useEffect(() => {
                   ? config.bottom_reversal_filter.rsi_floor
                   : ""
               }
-              onChange={v => updateNestedField("bottom_reversal_filter", "rsi_floor", null, v)}
+              onChange={v => updateField("bottom_reversal_filter", "rsi_floor", v)}
             />
             <NumericField
               label="Candles Required"
@@ -422,7 +423,7 @@ useEffect(() => {
                   ? config.bottom_reversal_filter.candles_required
                   : 5
               }
-              onChange={v => updateNestedField("bottom_reversal_filter", "candles_required", null, v)}
+              onChange={v => updateField("bottom_reversal_filter", "candles_required", v)}
             />
           </FieldGrid>
         </CollapsibleSection>

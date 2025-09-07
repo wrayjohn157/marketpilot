@@ -140,10 +140,12 @@ const DcaStrategyBuilder = () => {
 
   // Load DCA config from API
   useEffect(() => {
-    fetch("/config/dca")
+    fetch("http://localhost:8000/config/dca")
       .then(res => res.json())
       .then(data => {
-        setFormData(data);
+        // Handle wrapped config response
+        const configData = data.config || data;
+        setFormData(configData);
         setError(null);
       })
       .catch(err => {
@@ -153,7 +155,7 @@ const DcaStrategyBuilder = () => {
   }, []);
 
   useEffect(() => {
-    fetch(`/price-series?symbol=${symbol}&interval=${interval}`)
+    fetch(`http://localhost:8000/price-series?symbol=${symbol}&interval=${interval}`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data.series)) {
@@ -201,14 +203,14 @@ const DcaStrategyBuilder = () => {
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
-      const response = await fetch("/config/dca", {
+      const response = await fetch("http://localhost:8000/config/dca", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
-      
+
       if (response.ok) {
         setSuccess("Configuration saved successfully!");
         setTimeout(() => setSuccess(null), 3000);
@@ -227,11 +229,11 @@ const DcaStrategyBuilder = () => {
     if (!window.confirm("Are you sure you want to reset to default configuration? This will overwrite all current settings.")) {
       return;
     }
-    
+
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       // Reset to default values
       setFormData({ ...params });
@@ -249,9 +251,9 @@ const DcaStrategyBuilder = () => {
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
-      const response = await fetch("/config/dca/default");
+      const response = await fetch("http://localhost:8000/config/dca/default");
       if (response.ok) {
         const defaultConfig = await response.json();
         setFormData(defaultConfig);
@@ -286,40 +288,40 @@ const DcaStrategyBuilder = () => {
         {/* Core DCA Config */}
         <Section title="🛠️ Core DCA Settings">
           <FieldGrid>
-            <NumericField 
-              label="Max Trade USDT" 
-              value={configData.max_trade_usdt} 
-              onChange={(v) => updateParam("max_trade_usdt", v)} 
+            <NumericField
+              label="Max Trade USDT"
+              value={configData.max_trade_usdt}
+              onChange={(v) => updateParam("max_trade_usdt", v)}
             />
-            <NumericField 
-              label="Base Order USDT" 
-              value={configData.base_order_usdt} 
-              onChange={(v) => updateParam("base_order_usdt", v)} 
+            <NumericField
+              label="Base Order USDT"
+              value={configData.base_order_usdt}
+              onChange={(v) => updateParam("base_order_usdt", v)}
             />
-            <NumericField 
-              label="Drawdown Trigger %" 
-              value={configData.drawdown_trigger_pct} 
-              onChange={(v) => updateParam("drawdown_trigger_pct", v)} 
+            <NumericField
+              label="Drawdown Trigger %"
+              value={configData.drawdown_trigger_pct}
+              onChange={(v) => updateParam("drawdown_trigger_pct", v)}
             />
-            <NumericField 
-              label="SAFU Score Threshold" 
-              value={configData.safu_score_threshold} 
-              onChange={(v) => updateParam("safu_score_threshold", v)} 
+            <NumericField
+              label="SAFU Score Threshold"
+              value={configData.safu_score_threshold}
+              onChange={(v) => updateParam("safu_score_threshold", v)}
             />
-            <NumericField 
-              label="Score Decay Min" 
-              value={configData.score_decay_min} 
-              onChange={(v) => updateParam("score_decay_min", v)} 
+            <NumericField
+              label="Score Decay Min"
+              value={configData.score_decay_min}
+              onChange={(v) => updateParam("score_decay_min", v)}
             />
-            <NumericField 
-              label="Buffer Zone %" 
-              value={configData.buffer_zone_pct} 
-              onChange={(v) => updateParam("buffer_zone_pct", v)} 
+            <NumericField
+              label="Buffer Zone %"
+              value={configData.buffer_zone_pct}
+              onChange={(v) => updateParam("buffer_zone_pct", v)}
             />
-            <SwitchField 
-              label="Require Indicator Health" 
-              checked={configData.require_indicator_health} 
-              onChange={(v) => updateParam("require_indicator_health", v)} 
+            <SwitchField
+              label="Require Indicator Health"
+              checked={configData.require_indicator_health}
+              onChange={(v) => updateParam("require_indicator_health", v)}
             />
           </FieldGrid>
         </Section>
@@ -332,20 +334,20 @@ const DcaStrategyBuilder = () => {
           </CollapsibleTrigger>
           <CollapsibleContent className="p-4 bg-gray-800 rounded mt-2">
             <FieldGrid>
-              <NumericField 
-                label="RSI" 
-                value={configData.indicator_thresholds?.rsi} 
-                onChange={(v) => updateNestedParam("indicator_thresholds", "rsi", v)} 
+              <NumericField
+                label="RSI"
+                value={configData.indicator_thresholds?.rsi}
+                onChange={(v) => updateNestedParam("indicator_thresholds", "rsi", v)}
               />
-              <NumericField 
-                label="MACD Histogram" 
-                value={configData.indicator_thresholds?.macd_histogram} 
-                onChange={(v) => updateNestedParam("indicator_thresholds", "macd_histogram", v)} 
+              <NumericField
+                label="MACD Histogram"
+                value={configData.indicator_thresholds?.macd_histogram}
+                onChange={(v) => updateNestedParam("indicator_thresholds", "macd_histogram", v)}
               />
-              <NumericField 
-                label="ADX" 
-                value={configData.indicator_thresholds?.adx} 
-                onChange={(v) => updateNestedParam("indicator_thresholds", "adx", v)} 
+              <NumericField
+                label="ADX"
+                value={configData.indicator_thresholds?.adx}
+                onChange={(v) => updateNestedParam("indicator_thresholds", "adx", v)}
               />
             </FieldGrid>
           </CollapsibleContent>
@@ -359,25 +361,25 @@ const DcaStrategyBuilder = () => {
           </CollapsibleTrigger>
           <CollapsibleContent className="p-4 bg-gray-800 rounded mt-2">
             <FieldGrid>
-              <SwitchField 
-                label="Use BTC Filter" 
-                checked={configData.use_btc_filter} 
-                onChange={(v) => updateParam("use_btc_filter", v)} 
+              <SwitchField
+                label="Use BTC Filter"
+                checked={configData.use_btc_filter}
+                onChange={(v) => updateParam("use_btc_filter", v)}
               />
-              <NumericField 
-                label="BTC RSI Max" 
-                value={configData.btc_indicators?.rsi_max} 
-                onChange={(v) => updateNestedParam("btc_indicators", "rsi_max", v)} 
+              <NumericField
+                label="BTC RSI Max"
+                value={configData.btc_indicators?.rsi_max}
+                onChange={(v) => updateNestedParam("btc_indicators", "rsi_max", v)}
               />
-              <NumericField 
-                label="BTC MACD Max" 
-                value={configData.btc_indicators?.macd_histogram_max} 
-                onChange={(v) => updateNestedParam("btc_indicators", "macd_histogram_max", v)} 
+              <NumericField
+                label="BTC MACD Max"
+                value={configData.btc_indicators?.macd_histogram_max}
+                onChange={(v) => updateNestedParam("btc_indicators", "macd_histogram_max", v)}
               />
-              <NumericField 
-                label="BTC ADX Max" 
-                value={configData.btc_indicators?.adx_max} 
-                onChange={(v) => updateNestedParam("btc_indicators", "adx_max", v)} 
+              <NumericField
+                label="BTC ADX Max"
+                value={configData.btc_indicators?.adx_max}
+                onChange={(v) => updateNestedParam("btc_indicators", "adx_max", v)}
               />
             </FieldGrid>
           </CollapsibleContent>
@@ -432,22 +434,22 @@ const DcaStrategyBuilder = () => {
                 <option value="1d">1d</option>
               </select>
             </div>
-            
+
             <CandleChart
               data={series}
               onCandleClick={(candle) => setEntryTime(candle.timestamp)}
               height={400}
             />
-            
+
             <button
               onClick={async () => {
                 if (!entryTime) {
                   alert("Please click on a candle to set entry time");
                   return;
                 }
-                
+
                 try {
-                  const response = await fetch("/dca/simulate", {
+                  const response = await fetch("http://localhost:8000/dca/simulate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -457,10 +459,10 @@ const DcaStrategyBuilder = () => {
                       config: formData
                     })
                   });
-                  
+
                   const data = await response.json();
                   let resultArray = [];
-                  
+
                   if (data.result && Array.isArray(data.result)) {
                     resultArray = data.result;
                   } else if (data.series && Array.isArray(data.series)) {
@@ -507,25 +509,25 @@ const DcaStrategyBuilder = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-4 justify-end mt-6">
-          <Button 
-            onClick={handleLoadDefaults} 
-            variant="outline" 
+          <Button
+            onClick={handleLoadDefaults}
+            variant="outline"
             size="md"
             disabled={saving}
           >
             Load Defaults
           </Button>
-          <Button 
-            onClick={handleReset} 
-            variant="danger" 
+          <Button
+            onClick={handleReset}
+            variant="danger"
             size="md"
             disabled={saving}
           >
             Reset to Default
           </Button>
-          <Button 
-            onClick={handleSave} 
-            variant="default" 
+          <Button
+            onClick={handleSave}
+            variant="default"
             size="md"
             disabled={saving}
           >

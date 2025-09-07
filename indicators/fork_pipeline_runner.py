@@ -74,9 +74,9 @@ def write_to_history_log(entry: Any, date_str: Any) -> Any:
 # ===== MAIN =====
 def main() -> Any:
     logging.basicConfig(level=logging.INFO)
-    today_str = datetime.utcnow().strftime("%Y-%m-%d")
-    now_ts = int(datetime.utcnow().timestamp() * 1000)
-    now_iso = datetime.utcnow().isoformat() + "Z"
+    today_str = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
+    now_ts = int(datetime.now(datetime.UTC).timestamp() * 1000)
+    now_iso = datetime.now(datetime.UTC).isoformat() + "Z"
 
     if not os.path.exists(FORK_INPUT_FILE):
         logging.error(f"Missing fork input file: {FORK_INPUT_FILE}")
@@ -112,9 +112,9 @@ def main() -> Any:
             ema50 = indicators.get("EMA50", 0)
 
             subscores = {
-                "macd_histogram": 1.0
-                if macd_hist > macd_prev and macd_hist > 0
-                else 0.0,
+                "macd_histogram": (
+                    1.0 if macd_hist > macd_prev and macd_hist > 0 else 0.0
+                ),
                 "rsi_recovery": 1.0 if rsi > 35 else 0.0,
                 "stoch_rsi_cross": 1.0 if (k > d and k < 50) else 0.0,
                 "adx_rising": min(adx / 20, 1.0) if adx > 10 else 0.0,
@@ -160,7 +160,7 @@ def main() -> Any:
         # Always write to fork_history
         persistent_log = {
             "symbol": symbol.upper(),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
             "entry_price": indicators.get("latest_close"),
             "score": score,
             "score_hash": score_hash,

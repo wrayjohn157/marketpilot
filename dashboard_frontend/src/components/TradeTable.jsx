@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
+import apiClient from "../lib/api";
 
 function TradeTable() {
   const [trades, setTrades] = useState([]);
 
   useEffect(() => {
-    fetch("/api/fork/metrics")
-      .then(res => res.json())
+    apiClient.get3CommasMetrics()
       .then((data) => {
         const deals = data?.metrics?.active_deals;
         setTrades(Array.isArray(deals) ? deals : []);
@@ -37,7 +37,7 @@ function TradeTable() {
           </thead>
           <tbody>
             {trades.map((trade, idx) => (
-              <tr key={idx} className="border-t border-gray-700 hover:bg-gray-800">
+              <tr key={`trade-${trade.pair || trade.symbol}-${idx}`} className="border-t border-gray-700 hover:bg-gray-800">
                 <td className="p-2 font-medium">{trade.pair}</td>
                 <td className="p-2 text-green-400">Active</td>
                 <td className="p-2">—</td>
@@ -57,7 +57,7 @@ function TradeTable() {
       {/* Mobile Card View */}
       <div className="lg:hidden space-y-4">
         {trades.map((trade, idx) => (
-          <div key={idx} className="bg-gray-800 rounded-xl p-4 shadow-md">
+          <div key={`mobile-trade-${trade.pair || trade.symbol}-${idx}`} className="bg-gray-800 rounded-xl p-4 shadow-md">
             <div className="font-semibold text-lg">{trade.pair}</div>
             <div className="text-sm mt-1 text-green-400">Active</div>
             <div className="text-sm mt-2">💵 Budget: ${trade.spent_amount?.toFixed(0)}</div>

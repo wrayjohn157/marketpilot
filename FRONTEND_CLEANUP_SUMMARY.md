@@ -14,7 +14,7 @@
 - **Added**: Proper parameter names matching `config/dca_config.yaml`
 
 ### **3. Fixed Save/Restore Functionality**
-- **Before**: 
+- **Before**:
   - Save: `POST /sim/config/dca` (wrong endpoint)
   - Restore: `GET /sim/config/dca/default` (wrong endpoint)
 - **After**:
@@ -83,7 +83,7 @@ const handleSave = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData)
     });
-    
+
     if (response.ok) {
       setSuccess("Configuration saved successfully!");
     } else {

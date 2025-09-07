@@ -121,7 +121,7 @@ def send_dca_signal(pair: Any, volume: Any = 15) -> Any:
 def get_latest_indicators(symbol: Any, tf: Any = "15m") -> Any:
     path = (
         SNAPSHOT_BASE
-        / datetime.utcnow().strftime("%Y-%m-%d")
+        / datetime.now(datetime.UTC).strftime("%Y-%m-%d")
         / f"{symbol}_{tf}_klines.json"
     )
     if not path.exists():
@@ -181,7 +181,7 @@ def get_rsi_slope(symbol: Any, tf: Any = "15m", window: Any = 3) -> Any:
     try:
         path = (
             SNAPSHOT_BASE
-            / datetime.utcnow().strftime("%Y-%m-%d")
+            / datetime.now(datetime.UTC).strftime("%Y-%m-%d")
             / f"{symbol}_{tf}_klines.json"
         )
         if not path.exists():
@@ -202,7 +202,7 @@ def get_macd_lift(symbol: Any, tf: Any = "15m", window: Any = 3) -> Any:
     try:
         path = (
             SNAPSHOT_BASE
-            / datetime.utcnow().strftime("%Y-%m-%d")
+            / datetime.now(datetime.UTC).strftime("%Y-%m-%d")
             / f"{symbol}_{tf}_klines.json"
         )
         if not path.exists():
@@ -278,7 +278,7 @@ def simulate_new_avg_price(
 
 def load_btc_market_condition() -> Any:
     try:
-        today = datetime.utcnow().strftime("%Y-%m-%d")
+        today = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
         path = BTC_LOG_PATH / today / "btc_snapshots.jsonl"
         if not path.exists():
             return None

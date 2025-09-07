@@ -693,13 +693,15 @@ class UnifiedIndicatorManager:
             "total_indicators": total_indicators,
             "valid_indicators": valid_indicators,
             "invalid_indicators": total_indicators - valid_indicators,
-            "validity_rate": valid_indicators / total_indicators
-            if total_indicators > 0
-            else 0,
+            "validity_rate": (
+                valid_indicators / total_indicators if total_indicators > 0 else 0
+            ),
             "average_confidence": avg_confidence,
-            "quality_score": (valid_indicators / total_indicators) * avg_confidence
-            if total_indicators > 0
-            else 0,
+            "quality_score": (
+                (valid_indicators / total_indicators) * avg_confidence
+                if total_indicators > 0
+                else 0
+            ),
         }
 
 

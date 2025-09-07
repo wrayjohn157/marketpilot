@@ -10,43 +10,37 @@ from utils.redis_manager import get_redis_manager
 #!/usr/bin/env python3
 
 
-
 redis_client = get_redis_manager()
 
+
 def store_klines(symbol: str, timeframe: str, klines: list):
-    """Docstring placeholder."""
-    # pass
-""
-""""""""
-    # Stores the latest klines in Redis for a given symbol and timeframe.
-""""""""
-key = f"klines:{symbol}:{timeframe}"
-redis_client.set(key, json.dumps(klines))
+    """
+    Stores the latest klines in Redis for a given symbol and timeframe.
+    """
+    key = f"klines:{symbol}:{timeframe}"
+    redis_client.set_cache(key, klines)
+
 
 def get_klines(symbol: str, timeframe: str):
-    """Docstring placeholder."""
-    # pass
-""
-""""""""
-Retrieves klines from Redis for a given symbol and timeframe.
-""""""""
-key = f"klines:{symbol}:{timeframe}"
-data = redis_client.get(key)
-if data:
-        return json.loads(data)
+    """
+    Retrieves klines from Redis for a given symbol and timeframe.
+    """
+    key = f"klines:{symbol}:{timeframe}"
+    data = redis_client.get_cache(key)
+    if data:
+        return data
     return []
 
+
 def last_kline_timestamp(symbol: str, timeframe: str):
-    """Docstring placeholder."""
-    # pass
-""
-""""""""
-Returns the timestamp of the latest stored kline (if available).
-""""""""
-klines = get_klines(symbol, timeframe)
-if klines:
+    """
+    Returns the timestamp of the latest stored kline (if available).
+    """
+    klines = get_klines(symbol, timeframe)
+    if klines:
         return int(klines[-1][0])
     return 0
+
 
 if __name__ == "__main__":
     pass

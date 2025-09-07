@@ -36,7 +36,7 @@ export default function ForkScoreConfigPanel() {
 
   // Load config on mount
   useEffect(() => {
-    fetch("/config/fork_score")
+    fetch("/config/fork-score")
       .then(res => res.json())
       .then(data => setConfig(data))
       .catch(() => setError("Failed to load config"));
@@ -49,14 +49,14 @@ export default function ForkScoreConfigPanel() {
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
-      const response = await fetch("/config/fork_score", {
+      const response = await fetch("/config/fork-score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config)
       });
-      
+
       if (response.ok) {
         setSuccess("Configuration saved successfully!");
         setTimeout(() => setSuccess(null), 3000);
@@ -74,14 +74,14 @@ export default function ForkScoreConfigPanel() {
     if (!window.confirm("Are you sure you want to reset to default configuration? This will overwrite all current settings.")) {
       return;
     }
-    
+
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       // Load defaults from server
-      const response = await fetch("/config/fork_score/default");
+      const response = await fetch("/config/fork-score/default");
       if (response.ok) {
         const defaultConfig = await response.json();
         setConfig(defaultConfig);

@@ -102,21 +102,21 @@ def generate_realistic_indicators(trade_data):
 # Basic tech filter logic
 def evaluate_tech_filter(symbol, indicators):
     score = 0
-    
+
     # RSI analysis
     if indicators['rsi'] < 30:
         score += 0.3  # Oversold
     elif indicators['rsi'] > 70:
         score -= 0.3  # Overbought
-    
+
     # MACD analysis
     if indicators['macd'] > indicators['macd_signal']:
         score += 0.2  # Bullish
-    
+
     # ADX analysis
     if indicators['adx'] > 25:
         score += 0.2  # Strong trend
-    
+
     return min(max(score, 0), 1)  # Clamp to 0-1
 ```
 
@@ -127,12 +127,12 @@ def collect_tech_filter_data():
     while True:
         # Get active trades
         trades = get_active_trades()
-        
+
         # Generate indicators for each symbol
         for trade in trades:
             indicators = generate_realistic_indicators(trade)
             save_to_redis(trade['symbol'], indicators)
-        
+
         time.sleep(60)  # Update every minute
 ```
 
@@ -168,4 +168,3 @@ def collect_tech_filter_data():
 5. **Plan Real Data Integration** (1 hour)
 
 **Total Time**: ~3.5 hours for basic tech filter functionality
-

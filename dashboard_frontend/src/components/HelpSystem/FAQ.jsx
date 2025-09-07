@@ -189,7 +189,7 @@ const FAQ = () => {
                 const isOpen = openItems.has(key);
 
                 return (
-                  <div key={questionIndex} className="p-6">
+                  <div key={`question-${categoryIndex}-${questionIndex}`} className="p-6">
                     <button
                       onClick={() => toggleItem(categoryIndex, questionIndex)}
                       className="w-full text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-lg p-2 -m-2"

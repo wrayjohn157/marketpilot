@@ -75,7 +75,7 @@ def refresh_price(deal_id: int):
 
         # Optional: patch in DCA log details
         latest = {}
-        today = datetime.utcnow().strftime("%Y-%m-%d")
+        today = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
         dca_log_path = (
             get_path("live_logs").parent / "dca" / "logs" / today / "dca_log.jsonl"
         )

@@ -66,19 +66,19 @@ detect_os() {
         OS="unknown"
         PKG_MANAGER="unknown"
     fi
-    
+
     log_info "Detected OS: $OS"
 }
 
 # Install system dependencies
 install_system_deps() {
     log_header "Installing System Dependencies"
-    
+
     case $OS in
         "ubuntu")
             log_info "Updating package list..."
             sudo apt update
-            
+
             log_info "Installing Python and development tools..."
             sudo apt install -y \
                 python3.12 \
@@ -130,7 +130,7 @@ install_system_deps() {
             if ! command -v brew &> /dev/null; then
                 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
             fi
-            
+
             log_info "Installing dependencies via Homebrew..."
             brew install \
                 python@3.12 \
@@ -148,49 +148,49 @@ install_system_deps() {
             log_info "Required: Python 3.12+, Redis, PostgreSQL, Node.js, Docker"
             ;;
     esac
-    
+
     log_success "System dependencies installed"
 }
 
 # Setup Python virtual environment
 setup_python_env() {
     log_header "Setting up Python Environment"
-    
+
     # Remove existing venv if it exists
     if [ -d "venv" ]; then
         log_info "Removing existing virtual environment..."
         rm -rf venv
     fi
-    
+
     # Create virtual environment
     log_info "Creating Python virtual environment..."
     python3.12 -m venv venv
-    
+
     # Activate virtual environment
     log_info "Activating virtual environment..."
     source venv/bin/activate
-    
+
     # Upgrade pip
     log_info "Upgrading pip..."
     pip install --upgrade pip setuptools wheel
-    
+
     # Install Python dependencies
     log_info "Installing Python dependencies..."
     pip install -r requirements.txt
-    
+
     # Install development dependencies
     if [ -f "requirements-dev.txt" ]; then
         log_info "Installing development dependencies..."
         pip install -r requirements-dev.txt
     fi
-    
+
     log_success "Python environment ready"
 }
 
 # Setup Node.js environment
 setup_node_env() {
     log_header "Setting up Node.js Environment"
-    
+
     if [ -d "dashboard_frontend" ]; then
         log_info "Installing frontend dependencies..."
         cd dashboard_frontend
@@ -205,7 +205,7 @@ setup_node_env() {
 # Setup Redis
 setup_redis() {
     log_header "Setting up Redis"
-    
+
     case $OS in
         "ubuntu"|"rhel"|"fedora")
             log_info "Starting Redis service..."
@@ -217,7 +217,7 @@ setup_redis() {
             brew services start redis
             ;;
     esac
-    
+
     # Test Redis connection
     log_info "Testing Redis connection..."
     if redis-cli ping | grep -q "PONG"; then
@@ -230,7 +230,7 @@ setup_redis() {
 # Setup PostgreSQL
 setup_postgresql() {
     log_header "Setting up PostgreSQL"
-    
+
     case $OS in
         "ubuntu"|"rhel"|"fedora")
             log_info "Starting PostgreSQL service..."
@@ -242,20 +242,20 @@ setup_postgresql() {
             brew services start postgresql
             ;;
     esac
-    
+
     log_success "PostgreSQL setup complete"
 }
 
 # Setup Docker
 setup_docker() {
     log_header "Setting up Docker"
-    
+
     case $OS in
         "ubuntu"|"rhel"|"fedora")
             log_info "Starting Docker service..."
             sudo systemctl start docker
             sudo systemctl enable docker
-            
+
             # Add user to docker group
             log_info "Adding user to docker group..."
             sudo usermod -aG docker $USER
@@ -264,67 +264,67 @@ setup_docker() {
             log_info "Docker Desktop should be started manually on macOS"
             ;;
     esac
-    
+
     log_success "Docker setup complete"
 }
 
 # Create configuration files
 setup_config() {
     log_header "Setting up Configuration"
-    
+
     # Create logs directory
     mkdir -p logs
-    
+
     # Create data directories
     mkdir -p data/{snapshots,logs,models,backtest}
     mkdir -p ml/{models,datasets,preprocess,recovery,confidence}
     mkdir -p dca/{logs,tracking,recovery}
     mkdir -p fork/{logs,history,candidates}
     mkdir -p indicators/{logs,data}
-    
+
     # Set permissions
     chmod 755 logs data ml dca fork indicators
-    
+
     log_success "Configuration directories created"
 }
 
 # Setup pre-commit hooks
 setup_precommit() {
     log_header "Setting up Pre-commit Hooks"
-    
+
     source venv/bin/activate
-    
+
     log_info "Installing pre-commit hooks..."
     pre-commit install
-    
+
     log_success "Pre-commit hooks installed"
 }
 
 # Run initial tests
 run_initial_tests() {
     log_header "Running Initial Tests"
-    
+
     source venv/bin/activate
-    
+
     # Test basic imports
     log_info "Testing basic imports..."
     python3 -c "from config.unified_config_manager import get_config; print('✅ Config system works')"
-    
+
     # Test paper trading setup
     log_info "Testing paper trading configuration..."
     python3 test_paper_trading_config.py
-    
+
     # Run syntax check
     log_info "Running syntax check..."
     make check-syntax || log_warning "Some syntax issues found (expected - 2% remaining work)"
-    
+
     log_success "Initial tests completed"
 }
 
 # Create startup scripts
 create_startup_scripts() {
     log_header "Creating Startup Scripts"
-    
+
     # Create start script
     cat > start_marketpilot.sh << 'EOF'
 #!/bin/bash
@@ -381,7 +381,7 @@ echo -e "${GREEN}✅ MarketPilot started!${NC}"
 EOF
 
     chmod +x start_marketpilot.sh
-    
+
     # Create stop script
     cat > stop_marketpilot.sh << 'EOF'
 #!/bin/bash
@@ -401,14 +401,14 @@ echo "✅ MarketPilot services stopped"
 EOF
 
     chmod +x stop_marketpilot.sh
-    
+
     log_success "Startup scripts created"
 }
 
 # Create environment file
 create_env_file() {
     log_header "Creating Environment Configuration"
-    
+
     cat > .env << 'EOF'
 # MarketPilot Environment Configuration
 # Copy this file and customize for your environment
@@ -460,42 +460,42 @@ main() {
     echo "It will install dependencies, configure the environment,"
     echo "and prepare the system for development and production use."
     echo ""
-    
+
     # Check if running as root
     check_root
-    
+
     # Detect operating system
     detect_os
-    
+
     # Install system dependencies
     install_system_deps
-    
+
     # Setup Python environment
     setup_python_env
-    
+
     # Setup Node.js environment
     setup_node_env
-    
+
     # Setup services
     setup_redis
     setup_postgresql
     setup_docker
-    
+
     # Setup configuration
     setup_config
-    
+
     # Setup pre-commit hooks
     setup_precommit
-    
+
     # Create startup scripts
     create_startup_scripts
-    
+
     # Create environment file
     create_env_file
-    
+
     # Run initial tests
     run_initial_tests
-    
+
     # Final instructions
     log_header "Onboarding Complete! 🎉"
     echo ""

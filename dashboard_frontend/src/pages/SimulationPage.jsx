@@ -80,7 +80,7 @@ const SimulationPage = () => {
     try {
       const endTime = Date.now();
       const startTime = endTime - (simulationDays * 24 * 60 * 60 * 1000);
-      
+
       const response = await fetch('/api/simulation/data/load', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -91,13 +91,34 @@ const SimulationPage = () => {
           end_time: endTime
         })
       });
-      
+
       const data = await response.json();
       if (data.success) {
         setHistoricalData(data.data.candles);
       }
     } catch (error) {
       console.error('Error loading historical data:', error);
+    }
+  };
+
+  // Export results
+  const exportResults = (format = 'json') => {
+    if (!simulationResult) return;
+
+    const data = {
+      simulation: simulationResult,
+      parameters: dcaParameters,
+      timestamp: new Date().toISOString()
+    };
+
+    if (format === 'json') {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dca_simulation_${symbol}_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
     }
   };
 
@@ -176,20 +197,6 @@ const SimulationPage = () => {
     setSelectedCandle(candle);
   }, []);
 
-  // Export results
-  const exportResults = () => {
-    if (!simulationResult) return;
-    
-    const dataStr = JSON.stringify(simulationResult, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `dca_simulation_${symbol}_${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6">
       <div className="max-w-7xl mx-auto">
@@ -246,8 +253,8 @@ const SimulationPage = () => {
 
               <FormField label="Entry Point">
                 <div className="text-sm text-gray-400">
-                  {entryTime ? 
-                    `Selected: ${new Date(entryTime).toLocaleString()}` : 
+                  {entryTime ?
+                    `Selected: ${new Date(entryTime).toLocaleString()}` :
                     'Click on chart to select'
                   }
                 </div>
@@ -299,8 +306,8 @@ const SimulationPage = () => {
         <div className="mt-6 p-4 bg-gray-800 rounded-lg">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-400">
-              {isRunning ? 'Running simulation...' : 
-               simulationResult ? 'Simulation completed' : 
+              {isRunning ? 'Running simulation...' :
+               simulationResult ? 'Simulation completed' :
                'Ready to run simulation'}
             </div>
             <div className="text-sm text-gray-400">

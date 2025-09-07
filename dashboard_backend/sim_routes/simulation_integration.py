@@ -6,6 +6,7 @@ Integrates the simulation system with the main dashboard backend
 
 import sys
 from pathlib import Path
+
 from fastapi import APIRouter
 
 # Add simulation paths
@@ -19,12 +20,9 @@ router = APIRouter()
 # Include simulation routes
 router.include_router(simulation_router, prefix="/simulation")
 
+
 # Additional integration endpoints
 @router.get("/simulation/health")
 async def simulation_health():
     """Health check for simulation system"""
-    return {
-        "status": "healthy",
-        "system": "simulation",
-        "version": "1.0.0"
-    }
+    return {"status": "healthy", "system": "simulation", "version": "1.0.0"}

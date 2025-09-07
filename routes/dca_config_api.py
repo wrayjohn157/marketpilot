@@ -3,12 +3,13 @@ DCA Configuration API Routes
 Handles DCA strategy configuration with two-tier system
 """
 
-from fastapi import APIRouter, HTTPException
-from datetime import datetime
-from typing import Dict, Any
 import json
-import os
 import logging
+import os
+from datetime import datetime
+from typing import Any, Dict
+
+from fastapi import APIRouter, HTTPException
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -42,38 +43,42 @@ DEFAULT_DCA_CONFIG = {
     "health_check_interval": 300,
     "max_health_check_failures": 3,
     "health_check_timeout": 30,
-    "health_check_retry_delay": 60
+    "health_check_retry_delay": 60,
 }
 
 # File paths
 USER_CONFIG_FILE = "user_dca_config.json"
 DEFAULT_CONFIG_FILE = "default_dca_config.json"
 
+
 def load_user_config() -> Dict[str, Any]:
     """Load user configuration from file, fallback to default if not found"""
     try:
         if os.path.exists(USER_CONFIG_FILE):
-            with open(USER_CONFIG_FILE, 'r') as f:
+            with open(USER_CONFIG_FILE, "r") as f:
                 return json.load(f)
     except Exception as e:
         print(f"Error loading user config: {e}")
     return DEFAULT_DCA_CONFIG.copy()
 
+
 def save_user_config(config: Dict[str, Any]) -> None:
     """Save user configuration to file"""
     try:
-        with open(USER_CONFIG_FILE, 'w') as f:
+        with open(USER_CONFIG_FILE, "w") as f:
             json.dump(config, f, indent=2)
     except Exception as e:
         print(f"Error saving user config: {e}")
 
+
 def save_default_config() -> None:
     """Save default configuration to file"""
     try:
-        with open(DEFAULT_CONFIG_FILE, 'w') as f:
+        with open(DEFAULT_CONFIG_FILE, "w") as f:
             json.dump(DEFAULT_DCA_CONFIG, f, indent=2)
     except Exception as e:
         print(f"Error saving default config: {e}")
+
 
 @router.get("/config/dca")
 def get_dca_config() -> Dict[str, Any]:
@@ -82,8 +87,9 @@ def get_dca_config() -> Dict[str, Any]:
     return {
         "config": user_config,
         "is_default": user_config == DEFAULT_DCA_CONFIG,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(datetime.UTC).isoformat(),
     }
+
 
 @router.post("/config/dca")
 def save_dca_config(config_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -93,19 +99,23 @@ def save_dca_config(config_data: Dict[str, Any]) -> Dict[str, Any]:
         save_user_config(config_data)
         return {
             "message": "Configuration saved successfully",
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
         }
     except Exception as e:
         logger.error(f"Failed to save DCA config: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to save configuration: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to save configuration: {e}"
+        )
+
 
 @router.get("/config/dca/default")
 def get_default_dca_config() -> Dict[str, Any]:
     """Get default DCA configuration (immutable)"""
     return {
         "config": DEFAULT_DCA_CONFIG,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(datetime.UTC).isoformat(),
     }
+
 
 @router.post("/config/dca/reset")
 def reset_dca_config() -> Dict[str, Any]:
@@ -115,8 +125,10 @@ def reset_dca_config() -> Dict[str, Any]:
         return {
             "message": "Configuration reset to defaults",
             "config": DEFAULT_DCA_CONFIG,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
         }
     except Exception as e:
         logger.error(f"Failed to reset DCA config: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to reset configuration: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to reset configuration: {e}"
+        )

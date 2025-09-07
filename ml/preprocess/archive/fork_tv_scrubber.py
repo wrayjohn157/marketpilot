@@ -114,7 +114,9 @@ def main():
     parser.add_argument("--date", type=str, help="Date in YYYY-MM-DD (UTC)")
     args = parser.parse_args()
 
-    date_str = args.date or (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
+    date_str = args.date or (datetime.now(datetime.UTC) - timedelta(days=1)).strftime(
+        "%Y-%m-%d"
+    )
 
     paper_file = PAPER_TRADE_BASE / date_str / "scrubbed_trades.jsonl"
     btc_file = BTC_SNAPSHOT_BASE / date_str / "btc_snapshots.jsonl"

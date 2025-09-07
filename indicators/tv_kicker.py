@@ -28,7 +28,7 @@ INPUT_FILE = get_path("fork_backtest_candidates")
 FORK_TV_OUTPUT = get_path("fork_tv_adjusted")
 TV_HISTORY_BASE = get_path("tv_history")
 
-today_str = datetime.utcnow().strftime("%Y-%m-%d")
+today_str = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
 TV_FILE = TV_HISTORY_BASE / today_str / "tv_screener_raw_dict.txt"
 CONFIG_PATH = get_path("tv_screener_config")
 
@@ -123,7 +123,7 @@ base_score = item.get("score", 0)
 tv_tag = tv_tags.get(symbol, "neutral")
 tv_kicker = TV_SCORE_WEIGHTS.get(tv_tag, 0.0)
 adjusted_score = round(base_score + tv_kicker, 4)
-now = datetime.utcnow()
+now = datetime.now(datetime.UTC)
 ts = int(now.timestamp() * 1000)
 ts_iso = now.isoformat() + "Z"
             passed = adjusted_score >= MIN_PASS_SCORE

@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+import redis
 from redis.connection import ConnectionPool
 from redis.exceptions import ConnectionError, RedisError, TimeoutError
 
@@ -95,7 +96,7 @@ class RedisDataManager:
             socket_connect_timeout=config.socket_connect_timeout,
             health_check_interval=config.health_check_interval,
         )
-        self.redis = get_redis_manager()
+        self.redis = redis.Redis(connection_pool=self.pool)
         self.logger = logging.getLogger(__name__)
 
     def health_check(self) -> bool:

@@ -16,7 +16,7 @@ from dca.utils.entry_utils import get_live_3c_trades
 from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 # === Paths ===
-today = datetime.utcnow().strftime("%Y-%m-%d")
+today = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
 DCA_LOG_PATH = get_path("live_logs") / today / "dca_log.jsonl"
 SNAPSHOT_BASE = get_path("kline_snapshots")
 RECOVERY_SNAPSHOT_PATH = Path("/home/signal/market7/ml/datasets/recovery_snapshots")
@@ -25,7 +25,7 @@ RECOVERY_SNAPSHOT_PATH = Path("/home/signal/market7/ml/datasets/recovery_snapsho
 # === Sparkline loader ===
 def get_sparkline_data(symbol: str, date: str = None) -> list:
     try:
-        date = date or datetime.utcnow().strftime("%Y-%m-%d")
+        date = date or datetime.now(datetime.UTC).strftime("%Y-%m-%d")
         path = SNAPSHOT_BASE / date / f"{symbol}_15m_klines.json"
         if not path.exists():
             return []

@@ -111,7 +111,7 @@ class TradeTracker:
             "deal_id": deal_id,
             "step": step,
             "symbol": symbol,
-            "timestamp": str(datetime.utcnow()),
+            "timestamp": str(datetime.now(datetime.UTC)),
         }
 
         try:

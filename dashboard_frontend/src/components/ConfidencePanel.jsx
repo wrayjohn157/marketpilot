@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "./ui/Card";
+import apiClient from "../lib/api";
 
 export default function ConfidencePanel() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch("/ml/confidence")
-      .then((res) => res.json())
+    apiClient.getMLConfidence()
       .then(setData)
       .catch(() => setData([]));
   }, []);
@@ -32,19 +32,19 @@ export default function ConfidencePanel() {
         ) : (
           filtered.map((entry, index) => (
             <div
-              key={index}
+              key={`${entry.symbol}-${entry.timestamp}-${index}`}
               className="flex items-center justify-between text-sm border-b border-gray-800 pb-1"
             >
               <div className="flex flex-col">
                 <span className="text-white font-mono text-xs">{entry.symbol}</span>
                 <span className="text-xs text-gray-400 uppercase">
-                  {entry.rejection_reason || "—"}
+                  {entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString() : "—"}
                 </span>
               </div>
 
               <div className="flex flex-col items-end text-right">
                 <span className="text-base font-bold text-white">
-                  {entry.confidence_score.toFixed(2)}
+                  {(entry.confidence || 0).toFixed(2)}
                 </span>
                 <div
                   className={`text-xs rounded px-2 py-0.5 mt-1 ${getBadgeClass(entry.decision)}`}

@@ -328,7 +328,7 @@ class SmartDCACore:
     ):
         """Log decision with all relevant data"""
         log_entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
             "deal_id": metrics["deal_id"],
             "symbol": metrics["symbol"],
             "step": self._get_current_step(metrics["deal_id"]),
@@ -352,7 +352,7 @@ class SmartDCACore:
         }
 
         # Write to daily log
-        today = datetime.utcnow().strftime("%Y-%m-%d")
+        today = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
         log_path = LOG_DIR / today
         log_path.mkdir(parents=True, exist_ok=True)
         file_path = log_path / "smart_dca_log.jsonl"
@@ -430,7 +430,7 @@ class SmartDCACore:
             f.write(
                 json.dumps(
                     {
-                        "timestamp": datetime.utcnow().isoformat(),
+                        "timestamp": datetime.now(datetime.UTC).isoformat(),
                         "deal_id": deal_id,
                         "step": step,
                         "symbol": symbol,

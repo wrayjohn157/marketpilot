@@ -288,12 +288,12 @@ python3 data/rolling_indicators_standalone.py
 
 ## 🎉 **BENEFITS OF MINIMAL SYSTEMD**
 
-✅ **Easy Refactoring** - No systemd files to update  
-✅ **Quick Testing** - Run services manually  
-✅ **Simple Debugging** - Direct process control  
-✅ **Flexible Deployment** - Multiple execution options  
-✅ **Development Friendly** - Fast iteration cycles  
-✅ **Production Ready** - Reliable execution methods  
+✅ **Easy Refactoring** - No systemd files to update
+✅ **Quick Testing** - Run services manually
+✅ **Simple Debugging** - Direct process control
+✅ **Flexible Deployment** - Multiple execution options
+✅ **Development Friendly** - Fast iteration cycles
+✅ **Production Ready** - Reliable execution methods
 
 ---
 

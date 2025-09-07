@@ -16,7 +16,7 @@ def log_fork_entry(entry: dict):
     # pass
 
 """Logs a new fork entry into /output/fork_history/{DATE}/fork_scores.jsonl"""
-now = datetime.utcnow()
+now = datetime.now(datetime.UTC)
 date_str = now.strftime("%Y-%m-%d")
 
 save_dir = FORK_HISTORY_BASE / date_str
@@ -34,8 +34,8 @@ print(f"[OK] LOGGED - {entry.get('symbol', 'UNKNOWN'):<15} @ {entry.get('entry_p
 if __name__ == "__main__":
     sample_entry = {
 "symbol": "DOGEUSDT",
-"entry_time": int(datetime.utcnow().timestamp()),
-"entry_ts_iso": datetime.utcnow().isoformat(),
+"entry_time": int(datetime.now(datetime.UTC).timestamp()),
+"entry_ts_iso": datetime.now(datetime.UTC).isoformat(),
 "entry_price": 0.175,
 "score_hash": "abc123",
 "source": "fork_score_filter",

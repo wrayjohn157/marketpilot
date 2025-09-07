@@ -20,7 +20,7 @@ OUTPUT_PATH = get_path("base") / "dashboard_backend" / "cache" / "fork_metrics.j
 
 def main():
     data = get_fork_trade_metrics()
-    data["last_updated"] = datetime.utcnow().isoformat()
+    data["last_updated"] = datetime.now(datetime.UTC).isoformat()
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_PATH, "w") as f:

@@ -90,14 +90,14 @@ const handleSave = async () => {
   setSaving(true);
   setError(null);
   setSuccess(null);
-  
+
   try {
     const response = await fetch(`/config/${configName}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(config)
     });
-    
+
     if (response.ok) {
       setSuccess("Configuration saved successfully!");
     } else {
@@ -114,11 +114,11 @@ const handleReset = async () => {
   if (!window.confirm("Are you sure you want to reset to default configuration?")) {
     return;
   }
-  
+
   setSaving(true);
   setError(null);
   setSuccess(null);
-  
+
   try {
     const response = await fetch(`/config/${configName}/default`);
     if (response.ok) {

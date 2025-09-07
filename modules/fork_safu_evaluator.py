@@ -2,6 +2,7 @@
 Fork SAFU Evaluator - Simplified version for MarketPilot
 """
 
+
 def get_safu_exit_decision(symbol, current_price, entry_price, volume):
     """Get SAFU exit decision for a trade"""
     # Simplified SAFU logic
@@ -11,6 +12,7 @@ def get_safu_exit_decision(symbol, current_price, entry_price, volume):
         return "EXIT"
     else:
         return "HOLD"
+
 
 def load_safu_exit_model():
     """Load SAFU exit model"""

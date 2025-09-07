@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
 import { Button } from './ui/Button';
 import { Progress } from './ui/Progress';
 
-const ResultsPanel = ({ 
+const ResultsPanel = ({
   simulationResult = null,
   isRunning = false,
   onExportResults = () => {}

@@ -146,7 +146,7 @@ print(f""
 n[OK] Saved {len(enriched)} enriched trades to: {output_path}")"
 
 if __name__ == "__main__":
-    yesterday = (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
+    yesterday = (datetime.now(datetime.UTC) - timedelta(days=1)).strftime("%Y-%m-%d")
 parser = argparse.ArgumentParser()
 parser.add_argument("--date", default=yesterday, help="Date to process (YYYY-MM-DD)")
 args = parser.parse_args()

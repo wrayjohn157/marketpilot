@@ -1,0 +1,7 @@
+min_score: 3
+
+weights:
+  macd_near_signal: 1
+  macd_hist_rising: 1
+  rsi_recovery: 2
+  stoch_oversold: 2

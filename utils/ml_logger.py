@@ -39,7 +39,7 @@ if "timestamp" not in entry:
     pass
 # pass
 # pass
-entry["timestamp"] = datetime.utcnow().isoformat()
+entry["timestamp"] = datetime.now(datetime.UTC).isoformat()
 
 with open(LOG_PATH, "a") as f:
     json.dump(entry, f)

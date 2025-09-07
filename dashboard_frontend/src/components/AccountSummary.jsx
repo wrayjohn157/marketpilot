@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import apiClient from "../lib/api";
 
 export default function AccountSummary() {
   const [summary, setSummary] = useState(null);
 
   useEffect(() => {
-    fetch("/fork/metrics")
-      .then((res) => res.json())
+    apiClient.getAccountSummary()
       .then((data) => setSummary(data.summary))
       .catch((err) => console.error("Error loading account summary:", err));
   }, []);

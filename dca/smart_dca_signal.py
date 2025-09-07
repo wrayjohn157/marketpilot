@@ -16,6 +16,7 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
+
 from modules.fork_safu_evaluator import get_safu_exit_decision, load_safu_exit_model
 
 safu_exit_model = load_safu_exit_model()
@@ -145,7 +146,7 @@ def update_dca_log(deal_id, step, symbol):
         f.write(
             json.dumps(
                 {
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(datetime.UTC).isoformat(),
                     "deal_id": deal_id,
                     "step": step,
                     "symbol": symbol,
@@ -156,7 +157,7 @@ def update_dca_log(deal_id, step, symbol):
 
 
 def write_log(entry):
-    today = datetime.utcnow().strftime("%Y-%m-%d")
+    today = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
     log_path = LOG_DIR / today
     log_path.mkdir(parents=True, exist_ok=True)
     file_path = log_path / "dca_log.jsonl"
@@ -178,7 +179,7 @@ def log_ml_snapshot(
     confidence_score,
 ):
     snapshot = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(datetime.UTC).isoformat(),
         "symbol": symbol,
         "deal_id": deal_id,
         "entry_score": entry_score,
@@ -251,7 +252,7 @@ def run():
             print(f"💰 Skipping {symbol} — already in profit ({deviation_pct:.2f}%)")
             reason = "in_profit"
             log_entry = {
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(datetime.UTC).isoformat(),
                 "deal_id": deal_id,
                 "symbol": symbol,
                 "step": 0,
@@ -294,7 +295,7 @@ def run():
                 print(f"⚠️ Not enough MACD history to check cross for {symbol}")
                 reason = "insufficient_macd_data"
                 log_entry = {
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(datetime.UTC).isoformat(),
                     "deal_id": deal_id,
                     "symbol": symbol,
                     "step": 0,
@@ -331,7 +332,7 @@ def run():
                 print(f"⛔ Skipping {symbol} — no recent MACD cross")
                 reason = "no_macd_cross"
                 log_entry = {
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(datetime.UTC).isoformat(),
                     "deal_id": deal_id,
                     "symbol": symbol,
                     "step": 0,
@@ -461,7 +462,7 @@ def run():
                 else f"🛑 [SAFU Decision] Exit triggered for {symbol}: {exit_reason}"
             )
             log_entry = {
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(datetime.UTC).isoformat(),
                 "deal_id": deal_id,
                 "symbol": symbol,
                 "step": get_last_fired_step(deal_id) + 1,
@@ -588,7 +589,7 @@ def run():
             if step is None:
                 step = get_last_fired_step(deal_id) + 1
             log_entry = {
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(datetime.UTC).isoformat(),
                 "deal_id": deal_id,
                 "symbol": symbol,
                 "step": step,
@@ -645,7 +646,7 @@ def run():
                 # Only allow re-fire if confidence or TP1 shift improved enough
                 reason = "no_step_improvement"
                 log_entry = {
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(datetime.UTC).isoformat(),
                     "deal_id": deal_id,
                     "symbol": symbol,
                     "step": prev_step,
@@ -699,7 +700,7 @@ def run():
                         log_reason(deal_id, symbol, "step_repeat_guard_price", log_msg)
                         # Compose a log entry and skip
                         log_entry = {
-                            "timestamp": datetime.utcnow().isoformat(),
+                            "timestamp": datetime.now(datetime.UTC).isoformat(),
                             "deal_id": deal_id,
                             "symbol": symbol,
                             "step": prev_step,
@@ -743,7 +744,7 @@ def run():
             price_change_pct = (
                 abs(current_price - prev_price) / prev_price * 100 if prev_price else 0
             )
-            time_elapsed = (datetime.utcnow() - prev_time).total_seconds()
+            time_elapsed = (datetime.now(datetime.UTC) - prev_time).total_seconds()
             be_gain = be_improvement - prev_be
 
             if (
@@ -881,9 +882,7 @@ def run():
             btc_context = (
                 indicators.get("btc_context")
                 if "btc_context" in indicators
-                else btc_context
-                if "btc_context" in locals()
-                else None
+                else btc_context if "btc_context" in locals() else None
             )
             if btc_context and isinstance(btc_context, dict):
                 input_features["btc_rsi"] = float(btc_context.get("rsi", 0.0))
@@ -937,7 +936,7 @@ def run():
                 )
                 rejection_reason = "spend_guard_limit"
                 log_entry = {
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(datetime.UTC).isoformat(),
                     "deal_id": deal_id,
                     "symbol": symbol,
                     "step": step,
@@ -1016,7 +1015,7 @@ def run():
         )
 
         log_entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
             "deal_id": deal_id,
             "symbol": symbol,
             "step": step,
@@ -1119,7 +1118,8 @@ def run():
 
             time_since_last = (
                 (
-                    datetime.utcnow() - datetime.fromisoformat(last_logged["timestamp"])
+                    datetime.now(datetime.UTC)
+                    - datetime.fromisoformat(last_logged["timestamp"])
                 ).total_seconds()
                 / 60
                 if last_logged.get("timestamp")

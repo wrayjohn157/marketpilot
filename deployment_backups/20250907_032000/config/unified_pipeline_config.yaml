@@ -1,0 +1,128 @@
+# Unified Trading Pipeline Configuration
+# Streamlined configuration for Tech Filter → Fork → TV flow
+
+# === Pipeline Settings ===
+pipeline:
+  max_trades_per_batch: 10
+  parallel_processing: true
+  max_workers: 5
+  timeout_seconds: 30
+
+# === Tech Filter Settings ===
+tech_filter:
+  min_score: 0.6
+  thresholds:
+    neutral:
+      rsi_range: [35, 65]
+      adx_min: 20
+      macd_hist_min: 0.0
+    bullish:
+      rsi_max: 75
+      adx_min: 25
+      macd_hist_min: 0.001
+    bearish:
+      rsi_max: 45
+      adx_min: 15
+      macd_hist_min: -0.001
+
+# === Fork Scoring Settings ===
+fork_scorer:
+  min_score: 0.73
+  weights:
+    neutral:
+      macd_histogram: 0.25
+      rsi_recovery: 0.20
+      stoch_cross: 0.15
+      adx_rising: 0.20
+      ema_reclaim: 0.20
+    bullish:
+      macd_histogram: 0.30
+      rsi_recovery: 0.15
+      stoch_cross: 0.20
+      adx_rising: 0.25
+      ema_reclaim: 0.10
+    bearish:
+      macd_histogram: 0.20
+      rsi_recovery: 0.30
+      stoch_cross: 0.20
+      adx_rising: 0.15
+      ema_reclaim: 0.15
+
+# === TV Adjustment Settings ===
+tv_adjuster:
+  enabled: true
+  min_score: 0.8
+  weights:
+    strong_buy: 0.30
+    buy: 0.20
+    neutral: 0.00
+    sell: -0.20
+    strong_sell: -0.30
+
+# === Trade Execution Settings ===
+trade_executor:
+  enabled: true
+  max_retries: 3
+  retry_delay: 5
+  timeout: 10
+
+# === BTC Market Conditions ===
+btc_conditions:
+  enabled: true
+  update_interval: 300  # 5 minutes
+  thresholds:
+    bullish:
+      price_above_ema50: true
+      adx_min: 25
+      rsi_min: 40
+    bearish:
+      price_below_ema50: true
+      adx_max: 15
+      rsi_max: 35
+    neutral:
+      default: true
+
+# === Data Validation ===
+data_validation:
+  enabled: true
+  required_indicators:
+    - RSI14
+    - MACD
+    - ADX14
+    - EMA50
+  validation_rules:
+    rsi_range: [0, 100]
+    adx_min: 0
+    macd_range: [-1, 1]
+
+# === Error Handling ===
+error_handling:
+  max_errors_per_symbol: 3
+  error_cooldown: 60  # seconds
+  fallback_mode: true
+  alert_on_critical: true
+
+# === Performance Monitoring ===
+monitoring:
+  enabled: true
+  log_level: INFO
+  metrics_interval: 60  # seconds
+  performance_tracking: true
+  success_rate_tracking: true
+
+# === Redis Settings ===
+redis:
+  host: localhost
+  port: 6379
+  db: 0
+  decode_responses: true
+  connection_pool_size: 10
+  timeout: 5
+
+# === Logging ===
+logging:
+  level: INFO
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+  file: logs/pipeline.log
+  max_size: 10MB
+  backup_count: 5

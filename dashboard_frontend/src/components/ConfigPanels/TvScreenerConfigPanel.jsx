@@ -37,7 +37,7 @@ export default function TvScreenerConfigPanel() {
   const [success, setSuccess] = useState(null);
 
   useEffect(() => {
-    fetch("/config/tv_screener")
+    fetch("/config/tv-screener")
       .then((res) => res.json())
       .then((data) => {
         const cfg = data || {};
@@ -70,14 +70,14 @@ export default function TvScreenerConfigPanel() {
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
-      const response = await fetch("/config/tv_screener", {
+      const response = await fetch("/config/tv-screener", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config)
       });
-      
+
       if (response.ok) {
         setSuccess("Configuration saved successfully!");
         setTimeout(() => setSuccess(null), 3000);
@@ -95,14 +95,14 @@ export default function TvScreenerConfigPanel() {
     if (!window.confirm("Are you sure you want to reset to default configuration? This will overwrite all current settings.")) {
       return;
     }
-    
+
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       // Load defaults from server
-      const response = await fetch("/config/tv_screener/default");
+      const response = await fetch("/config/tv-screener/default");
       if (response.ok) {
         const defaultConfig = await response.json();
         setConfig(defaultConfig);
@@ -151,7 +151,7 @@ export default function TvScreenerConfigPanel() {
             />
             <label className="text-sm">Enabled</label>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <Switch
               checked={config.disable_if_btc_unhealthy}
@@ -159,7 +159,7 @@ export default function TvScreenerConfigPanel() {
             />
             <label className="text-sm">Disable if BTC Unhealthy</label>
           </div>
-          
+
           <FormField label="Score Threshold">
             <Input
               type="number"

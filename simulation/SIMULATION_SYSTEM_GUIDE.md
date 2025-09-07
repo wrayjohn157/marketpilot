@@ -136,7 +136,7 @@ simulation:
     simulation_days: 30
     timeframe: "1h"
     max_combinations: 1000
-  
+
   dca:
     confidence_weights:
       rsi: 0.25

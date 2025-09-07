@@ -61,7 +61,7 @@ parser.add_argument("--date", type=str, help="Date in YYYY-MM-DD format. Default
 args = parser.parse_args()
 
 # Use provided date or default to yesterday's date'
-date_str = args.date or (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
+date_str = args.date or (datetime.now(datetime.UTC) - timedelta(days=1)).strftime("%Y-%m-%d")
 
 input_file = RAW_DIR / date_str / "paper_trades.jsonl"
 output_dir = SCRUBBED_DIR / date_str

@@ -8,13 +8,13 @@ data:
     base_url: "https://api.binance.com/api/v3"
     rate_limit_delay: 0.1  # seconds between requests
     timeout: 30  # seconds
-  
+
   # Cache settings
   cache:
     enabled: true
     directory: "simulation/cache"
     ttl_hours: 24  # cache time-to-live
-  
+
   # Data quality settings
   quality:
     min_candles: 50  # minimum candles required for simulation
@@ -28,7 +28,7 @@ simulation:
     simulation_days: 30
     timeframe: "1h"
     max_combinations: 1000
-  
+
   # DCA parameters
   dca:
     # Confidence scoring weights
@@ -38,7 +38,7 @@ simulation:
       volume: 0.15
       drawdown: 0.20
       dca_count: 0.15
-    
+
     # Volume calculation
     volume:
       base_volume: 100
@@ -46,7 +46,7 @@ simulation:
       confidence_factor: 0.5  # 0.5 to 1.0 multiplier
       max_volume: 500
       min_volume: 10
-  
+
   # Risk management
   risk:
     max_drawdown_pct: 50.0  # maximum drawdown before stopping
@@ -60,7 +60,7 @@ optimization:
   grid_search:
     max_combinations: 1000
     parallel_workers: 4
-  
+
   # Genetic algorithm settings
   genetic_algorithm:
     population_size: 50
@@ -68,7 +68,7 @@ optimization:
     mutation_rate: 0.1
     tournament_size: 3
     elite_size: 0.25  # percentage of population to keep as elite
-  
+
   # Sensitivity analysis settings
   sensitivity:
     default_steps: 5  # number of steps for each parameter
@@ -80,12 +80,12 @@ performance:
   parallel:
     enabled: true
     max_workers: 4
-  
+
   # Memory management
   memory:
     max_dataframe_size: 1000000  # maximum rows in DataFrame
     cleanup_interval: 100  # simulations between cleanup
-  
+
   # Logging
   logging:
     level: "INFO"
@@ -102,7 +102,7 @@ frontend:
     entry_point_color: "#4ecdc4"
     profit_color: "#45b7d1"
     loss_color: "#f9ca24"
-  
+
   # UI settings
   ui:
     default_symbols: ["BTCUSDT", "ETHUSDT", "ADAUSDT", "SOLUSDT"]
@@ -116,13 +116,13 @@ api:
   rate_limit:
     requests_per_minute: 60
     burst_size: 10
-  
+
   # Response settings
   response:
     max_results: 1000
     default_page_size: 50
     max_page_size: 200
-  
+
   # Caching
   cache:
     enabled: true
@@ -135,13 +135,13 @@ monitoring:
   metrics:
     enabled: true
     collection_interval: 60  # seconds
-  
+
   # Performance tracking
   performance:
     track_simulation_time: true
     track_memory_usage: true
     track_api_calls: true
-  
+
   # Alerts
   alerts:
     enabled: false
@@ -156,7 +156,7 @@ development:
     enabled: false
     verbose_logging: false
     save_intermediate_results: false
-  
+
   # Testing
   testing:
     use_mock_data: false

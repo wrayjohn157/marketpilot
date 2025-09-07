@@ -120,7 +120,7 @@ def main() -> Any:
         print(f"[ERROR] Dataset not found: {dataset_path}")
         return
 
-    date_tag = datetime.utcnow().strftime("%Y-%m-%d")
+    date_tag = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
     shap_out_path = MODEL_DIR / f"shap_summary_{date_tag}.png"
     model_out_path = MODEL_DIR / "xgb_model.pkl"
     scaler_out_path = MODEL_DIR / "scaler.pkl"

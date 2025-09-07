@@ -3,13 +3,15 @@ Trades API Routes
 Handles active trades and trade management
 """
 
-from fastapi import APIRouter, HTTPException
-from datetime import datetime
-from typing import Dict, Any
 import logging
+from datetime import datetime
+from typing import Any, Dict
+
+from fastapi import APIRouter, HTTPException
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
 
 @router.get("/api/trades/active")
 def get_active_trades_enhanced() -> Dict[str, Any]:
@@ -39,12 +41,12 @@ def get_active_trades_enhanced() -> Dict[str, Any]:
                 "max_safety_orders": 0,
                 "active_safety_orders_count": 0,
                 "health_score": 50.0,
-                "confidence_score": 60.0
+                "confidence_score": 60.0,
             }
         ]
 
         # Calculate summary metrics
-        total_open_pnl = sum(trade.get('open_pnl', 0) for trade in mock_trades)
+        total_open_pnl = sum(trade.get("open_pnl", 0) for trade in mock_trades)
         total_deals = len(mock_trades)
 
         summary = {
@@ -60,16 +62,20 @@ def get_active_trades_enhanced() -> Dict[str, Any]:
             "trades": mock_trades,
             "count": len(mock_trades),
             "summary": summary,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
         }
     except Exception as e:
         logger.error(f"Failed to get enhanced active trades: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to fetch active trades: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to fetch active trades: {e}"
+        )
+
 
 @router.get("/active-trades")
 def get_active_trades_legacy() -> Dict[str, Any]:
     """Legacy active trades endpoint"""
     return get_active_trades_enhanced()
+
 
 @router.get("/trade-health/{symbol}")
 def get_trade_health(symbol: str) -> Dict[str, Any]:
@@ -80,8 +86,10 @@ def get_trade_health(symbol: str) -> Dict[str, Any]:
             "symbol": symbol.upper(),
             "health_score": 75.0,
             "confidence_score": 80.0,
-            "last_updated": datetime.utcnow().isoformat()
+            "last_updated": datetime.now(datetime.UTC).isoformat(),
         }
     except Exception as e:
         logger.error(f"Failed to get trade health for {symbol}: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to fetch trade health: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to fetch trade health: {e}"
+        )

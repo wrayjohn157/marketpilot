@@ -3,19 +3,20 @@ Modular MarketPilot Dashboard API
 Market7-inspired architecture with proper route separation
 """
 
-import sys
-import os
-from datetime import datetime
 import logging
+import os
+import sys
+from datetime import datetime
 
 # Add project root to path for imports
-sys.path.insert(0, '/home/signal/marketpilot')
+sys.path.insert(0, "/home/signal/marketpilot")
+
+from typing import Any, Dict  # noqa: E402
 
 # Import FastAPI and other dependencies after path setup
 from fastapi import FastAPI  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.responses import HTMLResponse  # noqa: E402
-from typing import Any, Dict  # noqa: E402
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="MarketPilot Modular Dashboard API",
     description="Enhanced MarketPilot API with modular architecture",
-    version="2.1.0"
+    version="2.1.0",
 )
 
 # Add CORS middleware
@@ -38,13 +39,14 @@ app.add_middleware(
 )
 
 # Import route modules
-from routes import trades_api, tech_filter_api, dca_config_api, scan_api  # noqa: E402
+from routes import dca_config_api, scan_api, tech_filter_api, trades_api  # noqa: E402
 
 # Include routers
 app.include_router(trades_api.router, tags=["trades"])
 app.include_router(tech_filter_api.router, tags=["tech-filter"])
 app.include_router(dca_config_api.router, tags=["dca-config"])
 app.include_router(scan_api.router, tags=["scan"])
+
 
 @app.get("/", response_class=HTMLResponse)
 def root() -> HTMLResponse:
@@ -182,6 +184,7 @@ def root() -> HTMLResponse:
     </html>
     """
 
+
 @app.get("/health")
 def health_check() -> Dict[str, Any]:
     """Enhanced health check endpoint"""
@@ -190,11 +193,12 @@ def health_check() -> Dict[str, Any]:
         redis_status = "healthy"
         try:
             import redis
-            r = redis.Redis(host='localhost', port=6379, db=0)
+
+            r = redis.Redis(host="localhost", port=6379, db=0)
             r.ping()
         except Exception as e:
             redis_status = f"unhealthy: {str(e)}"
-        
+
         # Check 3Commas API
         api_status = "healthy"
         try:
@@ -202,40 +206,45 @@ def health_check() -> Dict[str, Any]:
             pass
         except Exception as e:
             api_status = f"unhealthy: {str(e)}"
-        
+
         return {
-            "status": "healthy" if redis_status == "healthy" and api_status == "healthy" else "degraded",
-            "timestamp": datetime.utcnow().isoformat(),
-            "services": {
-                "redis": redis_status,
-                "3commas_api": api_status
-            },
-            "version": "2.1.0"
+            "status": (
+                "healthy"
+                if redis_status == "healthy" and api_status == "healthy"
+                else "degraded"
+            ),
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
+            "services": {"redis": redis_status, "3commas_api": api_status},
+            "version": "2.1.0",
         }
     except Exception as e:
         return {
             "status": "unhealthy",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
             "error": str(e),
-            "version": "2.1.0"
+            "version": "2.1.0",
         }
+
 
 @app.get("/api/account/summary")
 def get_account_summary() -> Dict[str, Any]:
     """Legacy account summary endpoint"""
     return {
         "message": "Legacy endpoint - use /api/trades/active for enhanced data",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(datetime.UTC).isoformat(),
     }
+
 
 @app.get("/api/ml/confidence")
 def get_ml_confidence() -> Dict[str, Any]:
     """Legacy ML confidence endpoint"""
     return {
         "message": "Legacy endpoint - ML confidence data will be integrated into trade endpoints",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(datetime.UTC).isoformat(),
     }
+
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8001)  # nosec B104

@@ -20,13 +20,15 @@ from config.unified_config_manager import (
 from utils.credential_manager import get_3commas_credentials
 
 # === Load credentials ===
-with open(get_path("paper_cred"), "r") as f:
+with open("/home/signal/marketpilot/config/paper_cred.json", "r") as f:
     creds = json.load(f)
 
 API_KEY = creds["3commas_api_key"]
 API_SECRET = creds["3commas_api_secret"]
-BOT_ID = creds.get("3commas_bot_id", 16017224)
-ACCOUNT_ID = creds.get("3commas_account_id", 32994602)  # fallback paper trading ID
+BOT_ID = creds.get("3commas_bot_id", 16477920)
+ACCOUNT_ID = creds.get("3commas_account_id", 16477920)  # demo bot ID
+EMAIL_TOKEN = creds.get("3commas_email_token", "aa5bba08-4875-41bc-91a0-5e0bb66c72b0")
+PAIR = creds.get("pair", "USDT_BTC")
 
 
 # === Helper: Sign a request ===
@@ -102,8 +104,15 @@ def calculate_open_pnl(active_deals):
             )
 
             total_open_pnl += open_pnl
+
+            # Use real deal_id from 3Commas API, fallback to generated ID if not available
+            deal_id = deal.get("id") or (
+                100000000 + len(deals_info) + hash(pair) % 9999999
+            )
+
             deals_info.append(
                 {
+                    "deal_id": deal_id,
                     "pair": pair,
                     "spent_amount": round(spent_amount, 2),
                     "current_price": round(current_price, 6),
@@ -121,7 +130,7 @@ def calculate_open_pnl(active_deals):
 
 # === Closed Deals Calculator ===
 def calculate_closed_deals_stats(finished_deals):
-    now = datetime.utcnow()
+    now = datetime.now(datetime.UTC)
     last_24h = now - timedelta(days=1)
     total_realized_pnl = 0.0
     daily_realized_pnl = 0.0

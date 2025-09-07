@@ -139,7 +139,7 @@ with open(RRR_PASS_FILE, "w") as f:
 
 r.store_indicators(FINAL_FILTER_KEY, filtered)
 r.store_indicators(FINAL_TRADES_KEY, list(filtered.keys()))
-r.set_cache("last_scan_rrr", datetime.utcnow().isoformat())
+r.set_cache("last_scan_rrr", datetime.now(datetime.UTC).isoformat())
 r.set_cache("rrr_filter_count_in", len(symbols))
 r.set_cache("rrr_filter_count_out", len(filtered))
 r.set_cache("final_trades_count", len(filtered))

@@ -91,7 +91,7 @@ with open(OUTPUT_FILE, "w") as f:
 logging.info(f"[OK] Qualified: {len(qualified)}")
 logging.info(f"[SAVE] Saved to: {OUTPUT_FILE}")
 
-timestamp = datetime.utcnow().isoformat()
+timestamp = datetime.now(datetime.UTC).isoformat()
 r.set_cache("counters:last_scan_vol", timestamp)
 r.set_cache("counters:volume_filter_count", len(qualified))
 r.cleanup_expired_keys()

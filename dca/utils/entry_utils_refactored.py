@@ -239,7 +239,7 @@ def get_latest_indicators(symbol: str, tf: str = "15m") -> Optional[Dict[str, An
     """
     try:
         snapshot_base = get_path("snapshots")
-        today = datetime.utcnow().strftime("%Y-%m-%d")
+        today = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
         indicator_path = (
             snapshot_base / today / f"{symbol.upper()}_{tf}_indicators.json"
         )

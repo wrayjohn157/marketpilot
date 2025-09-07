@@ -61,7 +61,7 @@ r = get_redis_manager()
 
 
 def get_snapshot_dir() -> Any:
-    path = SNAPSHOTS_BASE / datetime.utcnow().strftime("%Y-%m-%d")
+    path = SNAPSHOTS_BASE / datetime.now(datetime.UTC).strftime("%Y-%m-%d")
     path.mkdir(parents=True, exist_ok=True)
     return path
 

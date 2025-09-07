@@ -1,0 +1,60 @@
+# Smart DCA Configuration - Focused on Profitable Trade Rescue
+# Streamlined configuration for maximum profitability
+
+# === Core Settings ===
+max_trade_usdt: 2000
+base_order_usdt: 200
+drawdown_trigger_pct: 1.5  # Minimum drawdown to consider rescue
+
+# === Safety Orders Table (Progressive) ===
+so_volume_table:
+  - 20   # Step 1: Small test
+  - 30   # Step 2: Slightly larger
+  - 50   # Step 3: Medium rescue
+  - 80   # Step 4: Larger rescue
+  - 120  # Step 5: Big rescue
+  - 180  # Step 6: Major rescue
+  - 250  # Step 7: Maximum rescue
+  - 350  # Step 8: Emergency rescue
+  - 500  # Step 9: Last resort
+
+# === Rescue Confidence Thresholds ===
+rescue_thresholds:
+  high_confidence: 0.75    # High confidence rescue
+  medium_confidence: 0.60  # Medium confidence rescue
+  desperate_rescue: 0.45   # Desperate rescue (high drawdown only)
+
+# === ML Spend Model ===
+use_ml_spend_model: true
+spend_adjustment_rules:
+  min_volume: 15
+  max_multiplier: 2.5
+  tp1_shift_boost: 1.25    # Boost volume if TP1 shift is good
+
+# === Risk Management ===
+risk_management:
+  max_drawdown_for_rescue: 25.0  # Don't rescue beyond 25% drawdown
+  min_recovery_odds: 0.4         # Minimum recovery probability
+  min_safu_score: 0.3            # Minimum safety score
+  max_rescue_attempts: 8         # Maximum rescue attempts per trade
+
+# === BTC Market Filter ===
+btc_filter:
+  enabled: true
+  rsi_max: 40
+  macd_histogram_max: 0
+  adx_max: 20
+
+# === Logging ===
+logging:
+  level: INFO
+  log_verbose: true
+  log_ml_snapshots: true
+
+# === Advanced Features ===
+advanced:
+  use_confidence_override: true
+  use_health_scoring: true
+  use_recovery_prediction: true
+  use_safu_evaluation: true
+  adaptive_volume: true

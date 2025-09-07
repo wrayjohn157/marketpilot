@@ -7,7 +7,7 @@ After examining the frontend configuration system, I've identified several issue
 ## ❌ **Issues Found**
 
 ### **1. Redundant Configuration Panels**
-- **Duplicate ForkScoreConfigPanel**: 
+- **Duplicate ForkScoreConfigPanel**:
   - `dashboard_frontend/src/components/ForkScoreConfigPanel.jsx` (33 lines, basic)
   - `dashboard_frontend/src/components/ConfigPanels/ForkScoreConfigPanel.jsx` (143 lines, advanced)
   - **Issue**: Two different implementations for the same functionality
@@ -19,7 +19,7 @@ After examining the frontend configuration system, I've identified several issue
 - **Issue**: Frontend doesn't match actual backend configuration
 
 ### **3. Broken Save/Restore Functionality**
-- **DcaStrategyBuilder.jsx**: 
+- **DcaStrategyBuilder.jsx**:
   - Save: `POST /sim/config/dca` (wrong endpoint)
   - Restore: `GET /sim/config/dca/default` (wrong endpoint)
 - **DcaConfigPanel.jsx**:

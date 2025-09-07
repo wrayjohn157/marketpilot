@@ -157,9 +157,9 @@ def log_btc_snapshot():
     )
 
     # Prepare snapshot for file logging:
-    ts = int(datetime.utcnow().timestamp())
+    ts = int(datetime.now(datetime.UTC).timestamp())
     ts_iso = datetime.utcfromtimestamp(ts).strftime("%Y-%m-%dT%H:%M:%SZ")
-    day = datetime.utcnow().strftime("%Y-%m-%d")
+    day = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
     folder = SAVE_BASE / day
     folder.mkdir(parents=True, exist_ok=True)
 

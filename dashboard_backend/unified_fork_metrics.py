@@ -118,7 +118,7 @@ def calculate_open_pnl(active_deals):
 
 # === Calculate Closed Deals ===
 def calculate_closed_deals_stats(finished_deals):
-    now = datetime.utcnow()
+    now = datetime.now(datetime.UTC)
     last_24h = now - timedelta(days=1)
     total_realized_pnl = 0.0
     daily_realized_pnl = 0.0
@@ -205,7 +205,7 @@ def get_fork_trade_metrics():
 # === Main Cache and Output Handler ===
 if __name__ == "__main__":
     result = get_fork_trade_metrics()
-    result["last_updated"] = datetime.utcnow().isoformat()
+    result["last_updated"] = datetime.now(datetime.UTC).isoformat()
 
     # Write to backend cache
     cache_path = get_path("base") / "dashboard_backend" / "cache" / "fork_metrics.json"

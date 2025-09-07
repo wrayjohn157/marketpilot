@@ -21,7 +21,7 @@ BTC_SNAPSHOT_BASE = get_path("btc_logs") #BTC_SNAPSHOT_BASE = BASE_DIR / "dashbo
 
 # === BTC Snapshot Loader ===
 def get_latest_btc_snapshot() -> Any:
-    today = datetime.utcnow().strftime("%Y-%m-%d")
+    today = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
 filepath = BTC_SNAPSHOT_BASE / today / "btc_snapshots.jsonl"
 if not filepath.exists():
     logging.warning(f"[BTC] Snapshot file missing: {filepath}")

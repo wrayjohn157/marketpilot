@@ -184,6 +184,18 @@ class ApiClient {
   }
 
   /**
+   * Get ML confidence data
+   */
+  async getMLConfidence() {
+    try {
+      return await this.request('/ml/confidence');
+    } catch (error) {
+      console.error('Failed to fetch ML confidence:', error);
+      return [];
+    }
+  }
+
+  /**
    * Health check
    */
   async healthCheck() {

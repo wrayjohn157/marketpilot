@@ -37,7 +37,7 @@ date (str, optional): Date string, defaults to today UTC.
 Returns:
     tuple: (tv_tag, tv_kicker) or (None, 0.0) if not found.
 """"""""
-date = date or datetime.utcnow().strftime("%Y-%m-%d")
+date = date or datetime.now(datetime.UTC).strftime("%Y-%m-%d")
 file_path = TV_KICKER_PATH / date / "tv_kicker.jsonl"
 if not file_path.exists():
         return None, 0.0

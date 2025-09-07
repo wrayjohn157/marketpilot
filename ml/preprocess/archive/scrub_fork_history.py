@@ -86,7 +86,9 @@ def main():
     )
     args = parser.parse_args()
 
-    date_str = args.date or (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
+    date_str = args.date or (datetime.now(datetime.UTC) - timedelta(days=1)).strftime(
+        "%Y-%m-%d"
+    )
     input_file, output_dir, output_file = get_paths(date_str)
 
     if not input_file.exists():

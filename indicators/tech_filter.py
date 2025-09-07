@@ -277,7 +277,7 @@ def main() -> Any:
 
     r.set_cache("counters:tech_filter_count_in", len(symbols))
     r.set_cache("counters:tech_filter_count_out", len(approved))
-    r.set_cache("last_scan_tech", datetime.utcnow().isoformat())
+    r.set_cache("last_scan_tech", datetime.now(datetime.UTC).isoformat())
 
     logging.info(
         f"💾 Saved {len(approved)} approved | 🌀 Saved {len(fork_queue)} fork candidates"

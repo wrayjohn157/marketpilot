@@ -27,7 +27,7 @@ class ProfitabilityAnalyzer:
 
     def analyze_recent_trades(self, days: int = 7) -> Dict[str, any]:
         """Analyze recent trades for profitability patterns"""
-        end_date = datetime.utcnow()
+        end_date = datetime.now(datetime.UTC)
         start_date = end_date - timedelta(days=days)
 
         trades_data = []
@@ -168,7 +168,7 @@ class ProfitabilityAnalyzer:
 
     def analyze_by_symbol(self, days: int = 7) -> Dict[str, Dict]:
         """Analyze profitability by trading symbol"""
-        end_date = datetime.utcnow()
+        end_date = datetime.now(datetime.UTC)
         trades_data = []
 
         # Collect trade data
@@ -214,7 +214,7 @@ class ProfitabilityAnalyzer:
 
         report = f"""
 # Smart DCA Profitability Analysis Report
-Generated: {datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
+Generated: {datetime.now(datetime.UTC).strftime("%Y-%m-%d %H:%M:%S")}
 Analysis Period: {days} days
 
 ## Overall Performance

@@ -106,7 +106,7 @@ except Exception as e:
     return all_trades
 
 def load_indicators_from_disk(symbol: Any, tf: Any = "15m") -> Any:
-    date_str = datetime.utcnow().strftime("%Y-%m-%d")
+    date_str = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
 path = SNAPSHOT_BASE / date_str / f"{symbol}_{tf}_klines.json"
     if not path.exists():
     logging.warning(f"[Fallback] Kline file not found: {path}")

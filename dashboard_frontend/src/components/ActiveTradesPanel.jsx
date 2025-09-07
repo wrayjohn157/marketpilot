@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import TradeCard from "../components/ui/TradeCardEnhanced";
 import SelectFilter from "../components/ui/SelectFilter";
+import apiClient from "../lib/api";
 
 export default function ActiveTradesPanel() {
   const [trades, setTrades] = useState([]);
@@ -8,8 +9,7 @@ export default function ActiveTradesPanel() {
 
   useEffect(() => {
     const fetchTrades = async () => {
-      const res = await fetch("/dca-trades-active");
-      const data = await res.json();
+      const data = await apiClient.getActiveTrades();
       setTrades(data.dca_trades || []);
     };
     fetchTrades();
@@ -51,8 +51,8 @@ export default function ActiveTradesPanel() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-        {sortedTrades.map((trade) => (
-          <TradeCard key={`${sortBy}-${trade.deal_id}`} trade={trade} />
+        {sortedTrades.map((trade, index) => (
+          <TradeCard key={`${sortBy}-${trade.symbol}-${index}`} trade={trade} />
         ))}
       </div>
     </div>

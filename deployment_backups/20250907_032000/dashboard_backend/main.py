@@ -1,0 +1,188 @@
+# Import config environment fix first
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+import config_environment
+
+import json
+from datetime import datetime
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+
+# Import custom decorators
+from .decorators import *
+
+# === FastAPI ===
+app = FastAPI()
+
+# === Redis ===
+from utils.redis_manager import get_redis_manager
+
+r = get_redis_manager()
+# === Allow CORS from anywhere (or restrict to your domain) ===
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# === Modular Route Imports ===
+from .config_routes import safu_config_api
+from .config_routes.dca_config_api import router as dca_config_router
+from .config_routes.fork_score_config_api import router as fork_score_config_router
+from .config_routes.tv_screener_config_api import router as tv_screener_config_router
+from .dca_status import router as dca_router
+from .dca_trades_api import router as dca_trades_api_router
+from .eval_routes import dca_eval_api
+from .eval_routes.price_series_api import router as price_series_router
+from .ml_confidence_api import router as ml_confidence_router
+from .refresh_price_api import router as price_refresh_router
+from .sim_routes.dca_simulate_route import router as dca_simulate_router
+from .sim_routes.sim_dca_strategies import router as sim_dca_strategy_router
+from .sim_routes.simulation_integration import router as simulation_router
+
+# === Additional Route Imports ===
+from .unified_fork_metrics import get_fork_trade_metrics
+
+from config.unified_config_manager import get_path
+from .sim_routes.sim_dca_config_api import router as sim_dca_router
+
+from .anal.capital_routes import router as capital_router
+
+# === Include All Modular Routers ===
+app.include_router(dca_router)
+app.include_router(ml_confidence_router)
+app.include_router(price_refresh_router)
+app.include_router(dca_trades_api_router)
+app.include_router(fork_score_config_router, prefix="/config")
+app.include_router(dca_config_router, prefix="/config")
+app.include_router(tv_screener_config_router, prefix="/config")
+app.include_router(dca_eval_api.router)
+app.include_router(safu_config_api.router, prefix="/config")
+app.include_router(price_series_router)
+app.include_router(dca_simulate_router)
+app.include_router(sim_dca_strategy_router)
+app.include_router(sim_dca_router)
+app.include_router(simulation_router)
+app.include_router(capital_router, prefix="/api")
+
+
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat(),
+        "service": "MarketPilot Backend"
+    }
+
+@app.get("/", response_class=HTMLResponse)
+def root():
+    return f"""
+    <html>
+        <head><title>Market7 Dashboard API</title></head>
+        <body>
+            <h2>🚀 Market7 Dashboard Backend</h2>
+            <p>Available Endpoints:</p>
+            <ul>
+                <li><a href="/active-trades">/active-trades</a></li>
+                <li><a href="/3commas/metrics">/3commas/metrics</a></li>
+                <li><a href="/dca-trades-active" target="_blank">/dca-trades-active</a></li>
+                <li><a href="/btc/context" target="_blank">/btc/context</a></li>
+                <li><a href="/ml/confidence" target="_blank">/ml/confidence</a></li>
+            </ul>
+            <p><small>Server time: <code>{datetime.utcnow().isoformat()}</code></small></p>
+        </body>
+    </html>
+    """
+
+
+@app.get("/btc/context")
+def get_btc_context():
+    def parse_float(val):
+        try:
+            if val is None:
+                return 0.0
+            return float(str(val).replace("np.float64(", "").replace(")", ""))
+        except:
+            return 0.0
+
+    try:
+        return {
+            "status": r.get_cache("cache:btc_condition") or "UNKNOWN",
+            "rsi": parse_float(r.get_cache("indicators:BTC:15m:RSI14")),
+            "adx": parse_float(r.get_cache("indicators:BTC:1h:ADX14")),
+            "ema": parse_float(r.get_cache("indicators:BTC:1h:EMA50")),
+            "close": parse_float(r.get_cache("indicators:BTC:1h:latest_close")),
+        }
+    except:
+        return {
+            "status": "UNKNOWN",
+            "rsi": 50.0,
+            "adx": 25.0,
+            "ema": 45000.0,
+            "close": 45000.0,
+        }
+
+
+@app.get("/fork/metrics")
+def serve_cached_metrics():
+    try:
+        path = get_path("dashboard_cache") / "fork_metrics.json"
+        with open(path) as f:
+            return json.load(f)
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.get("/active-trades")
+def active_trades():
+    try:
+        raw = r.get_cache("active_trades")
+        if not raw:
+            return []
+
+        entries = json.loads(raw)
+        trades = []
+        for entry in entries:
+            parts = entry.split("_")
+            if len(parts) == 2:
+                symbol = parts[1] + parts[0]
+            else:
+                symbol = entry
+
+            score_raw = r.get_cache(f"trade_health:{symbol}")
+            try:
+                score = int(score_raw) if score_raw else None
+            except:
+                score = None
+
+            trades.append({"symbol": symbol, "score": score})
+
+        return trades
+    except:
+        return []
+
+
+@app.get("/trade-health/{symbol}")
+def trade_health(symbol: str):
+    redis_key = f"trade_health:{symbol.upper()}"
+    raw = r.get_cache(redis_key)
+
+    if not raw:
+        return {"error": "No data"}
+
+    try:
+        return {"symbol": symbol.upper(), "score": int(raw)}
+    except:
+        return {"error": "Invalid format"}
+
+
+from .threecommas_metrics import get_3commas_metrics
+
+@app.get("/3commas/metrics")
+def threecommas_metrics():
+    return get_3commas_metrics()

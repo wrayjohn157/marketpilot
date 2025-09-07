@@ -92,7 +92,7 @@ def btc_sentiment_multiplier() -> Any:
 
 
 def compute_stoch_slope(symbol: Any) -> Any:
-    today = datetime.utcnow().strftime("%Y-%m-%d")
+    today = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
     filepath = SNAPSHOT_BASE / today / f"{symbol.upper()}_15m_klines.json"
     if not filepath.exists():
         return 0.0, None
@@ -115,7 +115,7 @@ def compute_stoch_slope(symbol: Any) -> Any:
 
 
 def load_kline_volumes(symbol: Any) -> Any:
-    today = datetime.utcnow().strftime("%Y-%m-%d")
+    today = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
     filepath = SNAPSHOT_BASE / today / f"{symbol.upper()}_15m_klines.json"
     if not filepath.exists():
         return None, None
@@ -243,7 +243,7 @@ def main() -> Any:
     r.cleanup_expired_keys()
     r.cleanup_expired_keys()
 
-    now = datetime.utcnow()
+    now = datetime.now(datetime.UTC)
     now_ts = int(now.timestamp() * 1000)
     ts_iso = now.isoformat() + "Z"
     today = now.strftime("%Y-%m-%d")

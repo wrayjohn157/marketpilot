@@ -39,7 +39,7 @@ logger.setLevel(logging.INFO)
 
 
 def load_indicators_from_disk(symbol: str, tf: str = "15m") -> dict:
-    date_str = datetime.utcnow().strftime("%Y-%m-%d")
+    date_str = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
     path = SNAPSHOT_BASE / date_str / f"{symbol}_{tf}_klines.json"
     if not path.exists():
         logger.warning(f"[SAFU] Kline file not found: {path}")
