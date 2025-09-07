@@ -254,9 +254,7 @@ class FullSystemManager:
     def run_forever(self):
         """Keep the system running"""
         try:
-            logger.info(
-                "🔄 System manager running... Press Ctrl+C to stop all services"
-            )
+            logger.info("🔄 System manager running... Press Ctrl+C to stop all services")
             while True:
                 time.sleep(10)
                 # Check if any services died and restart them

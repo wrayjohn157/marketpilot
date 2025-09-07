@@ -57,5 +57,3 @@ log_success "MarketPilot Canonical System Stopped!"
 echo ""
 echo "🔧 To restart: ./start_canonical.sh"
 echo "📊 To check status: curl http://localhost:8000/health"
-
-

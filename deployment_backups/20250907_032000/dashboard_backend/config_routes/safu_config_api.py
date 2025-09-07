@@ -55,6 +55,7 @@ def update_safu_config(patch: dict):
     save_config(config)
     return {"status": "success", "updated": patch}
 
+
 @router.get("/safu/default")
 def get_default_safu_config():
     """Get default SAFU configuration"""
@@ -78,6 +79,6 @@ def get_default_safu_config():
             "min_rsi_slope": 1.0,
             "min_safu_score": 0.4,
             "allow_if_tp1_shift_under_pct": 12.5,
-        }
+        },
     }
     return default_config

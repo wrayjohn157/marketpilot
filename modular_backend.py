@@ -7,10 +7,10 @@ A working version that includes all modular routes without config issues
 import json
 import random
 import time
-import yaml
 from datetime import datetime
 from pathlib import Path
 
+import yaml
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -29,29 +29,37 @@ app.add_middleware(
 
 # === Redis ===
 from utils.redis_manager import get_redis_manager
+
 r = get_redis_manager()
 
 # === Custom Decorators ===
 from functools import wraps
+
 from fastapi import APIRouter
+
 
 def get_cache(router: APIRouter, path: str):
     """Decorator to add caching to FastAPI routes"""
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
-        
+
         # Add the route to the router
         router.add_api_route(path, wrapper, methods=["GET"])
         return wrapper
+
     return decorator
+
 
 # Monkey patch APIRouter to add get_cache method
 def _get_cache(self, path: str):
     return get_cache(self, path)
 
+
 APIRouter.get_cache = _get_cache
+
 
 # === Core Endpoints ===
 @app.get("/health")
@@ -59,8 +67,9 @@ def health_check():
     return {
         "status": "healthy",
         "timestamp": datetime.now(datetime.UTC).isoformat(),
-        "service": "MarketPilot Modular Backend"
+        "service": "MarketPilot Modular Backend",
     }
+
 
 @app.get("/", response_class=HTMLResponse)
 def root():
@@ -88,6 +97,7 @@ def root():
     </html>
     """
 
+
 # === Trading Endpoints ===
 @app.get("/active-trades")
 def active_trades():
@@ -95,26 +105,30 @@ def active_trades():
     try:
         # Get real 3commas data
         from dashboard_backend.threecommas_metrics import get_3commas_metrics
+
         data = get_3commas_metrics()
-        
-        if 'metrics' in data and 'active_deals' in data['metrics']:
+
+        if "metrics" in data and "active_deals" in data["metrics"]:
             trades = []
-            for deal in data['metrics']['active_deals']:
-                trades.append({
-                    "symbol": deal['pair'],
-                    "spent_amount": deal['spent_amount'],
-                    "current_price": deal['current_price'],
-                    "entry_price": deal['entry_price'],
-                    "open_pnl": deal['open_pnl'],
-                    "open_pnl_pct": deal['open_pnl_pct'],
-                    "drawdown_pct": deal['drawdown_pct'],
-                    "drawdown_usd": deal['drawdown_usd']
-                })
+            for deal in data["metrics"]["active_deals"]:
+                trades.append(
+                    {
+                        "symbol": deal["pair"],
+                        "spent_amount": deal["spent_amount"],
+                        "current_price": deal["current_price"],
+                        "entry_price": deal["entry_price"],
+                        "open_pnl": deal["open_pnl"],
+                        "open_pnl_pct": deal["open_pnl_pct"],
+                        "drawdown_pct": deal["drawdown_pct"],
+                        "drawdown_usd": deal["drawdown_usd"],
+                    }
+                )
             return trades
         return []
     except Exception as e:
         logger.warning(f"Failed to get active trades: {e}")
         return []
+
 
 @app.get("/api/btc/context")
 @app.get("/btc/context")
@@ -123,26 +137,31 @@ def get_btc_context():
     try:
         # Get real 3commas data for BTC price
         from dashboard_backend.threecommas_metrics import get_3commas_metrics
+
         data = get_3commas_metrics()
-        
+
         btc_price = 110000.0  # Default fallback
-        if 'metrics' in data and 'active_deals' in data['metrics']:
-            for deal in data['metrics']['active_deals']:
-                if deal['pair'] == 'USDT_BTC':
-                    btc_price = deal['current_price']
+        if "metrics" in data and "active_deals" in data["metrics"]:
+            for deal in data["metrics"]["active_deals"]:
+                if deal["pair"] == "USDT_BTC":
+                    btc_price = deal["current_price"]
                     break
-        
+
         # Calculate some basic indicators based on current price
         rsi = 45.0 + (btc_price - 100000) / 1000  # Simple RSI approximation
         rsi = max(20, min(80, rsi))  # Clamp between 20-80
-        
+
         adx = 25.0 + (abs(btc_price - 110000) / 1000)  # ADX based on volatility
         adx = max(15, min(50, adx))  # Clamp between 15-50
-        
+
         ema = btc_price * 0.98  # EMA slightly below current price
-        
+
         return {
-            "status": "HEALTHY" if rsi > 30 and rsi < 70 else "OVERBOUGHT" if rsi > 70 else "OVERSOLD",
+            "status": "HEALTHY"
+            if rsi > 30 and rsi < 70
+            else "OVERBOUGHT"
+            if rsi > 70
+            else "OVERSOLD",
             "rsi": round(rsi, 2),
             "adx": round(adx, 2),
             "ema": round(ema, 2),
@@ -158,37 +177,39 @@ def get_btc_context():
             "close": 110000.0,
         }
 
+
 @app.get("/api/account/summary")
 def get_account_summary():
     """Account summary endpoint for frontend API client"""
     try:
         # Get real 3commas data for account summary
         from dashboard_backend.threecommas_metrics import get_3commas_metrics
+
         data = get_3commas_metrics()
-        
+
         # Calculate account summary from 3commas data
         total_balance = 0
         total_pnl = 0
         today_pnl = 0
-        
-        if 'metrics' in data:
-            total_pnl = data['metrics'].get('open_pnl', 0)
-            today_pnl = data['metrics'].get('daily_realized_pnl', 0)
-            
+
+        if "metrics" in data:
+            total_pnl = data["metrics"].get("open_pnl", 0)
+            today_pnl = data["metrics"].get("daily_realized_pnl", 0)
+
             # Calculate total balance from active deals
-            if 'active_deals' in data['metrics']:
-                for deal in data['metrics']['active_deals']:
-                    total_balance += deal.get('spent_amount', 0)
-        
+            if "active_deals" in data["metrics"]:
+                for deal in data["metrics"]["active_deals"]:
+                    total_balance += deal.get("spent_amount", 0)
+
         return {
             "summary": {
                 "balance": total_balance,
                 "total_pnl": total_pnl,
                 "today_pnl": today_pnl,
-                "active_trades": len(data.get('metrics', {}).get('active_deals', [])),
+                "active_trades": len(data.get("metrics", {}).get("active_deals", [])),
                 "allocated": total_balance,
                 "upnl": total_pnl,
-                "win_rate": data.get('metrics', {}).get('win_rate', 0)
+                "win_rate": data.get("metrics", {}).get("win_rate", 0),
             }
         }
     except Exception as e:
@@ -201,9 +222,10 @@ def get_account_summary():
                 "active_trades": 2,
                 "allocated": 400.92,
                 "upnl": -1.95,
-                "win_rate": 0.0
+                "win_rate": 0.0,
             }
         }
+
 
 @app.get("/api/trades/active")
 def get_api_active_trades():
@@ -211,37 +233,44 @@ def get_api_active_trades():
     try:
         # Get real 3commas data
         from dashboard_backend.threecommas_metrics import get_3commas_metrics
+
         data = get_3commas_metrics()
-        
-        if 'metrics' in data and 'active_deals' in data['metrics']:
+
+        if "metrics" in data and "active_deals" in data["metrics"]:
             dca_trades = []
-            for deal in data['metrics']['active_deals']:
-                dca_trades.append({
-                    "deal_id": deal.get('deal_id', 12345678),  # Use real deal_id or fallback
-                    "symbol": deal['pair'],
-                    "avg_entry_price": deal['entry_price'],  # Match expected field name
-                    "current_price": deal['current_price'],
-                    "entry_price": deal['entry_price'],  # Keep both for compatibility
-                    "spent_amount": deal['spent_amount'],
-                    "open_pnl": deal['open_pnl'],
-                    "open_pnl_pct": deal['open_pnl_pct'],
-                    "drawdown_pct": deal['drawdown_pct'],
-                    "drawdown_usd": deal['drawdown_usd'],
-                    "step": 0,  # DCA step counter
-                    "confidence_score": 0.0,  # ML confidence
-                    "recovery_odds": 0.0,  # Recovery probability
-                    "safu_score": 0.0,  # Safety score
-                    "be_price": deal['entry_price'],  # Break-even price
-                    "tp1_shift": 2.5  # Take profit 1 shift %
-                })
-            return {
-                "dca_trades": dca_trades,
-                "count": len(dca_trades)
-            }
+            for deal in data["metrics"]["active_deals"]:
+                dca_trades.append(
+                    {
+                        "deal_id": deal.get(
+                            "deal_id", 12345678
+                        ),  # Use real deal_id or fallback
+                        "symbol": deal["pair"],
+                        "avg_entry_price": deal[
+                            "entry_price"
+                        ],  # Match expected field name
+                        "current_price": deal["current_price"],
+                        "entry_price": deal[
+                            "entry_price"
+                        ],  # Keep both for compatibility
+                        "spent_amount": deal["spent_amount"],
+                        "open_pnl": deal["open_pnl"],
+                        "open_pnl_pct": deal["open_pnl_pct"],
+                        "drawdown_pct": deal["drawdown_pct"],
+                        "drawdown_usd": deal["drawdown_usd"],
+                        "step": 0,  # DCA step counter
+                        "confidence_score": 0.0,  # ML confidence
+                        "recovery_odds": 0.0,  # Recovery probability
+                        "safu_score": 0.0,  # Safety score
+                        "be_price": deal["entry_price"],  # Break-even price
+                        "tp1_shift": 2.5,  # Take profit 1 shift %
+                    }
+                )
+            return {"dca_trades": dca_trades, "count": len(dca_trades)}
         return {"dca_trades": [], "count": 0}
     except Exception as e:
         logger.warning(f"Failed to get active trades: {e}")
         return {"dca_trades": [], "count": 0}
+
 
 @app.get("/api/3commas/metrics")
 def get_api_3commas_metrics():
@@ -249,6 +278,7 @@ def get_api_3commas_metrics():
     try:
         # Get real 3commas data
         from dashboard_backend.threecommas_metrics import get_3commas_metrics
+
         return get_3commas_metrics()
     except Exception as e:
         logger.warning(f"Failed to get 3commas metrics: {e}")
@@ -260,9 +290,10 @@ def get_api_3commas_metrics():
                 "realized_pnl_alltime": 0.0,
                 "total_deals": 0,
                 "win_rate": 0,
-                "active_deals": []
-            }
+                "active_deals": [],
+            },
         }
+
 
 @app.get("/ml/confidence")
 def get_ml_confidence():
@@ -274,18 +305,19 @@ def get_ml_confidence():
                 "symbol": "USDT_BTC",
                 "confidence": 0.85,
                 "decision": "RUN",
-                "timestamp": datetime.now(datetime.UTC).isoformat()
+                "timestamp": datetime.now(datetime.UTC).isoformat(),
             },
             {
-                "symbol": "USDT_XRP", 
+                "symbol": "USDT_XRP",
                 "confidence": 0.72,
                 "decision": "DCA",
-                "timestamp": datetime.now(datetime.UTC).isoformat()
-            }
+                "timestamp": datetime.now(datetime.UTC).isoformat(),
+            },
         ]
     except Exception as e:
         logger.warning(f"Failed to get ML confidence: {e}")
         return []
+
 
 @app.get("/3commas/metrics")
 def threecommas_metrics():
@@ -293,6 +325,7 @@ def threecommas_metrics():
     try:
         # Try to get real 3commas data
         from dashboard_backend.threecommas_metrics import get_3commas_metrics
+
         return get_3commas_metrics()
     except:
         # Fallback to mock data with demo bot info
@@ -305,8 +338,9 @@ def threecommas_metrics():
             "profit_loss": 1250.50,
             "success_rate": 0.78,
             "status": "modular_backend_demo",
-            "timestamp": datetime.now(datetime.UTC).isoformat()
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
         }
+
 
 @app.get("/fork/metrics")
 def serve_cached_metrics():
@@ -314,22 +348,23 @@ def serve_cached_metrics():
     try:
         # Get real 3commas data for account summary
         from dashboard_backend.threecommas_metrics import get_3commas_metrics
+
         data = get_3commas_metrics()
-        
+
         # Calculate account summary from 3commas data
         total_balance = 0
         total_pnl = 0
         today_pnl = 0
-        
-        if 'metrics' in data:
-            total_pnl = data['metrics'].get('open_pnl', 0)
-            today_pnl = data['metrics'].get('daily_realized_pnl', 0)
-            
+
+        if "metrics" in data:
+            total_pnl = data["metrics"].get("open_pnl", 0)
+            today_pnl = data["metrics"].get("daily_realized_pnl", 0)
+
             # Calculate total balance from active deals
-            if 'active_deals' in data['metrics']:
-                for deal in data['metrics']['active_deals']:
-                    total_balance += deal.get('spent_amount', 0)
-        
+            if "active_deals" in data["metrics"]:
+                for deal in data["metrics"]["active_deals"]:
+                    total_balance += deal.get("spent_amount", 0)
+
         return {
             "status": "modular_backend",
             "timestamp": datetime.now(datetime.UTC).isoformat(),
@@ -337,14 +372,10 @@ def serve_cached_metrics():
                 "balance": total_balance,
                 "total_pnl": total_pnl,
                 "today_pnl": today_pnl,
-                "active_trades": len(data.get('metrics', {}).get('active_deals', [])),
-                "win_rate": data.get('metrics', {}).get('win_rate', 0)
+                "active_trades": len(data.get("metrics", {}).get("active_deals", [])),
+                "win_rate": data.get("metrics", {}).get("win_rate", 0),
             },
-            "metrics": {
-                "total_pairs": 15,
-                "active_signals": 3,
-                "success_rate": 0.78
-            }
+            "metrics": {"total_pairs": 15, "active_signals": 3, "success_rate": 0.78},
         }
     except Exception as e:
         logger.warning(f"Failed to get fork metrics: {e}")
@@ -357,14 +388,11 @@ def serve_cached_metrics():
                 "total_pnl": -1.85,
                 "today_pnl": 0.0,
                 "active_trades": 2,
-                "win_rate": 0.0
+                "win_rate": 0.0,
             },
-            "metrics": {
-                "total_pairs": 15,
-                "active_signals": 3,
-                "success_rate": 0.78
-            }
+            "metrics": {"total_pairs": 15, "active_signals": 3, "success_rate": 0.78},
         }
+
 
 @app.get("/trade-health/{symbol}")
 def trade_health(symbol: str):
@@ -379,6 +407,7 @@ def trade_health(symbol: str):
     except:
         return {"error": "Invalid format"}
 
+
 # === DCA Endpoints ===
 @app.get("/dca-trades-active")
 def dca_trades_active():
@@ -387,15 +416,31 @@ def dca_trades_active():
         # Mock DCA data
         return {
             "trades": [
-                {"symbol": "BTCUSDT", "deal_id": 12345, "status": "active", "profit": 125.50},
-                {"symbol": "ETHUSDT", "deal_id": 12346, "status": "active", "profit": -25.30},
-                {"symbol": "ADAUSDT", "deal_id": 12347, "status": "active", "profit": 75.20},
+                {
+                    "symbol": "BTCUSDT",
+                    "deal_id": 12345,
+                    "status": "active",
+                    "profit": 125.50,
+                },
+                {
+                    "symbol": "ETHUSDT",
+                    "deal_id": 12346,
+                    "status": "active",
+                    "profit": -25.30,
+                },
+                {
+                    "symbol": "ADAUSDT",
+                    "deal_id": 12347,
+                    "status": "active",
+                    "profit": 75.20,
+                },
             ],
             "total_active": 3,
-            "total_profit": 175.40
+            "total_profit": 175.40,
         }
     except:
         return {"error": "DCA data not available"}
+
 
 # === ML Endpoints ===
 @app.get("/ml/confidence")
@@ -415,8 +460,9 @@ def ml_confidence():
             {"symbol": "ETHUSDT", "confidence": 0.72, "prediction": "neutral"},
             {"symbol": "ADAUSDT", "confidence": 0.91, "prediction": "bullish"},
         ],
-        "last_updated": datetime.now(datetime.UTC).isoformat()
+        "last_updated": datetime.now(datetime.UTC).isoformat(),
     }
+
 
 # === Config Endpoints ===
 @app.get("/config/dca")
@@ -425,8 +471,9 @@ def get_dca_config():
     try:
         # Try to load from the actual config file if it exists
         from pathlib import Path
+
         import yaml
-        
+
         config_path = Path("/home/signal/marketpilot/config/dca_config.yaml")
         if config_path.exists():
             with open(config_path, "r") as f:
@@ -434,13 +481,14 @@ def get_dca_config():
                 return {
                     "config": config,
                     "is_default": False,
-                    "timestamp": datetime.now(datetime.UTC).isoformat()
+                    "timestamp": datetime.now(datetime.UTC).isoformat(),
                 }
     except Exception as e:
         logger.warning(f"Failed to load DCA config: {e}")
-    
+
     # Return default config
     return get_default_dca_config()
+
 
 @app.get("/config/dca/default")
 def get_default_dca_config():
@@ -531,41 +579,46 @@ def get_default_dca_config():
     return {
         "config": default_config,
         "is_default": True,
-        "timestamp": datetime.now(datetime.UTC).isoformat()
+        "timestamp": datetime.now(datetime.UTC).isoformat(),
     }
+
 
 @app.post("/config/dca")
 def save_dca_config(config_data: dict):
     """Save DCA configuration"""
     try:
         from pathlib import Path
+
         import yaml
-        
+
         # Ensure config directory exists
         config_dir = Path("/home/signal/marketpilot/config")
         config_dir.mkdir(exist_ok=True)
-        
+
         config_path = config_dir / "dca_config.yaml"
-        
+
         # Extract config from request if it's wrapped
         if "config" in config_data:
             config_to_save = config_data["config"]
         else:
             config_to_save = config_data
-        
+
         # Save to file
         with open(config_path, "w") as f:
             yaml.dump(config_to_save, f, sort_keys=False)
-        
+
         return {
             "status": "success",
             "message": "DCA configuration saved successfully",
-            "timestamp": datetime.now(datetime.UTC).isoformat()
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
         }
-        
+
     except Exception as e:
         logger.error(f"Failed to save DCA config: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to save configuration: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to save configuration: {str(e)}"
+        )
+
 
 @app.get("/config/safu")
 def safu_config():
@@ -574,8 +627,9 @@ def safu_config():
         "enabled": True,
         "max_drawdown": 0.10,
         "emergency_stop": True,
-        "risk_level": "medium"
+        "risk_level": "medium",
     }
+
 
 @app.get("/config/safu/default")
 def get_default_safu_config():
@@ -584,14 +638,15 @@ def get_default_safu_config():
         "enabled": True,
         "max_drawdown": 0.10,
         "emergency_stop": True,
-        "risk_level": "medium"
+        "risk_level": "medium",
     }
     return {
         "message": "Default SAFU configuration loaded",
         "config": default_config,
         "is_default": True,
-        "timestamp": datetime.now(datetime.UTC).isoformat()
+        "timestamp": datetime.now(datetime.UTC).isoformat(),
     }
+
 
 @app.post("/config/safu")
 def save_safu_config(config_data: dict):
@@ -600,10 +655,13 @@ def save_safu_config(config_data: dict):
         return {
             "message": "SAFU configuration saved successfully",
             "saved_config": config_data,
-            "timestamp": datetime.now(datetime.UTC).isoformat()
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save SAFU config: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to save SAFU config: {str(e)}"
+        )
+
 
 @app.get("/config/fork-score")
 def fork_score_config():
@@ -617,8 +675,9 @@ def fork_score_config():
             "adx_rising": 0.15,
             "ema_price_reclaim": 0.15,
             "mean_reversion_score": 0.2,
-        }
+        },
     }
+
 
 @app.get("/config/fork-score/default")
 def get_default_fork_score_config():
@@ -632,14 +691,15 @@ def get_default_fork_score_config():
             "adx_rising": 0.15,
             "ema_price_reclaim": 0.15,
             "mean_reversion_score": 0.2,
-        }
+        },
     }
     return {
         "message": "Default fork score configuration loaded",
         "config": default_config,
         "is_default": True,
-        "timestamp": datetime.now(datetime.UTC).isoformat()
+        "timestamp": datetime.now(datetime.UTC).isoformat(),
     }
+
 
 @app.post("/config/fork-score")
 def save_fork_score_config(config_data: dict):
@@ -648,10 +708,13 @@ def save_fork_score_config(config_data: dict):
         return {
             "message": "Fork score configuration saved successfully",
             "saved_config": config_data,
-            "timestamp": datetime.now(datetime.UTC).isoformat()
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save fork score config: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to save fork score config: {str(e)}"
+        )
+
 
 @app.get("/config/tv-screener")
 def tv_screener_config():
@@ -666,8 +729,9 @@ def tv_screener_config():
             "adx_rising": 0.15,
             "ema_price_reclaim": 0.15,
             "mean_reversion_score": 0.2,
-        }
+        },
     }
+
 
 @app.get("/config/tv-screener/default")
 def get_default_tv_screener_config():
@@ -682,14 +746,15 @@ def get_default_tv_screener_config():
             "adx_rising": 0.15,
             "ema_price_reclaim": 0.15,
             "mean_reversion_score": 0.2,
-        }
+        },
     }
     return {
         "message": "Default TV screener configuration loaded",
         "config": default_config,
         "is_default": True,
-        "timestamp": datetime.now(datetime.UTC).isoformat()
+        "timestamp": datetime.now(datetime.UTC).isoformat(),
     }
+
 
 @app.post("/config/tv-screener")
 def save_tv_screener_config(config_data: dict):
@@ -698,53 +763,55 @@ def save_tv_screener_config(config_data: dict):
         return {
             "message": "TV screener configuration saved successfully",
             "saved_config": config_data,
-            "timestamp": datetime.now(datetime.UTC).isoformat()
+            "timestamp": datetime.now(datetime.UTC).isoformat(),
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save TV screener config: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to save TV screener config: {str(e)}"
+        )
+
 
 # === DCA Strategy Builder Endpoints ===
 @app.get("/price-series")
 def get_price_series(symbol: str = "BTCUSDT", interval: str = "1h"):
     """Get price series data for DCA strategy builder"""
     # Mock price data - in real implementation, fetch from Binance/3Commas
-    
+
     current_time = int(time.time() * 1000)
     series = []
-    
+
     base_price = 70000 if "BTC" in symbol.upper() else 2.5
-    
+
     # Generate 100 candles
     for i in range(100):
         timestamp = current_time - (i * 3600000)  # 1 hour intervals
-        
+
         # Add some randomness
         change = random.uniform(-0.02, 0.02)
         price = base_price * (1 + change)
-        
+
         high = price * random.uniform(1.001, 1.02)
         low = price * random.uniform(0.98, 0.999)
         open_price = price * random.uniform(0.995, 1.005)
         close = price
-        
-        series.append({
-            "timestamp": timestamp,
-            "open": round(open_price, 2),
-            "high": round(high, 2),
-            "low": round(low, 2),
-            "close": round(close, 2),
-        })
-        
+
+        series.append(
+            {
+                "timestamp": timestamp,
+                "open": round(open_price, 2),
+                "high": round(high, 2),
+                "low": round(low, 2),
+                "close": round(close, 2),
+            }
+        )
+
         base_price = close  # Continue from last close
-    
+
     # Reverse to have chronological order
     series.reverse()
-    
-    return {
-        "symbol": symbol,
-        "interval": interval,
-        "series": series
-    }
+
+    return {"symbol": symbol, "interval": interval, "series": series}
+
 
 @app.post("/dca/simulate")
 def simulate_dca(simulation_request: dict):
@@ -752,7 +819,7 @@ def simulate_dca(simulation_request: dict):
     symbol = simulation_request.get("symbol", "BTCUSDT")
     entry_time = simulation_request.get("entry_time")
     params = simulation_request.get("params", {})
-    
+
     # Mock simulation results
     return {
         "simulation_id": f"sim_{int(time.time())}",
@@ -765,14 +832,25 @@ def simulate_dca(simulation_request: dict):
             "profit_pct": 15.0,
             "trades_executed": 3,
             "average_entry": 69500.0,
-            "final_price": 71000.0
+            "final_price": 71000.0,
         },
         "trades": [
             {"time": entry_time, "price": 70000, "amount": 500, "type": "initial"},
-            {"time": entry_time + 3600000, "price": 68000, "amount": 300, "type": "dca"},
-            {"time": entry_time + 7200000, "price": 67000, "amount": 200, "type": "dca"}
-        ]
+            {
+                "time": entry_time + 3600000,
+                "price": 68000,
+                "amount": 300,
+                "type": "dca",
+            },
+            {
+                "time": entry_time + 7200000,
+                "price": 67000,
+                "amount": 200,
+                "type": "dca",
+            },
+        ],
     }
+
 
 # === Simulation System Endpoints ===
 @app.get("/api/simulation/data/symbols")
@@ -780,16 +858,24 @@ def get_simulation_symbols():
     """Get available symbols for simulation"""
     return {
         "success": True,
-        "symbols": ["BTCUSDT", "ETHUSDT", "ADAUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LINKUSDT", "AVAXUSDT"]
+        "symbols": [
+            "BTCUSDT",
+            "ETHUSDT",
+            "ADAUSDT",
+            "SOLUSDT",
+            "XRPUSDT",
+            "DOTUSDT",
+            "LINKUSDT",
+            "AVAXUSDT",
+        ],
     }
+
 
 @app.get("/api/simulation/data/timeframes")
 def get_simulation_timeframes():
     """Get available timeframes for simulation"""
-    return {
-        "success": True,
-        "timeframes": ["15m", "1h", "4h", "1d"]
-    }
+    return {"success": True, "timeframes": ["15m", "1h", "4h", "1d"]}
+
 
 @app.post("/api/simulation/data/load")
 def load_simulation_data(request_data: dict):
@@ -798,49 +884,50 @@ def load_simulation_data(request_data: dict):
     timeframe = request_data.get("timeframe", "1h")
     start_time = request_data.get("start_time")
     end_time = request_data.get("end_time")
-    
+
     # Generate realistic historical data
     current_time = int(time.time() * 1000)
     candles = []
-    
-    base_price = 70000 if "BTC" in symbol.upper() else 2.5 if "XRP" in symbol.upper() else 2000
-    
+
+    base_price = (
+        70000 if "BTC" in symbol.upper() else 2.5 if "XRP" in symbol.upper() else 2000
+    )
+
     # Generate 200 candles for more data
     for i in range(200):
         timestamp = current_time - (i * 3600000)  # 1 hour intervals
-        
+
         # Add some trend and randomness
         trend_factor = 1 + (random.uniform(-0.01, 0.01))
         price = base_price * trend_factor
-        
+
         high = price * random.uniform(1.001, 1.03)
         low = price * random.uniform(0.97, 0.999)
         open_price = price * random.uniform(0.99, 1.01)
         close = price
         volume = random.uniform(1000, 10000)
-        
-        candles.append({
-            "timestamp": timestamp,
-            "open": round(open_price, 2),
-            "high": round(high, 2),
-            "low": round(low, 2),
-            "close": round(close, 2),
-            "volume": round(volume, 2)
-        })
-        
+
+        candles.append(
+            {
+                "timestamp": timestamp,
+                "open": round(open_price, 2),
+                "high": round(high, 2),
+                "low": round(low, 2),
+                "close": round(close, 2),
+                "volume": round(volume, 2),
+            }
+        )
+
         base_price = close  # Continue from last close
-    
+
     # Reverse to have chronological order
     candles.reverse()
-    
+
     return {
         "success": True,
-        "data": {
-            "symbol": symbol,
-            "timeframe": timeframe,
-            "candles": candles
-        }
+        "data": {"symbol": symbol, "timeframe": timeframe, "candles": candles},
     }
+
 
 @app.post("/api/simulation/simulate")
 def run_simulation(request_data: dict):
@@ -850,33 +937,39 @@ def run_simulation(request_data: dict):
     timeframe = request_data.get("timeframe", "1h")
     dca_params = request_data.get("dca_params", {})
     simulation_days = request_data.get("simulation_days", 30)
-    
+
     # Mock simulation results
     base_price = 70000 if "BTC" in symbol.upper() else 2000
     entry_price = base_price * random.uniform(0.95, 1.05)
-    
+
     # Generate DCA points
     dca_points = []
     total_invested = 0
     for i in range(random.randint(2, 6)):
         dca_time = entry_time + (i * 24 * 60 * 60 * 1000)  # Daily DCA
         dca_price = entry_price * (1 - (i * 0.02))  # Declining price
-        dca_amount = dca_params.get("base_dca_volume", 100) * (1.5 ** i)  # Increasing DCA size
+        dca_amount = dca_params.get("base_dca_volume", 100) * (
+            1.5**i
+        )  # Increasing DCA size
         total_invested += dca_amount
-        
-        dca_points.append({
-            "timestamp": dca_time,
-            "price": round(dca_price, 2),
-            "amount": round(dca_amount, 2),
-            "type": "dca_buy"
-        })
-    
+
+        dca_points.append(
+            {
+                "timestamp": dca_time,
+                "price": round(dca_price, 2),
+                "amount": round(dca_amount, 2),
+                "type": "dca_buy",
+            }
+        )
+
     # Calculate final results
     final_price = entry_price * random.uniform(1.05, 1.25)  # Profitable outcome
-    portfolio_value = total_invested * (final_price / (total_invested / sum(p["amount"] for p in dca_points)))
+    portfolio_value = total_invested * (
+        final_price / (total_invested / sum(p["amount"] for p in dca_points))
+    )
     profit_loss = portfolio_value - total_invested
     profit_pct = (profit_loss / total_invested) * 100
-    
+
     return {
         "success": True,
         "result": {
@@ -891,9 +984,10 @@ def run_simulation(request_data: dict):
             "dca_count": len(dca_points),
             "dca_points": dca_points,
             "max_drawdown": random.uniform(5, 15),
-            "win_rate": random.uniform(60, 85)
-        }
+            "win_rate": random.uniform(60, 85),
+        },
     }
+
 
 @app.post("/api/simulation/optimize")
 def run_optimization(request_data: dict):
@@ -901,29 +995,29 @@ def run_optimization(request_data: dict):
     symbol = request_data.get("symbol", "BTCUSDT")
     optimization_type = request_data.get("optimization_type", "profit")
     parameter_ranges = request_data.get("parameter_ranges", {})
-    
+
     # Generate optimization results
     results = []
     best_result = None
     best_score = -999999
-    
+
     for i in range(10):  # Generate 10 optimization iterations
         # Random parameter combination
         params = {
             "confidence_threshold": random.uniform(0.4, 0.8),
             "min_drawdown_pct": random.uniform(1.0, 5.0),
             "base_dca_volume": random.uniform(50, 200),
-            "max_dca_count": random.randint(5, 15)
+            "max_dca_count": random.randint(5, 15),
         }
-        
+
         # Random performance metrics
         profit_pct = random.uniform(-10, 30)
         win_rate = random.uniform(50, 85)
         max_drawdown = random.uniform(5, 20)
         sharpe_ratio = random.uniform(0.5, 2.5)
-        
+
         score = profit_pct  # Simple scoring for now
-        
+
         result = {
             "iteration": i + 1,
             "parameters": params,
@@ -931,23 +1025,24 @@ def run_optimization(request_data: dict):
                 "profit_pct": round(profit_pct, 2),
                 "win_rate": round(win_rate, 2),
                 "max_drawdown": round(max_drawdown, 2),
-                "sharpe_ratio": round(sharpe_ratio, 2)
+                "sharpe_ratio": round(sharpe_ratio, 2),
             },
-            "score": round(score, 2)
+            "score": round(score, 2),
         }
-        
+
         results.append(result)
-        
+
         if score > best_score:
             best_score = score
             best_result = result
-    
+
     return {
         "success": True,
         "results": results,
         "best_result": best_result,
-        "optimization_type": optimization_type
+        "optimization_type": optimization_type,
     }
+
 
 # === Analytics Endpoints ===
 @app.get("/api/capital")
@@ -958,8 +1053,9 @@ def capital_analytics():
         "invested_capital": 7500.00,
         "available_capital": 2500.00,
         "profit_loss": 1250.50,
-        "roi_percentage": 12.55
+        "roi_percentage": 12.55,
     }
+
 
 # === Simulation Endpoints ===
 @app.get("/simulation/strategies")
@@ -973,16 +1069,14 @@ def simulation_strategies():
         ]
     }
 
+
 @app.get("/simulation/health")
 def simulation_health():
     """Simulation system health check"""
-    return {
-        "status": "healthy",
-        "system": "simulation",
-        "version": "1.0.0"
-    }
+    return {"status": "healthy", "system": "simulation", "version": "1.0.0"}
+
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
 
+    uvicorn.run(app, host="0.0.0.0", port=8000)

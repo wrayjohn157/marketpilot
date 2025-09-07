@@ -1,15 +1,16 @@
 # Import config environment fix first
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-import config_environment
 
+sys.path.insert(0, str(Path(__file__).parent.parent))
 import json
 from datetime import datetime
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+
+import config_environment
 
 # Import custom decorators
 from .decorators import *
@@ -30,6 +31,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from config.unified_config_manager import get_path
+
+from .anal.capital_routes import router as capital_router
+
 # === Modular Route Imports ===
 from .config_routes import safu_config_api
 from .config_routes.dca_config_api import router as dca_config_router
@@ -42,16 +47,12 @@ from .eval_routes.price_series_api import router as price_series_router
 from .ml_confidence_api import router as ml_confidence_router
 from .refresh_price_api import router as price_refresh_router
 from .sim_routes.dca_simulate_route import router as dca_simulate_router
+from .sim_routes.sim_dca_config_api import router as sim_dca_router
 from .sim_routes.sim_dca_strategies import router as sim_dca_strategy_router
 from .sim_routes.simulation_integration import router as simulation_router
 
 # === Additional Route Imports ===
 from .unified_fork_metrics import get_fork_trade_metrics
-
-from config.unified_config_manager import get_path
-from .sim_routes.sim_dca_config_api import router as sim_dca_router
-
-from .anal.capital_routes import router as capital_router
 
 # === Include All Modular Routers ===
 app.include_router(dca_router)
@@ -76,8 +77,9 @@ def health_check():
     return {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
-        "service": "MarketPilot Backend"
+        "service": "MarketPilot Backend",
     }
+
 
 @app.get("/", response_class=HTMLResponse)
 def root():
@@ -182,6 +184,7 @@ def trade_health(symbol: str):
 
 
 from .threecommas_metrics import get_3commas_metrics
+
 
 @app.get("/3commas/metrics")
 def threecommas_metrics():

@@ -24,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/", response_class=HTMLResponse)
 def root():
     return f"""
@@ -43,13 +44,15 @@ def root():
     </html>
     """
 
+
 @app.get("/health")
 def health_check():
     return {
         "status": "healthy",
         "timestamp": datetime.now(datetime.UTC).isoformat(),
-        "service": "MarketPilot Backend"
+        "service": "MarketPilot Backend",
     }
+
 
 @app.get("/btc/context")
 def get_btc_context():
@@ -62,6 +65,7 @@ def get_btc_context():
         "close": 45000.0,
     }
 
+
 @app.get("/active-trades")
 def active_trades():
     """Mock active trades data"""
@@ -71,14 +75,12 @@ def active_trades():
         {"symbol": "ADAUSDT", "score": 68},
     ]
 
+
 @app.get("/trade-health/{symbol}")
 def trade_health(symbol: str):
     """Mock trade health data"""
-    return {
-        "symbol": symbol.upper(),
-        "score": 75,
-        "status": "healthy"
-    }
+    return {"symbol": symbol.upper(), "score": 75, "status": "healthy"}
+
 
 @app.get("/3commas/metrics")
 def threecommas_metrics():
@@ -87,10 +89,11 @@ def threecommas_metrics():
         "total_trades": 150,
         "active_trades": 12,
         "profit_loss": 1250.50,
-        "success_rate": 0.78
+        "success_rate": 0.78,
     }
+
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
 
+    uvicorn.run(app, host="0.0.0.0", port=8000)

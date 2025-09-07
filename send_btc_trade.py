@@ -122,7 +122,9 @@ def send_btc_trade():
         print(f"📊 Current active deals: {len(active_deals)}")
 
         if len(active_deals) > 0:
-            print("⚠️  Bot already has active deals. Trade may not execute immediately.")
+            print(
+                "⚠️  Bot already has active deals. Trade may not execute immediately."
+            )
         else:
             print("✅ Bot is ready for new trades.")
 

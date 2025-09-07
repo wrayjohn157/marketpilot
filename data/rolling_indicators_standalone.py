@@ -234,9 +234,7 @@ def run_indicator_cycle():
                 logger.error(f"Error processing {full_symbol} {timeframe}: {e}")
                 failed += 1
 
-    logger.info(
-        f"🎉 Indicator cycle complete: {successful} successful, {failed} failed"
-    )
+    logger.info(f"🎉 Indicator cycle complete: {successful} successful, {failed} failed")
     return {"successful": successful, "failed": failed}
 
 

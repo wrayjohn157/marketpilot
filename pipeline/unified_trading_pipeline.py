@@ -428,9 +428,7 @@ class UnifiedTradingPipeline:
                 trade = self.tv_adjuster.adjust_score(trade, tv_tag)
 
                 if not trade.passed:
-                    self.logger.info(
-                        f"❌ {symbol} failed TV adjustment: {trade.reason}"
-                    )
+                    self.logger.info(f"❌ {symbol} failed TV adjustment: {trade.reason}")
                     continue
 
                 # Stage 4: Execute Trade

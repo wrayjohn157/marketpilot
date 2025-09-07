@@ -882,7 +882,9 @@ def run():
             btc_context = (
                 indicators.get("btc_context")
                 if "btc_context" in indicators
-                else btc_context if "btc_context" in locals() else None
+                else btc_context
+                if "btc_context" in locals()
+                else None
             )
             if btc_context and isinstance(btc_context, dict):
                 input_features["btc_rsi"] = float(btc_context.get("rsi", 0.0))

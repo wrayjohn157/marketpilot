@@ -33,6 +33,7 @@ DEFAULT_CONFIG = {
     },
 }
 
+
 # === Helpers ===
 def load_config():
     if CONFIG_PATH.exists():
@@ -40,19 +41,22 @@ def load_config():
             return yaml.safe_load(f)
     return DEFAULT_CONFIG
 
+
 def save_config(data):
     with open(CONFIG_PATH, "w") as f:
         yaml.dump(data, f, sort_keys=False)
+
 
 # === Routes ===
 @router.get("/fork_score")
 def read_fork_score_config():
     return load_config()
 
+
 @router.post("/fork_score")
 def update_fork_score_config(patch: dict):
     config = load_config()
-    
+
     # Update config with patch
     for key, val in patch.items():
         if key in config:
@@ -62,9 +66,10 @@ def update_fork_score_config(patch: dict):
                 config[key] = val
         else:
             raise HTTPException(status_code=400, detail=f"Invalid config key: {key}")
-    
+
     save_config(config)
     return {"status": "success", "updated": patch}
+
 
 @router.get("/fork_score/default")
 def get_default_fork_score_config():

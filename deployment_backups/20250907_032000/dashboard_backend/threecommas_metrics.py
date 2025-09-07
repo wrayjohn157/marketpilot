@@ -104,10 +104,12 @@ def calculate_open_pnl(active_deals):
             )
 
             total_open_pnl += open_pnl
-            
+
             # Use real deal_id from 3Commas API, fallback to generated ID if not available
-            deal_id = deal.get("id") or (100000000 + len(deals_info) + hash(pair) % 9999999)
-            
+            deal_id = deal.get("id") or (
+                100000000 + len(deals_info) + hash(pair) % 9999999
+            )
+
             deals_info.append(
                 {
                     "deal_id": deal_id,

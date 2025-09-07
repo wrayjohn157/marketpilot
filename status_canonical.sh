@@ -113,5 +113,3 @@ log_info "Commands:"
 echo "  Start:  ./start_canonical.sh"
 echo "  Stop:   ./stop_canonical.sh"
 echo "  Status: ./status_canonical.sh"
-
-

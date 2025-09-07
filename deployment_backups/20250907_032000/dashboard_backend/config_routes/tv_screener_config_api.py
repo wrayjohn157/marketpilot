@@ -26,6 +26,7 @@ DEFAULT_CONFIG = {
     "score_threshold": 0.7,
 }
 
+
 # === Helpers ===
 def load_config():
     if CONFIG_PATH.exists():
@@ -33,19 +34,22 @@ def load_config():
             return yaml.safe_load(f)
     return DEFAULT_CONFIG
 
+
 def save_config(data):
     with open(CONFIG_PATH, "w") as f:
         yaml.dump(data, f, sort_keys=False)
+
 
 # === Routes ===
 @router.get("/tv_screener")
 def read_tv_screener_config():
     return load_config()
 
+
 @router.post("/tv_screener")
 def update_tv_screener_config(patch: dict):
     config = load_config()
-    
+
     # Update config with patch
     for key, val in patch.items():
         if key in config:
@@ -55,9 +59,10 @@ def update_tv_screener_config(patch: dict):
                 config[key] = val
         else:
             raise HTTPException(status_code=400, detail=f"Invalid config key: {key}")
-    
+
     save_config(config)
     return {"status": "success", "updated": patch}
+
 
 @router.get("/tv_screener/default")
 def get_default_tv_screener_config():

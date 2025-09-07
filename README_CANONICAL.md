@@ -123,7 +123,7 @@ Located in `config/paper_cred.json`:
    ```bash
    # Check Redis
    redis-cli ping
-   
+
    # Check Python environment
    source venv/bin/activate
    python3 modular_backend.py
@@ -133,7 +133,7 @@ Located in `config/paper_cred.json`:
    ```bash
    # Check if frontend is running
    ps aux | grep "npm start"
-   
+
    # Restart frontend
    cd dashboard_frontend
    npm start
@@ -143,7 +143,7 @@ Located in `config/paper_cred.json`:
    ```bash
    # Check backend logs
    curl http://localhost:8000/health
-   
+
    # Check 3commas connection
    curl http://localhost:8000/3commas/metrics
    ```
@@ -164,8 +164,6 @@ Located in `config/paper_cred.json`:
 
 ---
 
-**Status:** ✅ **FULLY OPERATIONAL**  
-**Last Updated:** September 7, 2025  
+**Status:** ✅ **FULLY OPERATIONAL**
+**Last Updated:** September 7, 2025
 **Version:** Canonical v1.0
-
-
