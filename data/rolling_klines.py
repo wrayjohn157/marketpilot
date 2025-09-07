@@ -16,7 +16,7 @@ from config.unified_config_manager import (  # utils.redis_manager,; from,; impo
     get_redis_manager,
 )
 
-# /home/signal/market7/data/rolling_klines.py
+# get_path("base") / data/rolling_klines.py
 
 #!/usr/bin/env python3
 

@@ -1,8 +1,3 @@
-"""
-Enhanced MarketPilot Dashboard API
-Inspired by Market7 architecture with comprehensive 3Commas integration
-"""
-
 import hashlib
 import hmac
 import json
@@ -13,9 +8,17 @@ from typing import Any, Dict, List, Optional
 
 import redis
 import requests
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+
+from config import get_path
+
+"""
+Enhanced MarketPilot Dashboard API
+Inspired by Market7 architecture with comprehensive 3Commas integration
+"""
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -39,7 +42,7 @@ def get_3commas_credentials():
     """Load 3Commas credentials"""
     try:
         with open(
-            "/home/signal/marketpilot/config/credentials/3commas_default.json", "r"
+            get_path("base") / "config/credentials/3commas_default.json", "r"
         ) as f:
             return json.load(f)
     except Exception as e:
@@ -680,6 +683,4 @@ def get_trade_health(symbol: str):
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8001)

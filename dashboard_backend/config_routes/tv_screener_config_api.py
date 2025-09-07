@@ -1,11 +1,11 @@
-# /dashboard_backend/config_routes/tv_screener_config_api.py
-
 from pathlib import Path
 
 import yaml
 from fastapi import APIRouter, HTTPException
 
 from config.unified_config_manager import get_path
+
+# /dashboard_backend/config_routes/tv_screener_config_api.py
 
 CONFIG_PATH = get_path("tv_screener_config")
 

@@ -1,8 +1,3 @@
-"""
-DCA Configuration API Routes
-Handles DCA strategy configuration with two-tier system
-"""
-
 import json
 import logging
 import os
@@ -10,6 +5,11 @@ from datetime import datetime
 from typing import Any, Dict
 
 from fastapi import APIRouter, HTTPException
+
+"""
+DCA Configuration API Routes
+Handles DCA strategy configuration with two-tier system
+"""
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

@@ -1,13 +1,13 @@
-"""
-Scan API Routes
-Handles scan review and analysis
-"""
-
 import logging
 from datetime import datetime
 from typing import Any, Dict, List
 
 from fastapi import APIRouter
+
+"""
+Scan API Routes
+Handles scan review and analysis
+"""
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

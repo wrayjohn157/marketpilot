@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Smart DCA Core Engine - Streamlined for Profitable Trade Rescue
-Focus: Intelligent trade rescue with ML-powered decision making
-"""
 
 import json
 import logging
@@ -13,18 +9,60 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
 
-# Add parent directory to path
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+from config.unified_config_manager import (  # Add parent directory to path
+    DCA,
+    Core,
+    Engine,
+    Focus:,
+    Intelligent,
+    ML-powered,
+    Path,
+    Profitable,
+    Rescue,
+    Smart,
+    Streamlined,
+    Trade,
+    """,
+    -,
+    .parent.parent,
+    .resolve,
+    __file__,
+    adjust_volume,
+    compute_fork_score,
+    dca.modules.fork_safu_evaluator,
+    dca.utils.btc_filter,
+    dca.utils.entry_utils,
+    dca.utils.fork_score_utils,
+    dca.utils.recovery_confidence_utils,
+    dca.utils.recovery_odds_utils,
+    dca.utils.spend_predictor,
+    dca.utils.trade_health_evaluator,
+    dca.utils.zombie_utils,
+    decision,
+    evaluate_trade_health,
+    for,
+    from,
+    get_btc_status,
+    get_latest_snapshot,
+    get_safu_score,
+    import,
+    is_zombie_trade,
+    making,
+    predict_confidence_score,
+    predict_recovery_odds,
+    predict_spend_volume,
+    rescue,
+    str,
+    sys.path.append,
+    trade,
+    with,
+)
 
-from config.unified_config_manager import (
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
 )
-from dca.modules.fork_safu_evaluator import get_safu_score
-from dca.utils.btc_filter import get_btc_status
-from dca.utils.entry_utils import (
     get_latest_indicators,
     get_live_3c_trades,
     load_entry_score_from_redis,
@@ -33,13 +71,6 @@ from dca.utils.entry_utils import (
     send_dca_signal,
     simulate_new_avg_price,
 )
-from dca.utils.fork_score_utils import compute_fork_score
-from dca.utils.recovery_confidence_utils import predict_confidence_score
-from dca.utils.recovery_odds_utils import get_latest_snapshot, predict_recovery_odds
-from dca.utils.spend_predictor import adjust_volume, predict_spend_volume
-from dca.utils.trade_health_evaluator import evaluate_trade_health
-from dca.utils.zombie_utils import is_zombie_trade
-
 # === Configuration ===
 CONFIG_PATH = get_path("dca_config")
 LOG_DIR = get_path("base") / "dca" / "logs"

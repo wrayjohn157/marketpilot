@@ -1,5 +1,3 @@
-"""Main DCA Engine for intelligent trading decisions."""
-
 import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -8,6 +6,8 @@ import yaml
 
 from .snapshot_manager import SnapshotManager
 from .trade_tracker import TradeTracker
+
+"""Main DCA Engine for intelligent trading decisions."""
 
 logger = logging.getLogger(__name__)
 

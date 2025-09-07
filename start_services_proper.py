@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Proper service manager for MarketPilot with correct Python path
-"""
 
 import os
 import signal
@@ -9,6 +6,10 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+
+"""
+Proper service manager for MarketPilot with correct Python path
+"""
 
 
 class ProperServiceManager:

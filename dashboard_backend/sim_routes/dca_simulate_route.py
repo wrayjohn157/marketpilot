@@ -1,12 +1,11 @@
 import sys
 from pathlib import Path
 
+import simulate_dca_overlay
 from fastapi import APIRouter
 from pydantic import BaseModel
 
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent / "sim" / "sandbox"))
-import simulate_dca_overlay
-
 router = APIRouter()
 
 

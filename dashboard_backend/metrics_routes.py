@@ -1,13 +1,13 @@
-"""
-Metrics routes for Prometheus scraping
-"""
-
 import logging
 
 from fastapi import APIRouter, Response
 from fastapi.responses import PlainTextResponse
 
 from .metrics import get_metrics, update_system_metrics
+
+"""
+Metrics routes for Prometheus scraping
+"""
 
 logger = logging.getLogger(__name__)
 

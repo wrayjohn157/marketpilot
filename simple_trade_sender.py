@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Simple trade sender that monitors Redis for trade signals and sends them to 3Commas
-"""
 
 import json
 import logging
@@ -10,6 +7,10 @@ from pathlib import Path
 
 import redis
 import requests
+
+"""
+Simple trade sender that monitors Redis for trade signals and sends them to 3Commas
+"""
 
 # Setup logging
 logging.basicConfig(

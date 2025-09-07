@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""
-Custom decorators for the dashboard backend
-"""
 
 from functools import wraps
 
 from fastapi import APIRouter
+
+"""
+Custom decorators for the dashboard backend
+"""
 
 
 def get_cache(router: APIRouter, path: str):

@@ -4,8 +4,6 @@ import os
 import sys
 import time
 from datetime import datetime
-
-#!/usr/bin/env python3
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -15,14 +13,19 @@ from ta.momentum import RSIIndicator, StochRSIIndicator
 from ta.trend import MACD, ADXIndicator, EMAIndicator, PSARIndicator
 from ta.volatility import AverageTrueRange
 
-from config.unified_config_manager import (
+from config.unified_config_manager import (  # !/usr/bin/env python3
+    config.unified_config_manager,
+    from,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
+    get_redis_manager,
+    import,
+    utils.redis_manager,
 )
 
-# /home/signal/market7/data/rolling_indicators.py
+# get_path("base") / data/rolling_indicators.py
 
 
 # === Patch sys.path to reach /market7 ===
@@ -49,14 +52,10 @@ TIMEFRAMES = ["15m", "1h", "4h"]
 FILTERED_FILE = get_path("filtered_pairs")
 SNAPSHOTS_BASE = get_path("snapshots")
 FORK_METRICS_FILE = Path(
-    "/home/signal/market7/dashboard_backend/cache/fork_metrics.json"
+    get_path("base") / "dashboard_backend/cache/fork_metrics.json"
 )
 
-from config.unified_config_manager import get_config
-
 # === Redis ===
-from utils.redis_manager import get_redis_manager
-
 r = get_redis_manager()
 
 

@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""
-Send XRP trade using 3Commas TradingView signal format
-"""
 
 import json
 from pathlib import Path
 
 import requests
+
+"""
+Send XRP trade using 3Commas TradingView signal format
+"""
 
 
 def send_xrp_trade():

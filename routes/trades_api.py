@@ -1,13 +1,13 @@
-"""
-Trades API Routes
-Handles active trades and trade management
-"""
-
 import logging
 from datetime import datetime
 from typing import Any, Dict
 
 from fastapi import APIRouter, HTTPException
+
+"""
+Trades API Routes
+Handles active trades and trade management
+"""
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Unified Indicator System - Fixes all indicator calculation and usage issues
-Provides consistent, accurate, and validated indicator calculations across all timeframes
-"""
 
 import json
 import logging
@@ -15,8 +11,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 import requests
-
-# Technical Analysis
 import ta
 from ta.momentum import ROCIndicator, RSIIndicator, StochRSIIndicator
 from ta.others import DailyReturnIndicator
@@ -26,7 +20,13 @@ from ta.volume import VolumePriceTrendIndicator
 
 from utils.redis_manager import get_redis_manager
 
+"""
+Unified Indicator System - Fixes all indicator calculation and usage issues
+Provides consistent, accurate, and validated indicator calculations across all timeframes
+"""
 
+
+# Technical Analysis
 class Timeframe(Enum):
     """Standardized timeframes for different purposes"""
 

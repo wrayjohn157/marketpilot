@@ -1,19 +1,25 @@
-"""
-Prometheus metrics for Market7 backend
-"""
-
 import logging
 import time
 
 from prometheus_client import (
     CONTENT_TYPE_LATEST,
+    CollectorRegistry,
     Counter,
     Gauge,
     Histogram,
+    Market7,
+    Prometheus,
     Summary,
+    """,
+    backend,
+    for,
+    from,
     generate_latest,
+    import,
+    metrics,
+    prometheus_client.core,
+    psutil,
 )
-from prometheus_client.core import CollectorRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -163,8 +169,6 @@ def get_metrics():
 def update_system_metrics():
     """Update system metrics"""
     try:
-        import psutil
-
         # Update memory usage
         memory_info = psutil.virtual_memory()
         memory_usage_gauge.set(memory_info.used)

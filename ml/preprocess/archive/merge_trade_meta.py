@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
+
 import json
 from datetime import datetime
 from pathlib import Path
 
+from config import get_path
+
 # === Config Paths ===
-ENRICHED_DIR = Path("/home/signal/market7/ml/datasets/enriched/2025-05-12")
+ENRICHED_DIR = get_path("base") / "ml/datasets/enriched/2025-05-12"
 TRADES_PATH = ENRICHED_DIR / "scrubbed_trades_fixed.jsonl"
-TV_KICKER_PATH = Path(
-    "/home/signal/market7/output/tv_history/2025-05-12/tv_kicker.jsonl"
-)
+TV_KICKER_PATH = Path(get_path("base") / "output/tv_history/2025-05-12/tv_kicker.jsonl")
 OUTPUT_PATH = ENRICHED_DIR / "merged_trade_meta.jsonl"
 
 MATCH_WINDOW_SECONDS = 1800  # 30 minutes

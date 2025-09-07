@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""
-Start Trading Services with proper PYTHONPATH
-"""
 
 import logging
 import os
 import subprocess
 import sys
 import time
+
+"""
+Start Trading Services with proper PYTHONPATH
+"""
 
 # Setup logging
 logging.basicConfig(

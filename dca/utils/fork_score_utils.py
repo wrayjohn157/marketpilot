@@ -4,12 +4,15 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 from config.unified_config_manager import (
+    compute_subscores,
+    from,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
+    import,
+    indicators.fork_score_filter,
 )
-from indicators.fork_score_filter import compute_subscores
 
 #!/usr/bin/env python3
 

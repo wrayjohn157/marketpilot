@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Simulation API Routes
-FastAPI endpoints for DCA simulation functionality
-"""
 
 import logging
 import sys
@@ -13,11 +9,16 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-
 from core.data_manager import HistoricalDataManager
 from core.dca_simulator import DCASimulator
 from core.parameter_tuner import ParameterTuner
+
+"""
+Simulation API Routes
+FastAPI endpoints for DCA simulation functionality
+"""
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 # === Logging ===
 logging.basicConfig(

@@ -28,7 +28,7 @@ sys.path.append(str(PROJECT_ROOT))
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 # === Paths ===
-SYMBOL_LIST_FILE = Path("/home/signal/market7/data/binance_symbols.json")
+SYMBOL_LIST_FILE = get_path("base") / "data/binance_symbols.json"
 OUTPUT_FILE = get_path("filtered_pairs")
 
 # === Volume threshold (in USDT) ===

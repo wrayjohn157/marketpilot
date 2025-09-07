@@ -1,7 +1,3 @@
-"""
-Middleware for metrics collection and request tracking
-"""
-
 import logging
 import time
 
@@ -9,6 +5,10 @@ from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from .metrics import record_http_request
+
+"""
+Middleware for metrics collection and request tracking
+"""
 
 logger = logging.getLogger(__name__)
 

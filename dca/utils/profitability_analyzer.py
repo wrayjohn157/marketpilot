@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
-"""
-Profitability Analyzer for Smart DCA System
-Analyzes trade performance and provides optimization recommendations
-"""
 
+import argparse
 import json
 import logging
 from datetime import datetime, timedelta
@@ -12,6 +9,11 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+
+"""
+Profitability Analyzer for Smart DCA System
+Analyzes trade performance and provides optimization recommendations
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -241,8 +243,6 @@ Analysis Period: {days} days
 
 def main():
     """Main function for command-line usage"""
-import argparse
-
         parser = argparse.ArgumentParser(description="Analyze DCA profitability")
     parser.add_argument("--days", type=int, default=7, help="Number of days to analyze")
     parser.add_argument("--output", type=str, help="Output file for report")

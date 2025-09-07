@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
-"""
-Working MarketPilot Backend
-A simplified version that bypasses config issues and gets the system running
-"""
 
 import json
 from datetime import datetime
 from pathlib import Path
 
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+
+from dashboard_backend.threecommas_metrics import get_3commas_metrics
+from dashboard_backend.unified_fork_metrics import get_fork_trade_metrics
+from utils.redis_manager import get_redis_manager
+
+"""
+Working MarketPilot Backend
+A simplified version that bypasses config issues and gets the system running
+"""
 
 # === FastAPI ===
 app = FastAPI(title="MarketPilot API", version="1.0.0")
@@ -25,8 +31,6 @@ app.add_middleware(
 )
 
 # === Redis ===
-from utils.redis_manager import get_redis_manager
-
 r = get_redis_manager()
 
 
@@ -123,8 +127,6 @@ def threecommas_metrics():
     """3Commas trading metrics"""
     try:
         # Try to get real 3commas data
-        from dashboard_backend.threecommas_metrics import get_3commas_metrics
-
         return get_3commas_metrics()
     except:
         # Fallback to mock data
@@ -141,8 +143,6 @@ def threecommas_metrics():
 def serve_cached_metrics():
     try:
         # Try to get real fork metrics
-        from dashboard_backend.unified_fork_metrics import get_fork_trade_metrics
-
         return get_fork_trade_metrics()
     except:
         return {"error": "Fork metrics not available"}
@@ -163,6 +163,4 @@ def trade_health(symbol: str):
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8000)

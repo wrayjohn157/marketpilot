@@ -1,12 +1,20 @@
-# /home/signal/market7/dashboard_backend/dca_trades_api.py
-
+import hashlib
+import hmac
 import json
+import os
 from pathlib import Path
 
-from fastapi import APIRouter
+import requests
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
+from config import get_path
 from core.redis_utils import redis_client
 from dca.utils.entry_utils import get_live_3c_trades
+from utils.credential_manager import get_3commas_credentials
+from utils.redis_manager import RedisKeyManager, get_redis_manager
+
+# get_path("base") / dashboard_backend/dca_trades_api.py
 
 router = APIRouter()
 
@@ -34,7 +42,7 @@ def load_score_from_redis(symbol, deal_id, kind="entry"):
 
 # === Get sparkline data from saved files ===
 def get_sparkline_data(symbol):
-    file = Path(f"/home/signal/market7/data/rolling/{symbol}_sparkline.json")
+    file = Path(fget_path("base") / "data/rolling/{symbol}_sparkline.json")
     if file.exists():
         try:
             with open(file) as f:
@@ -80,23 +88,9 @@ def get_dca_trades_active():
     return enriched
 
 
-import hashlib
-import hmac
-import json
-import os
-
 # === Load 3Commas API credentials ===
-from pathlib import Path
-
 # === Panic sell endpoint for 3Commas integration ===
-import requests
-from fastapi import HTTPException
-from pydantic import BaseModel
-
-from utils.credential_manager import get_3commas_credentials
-from utils.redis_manager import RedisKeyManager, get_redis_manager
-
-CRED_PATH = Path("/home/signal/market7/config/paper_cred.json")
+CRED_PATH = get_path("base") / "config/paper_cred.json"
 with open(CRED_PATH) as f:
     creds = json.load(f)
 

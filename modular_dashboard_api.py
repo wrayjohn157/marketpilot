@@ -1,23 +1,26 @@
+import logging
+import os
+import sys
+from datetime import datetime
+from typing import Any, Dict  # noqa: E402
+
+import redis
+import uvicorn
+from fastapi import FastAPI  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from fastapi.responses import HTMLResponse  # noqa: E402
+
+from routes import dca_config_api, scan_api, tech_filter_api, trades_api  # noqa: E402
+
 """
 Modular MarketPilot Dashboard API
 Market7-inspired architecture with proper route separation
 """
 
-import logging
-import os
-import sys
-from datetime import datetime
-
 # Add project root to path for imports
 sys.path.insert(0, "/home/signal/marketpilot")
 
-from typing import Any, Dict  # noqa: E402
-
 # Import FastAPI and other dependencies after path setup
-from fastapi import FastAPI  # noqa: E402
-from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
-from fastapi.responses import HTMLResponse  # noqa: E402
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -39,8 +42,6 @@ app.add_middleware(
 )
 
 # Import route modules
-from routes import dca_config_api, scan_api, tech_filter_api, trades_api  # noqa: E402
-
 # Include routers
 app.include_router(trades_api.router, tags=["trades"])
 app.include_router(tech_filter_api.router, tags=["tech-filter"])
@@ -192,8 +193,6 @@ def health_check() -> Dict[str, Any]:
         # Check Redis connection
         redis_status = "healthy"
         try:
-            import redis
-
             r = redis.Redis(host="localhost", port=6379, db=0)
             r.ping()
         except Exception as e:
@@ -245,6 +244,4 @@ def get_ml_confidence() -> Dict[str, Any]:
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8001)  # nosec B104

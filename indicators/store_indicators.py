@@ -5,6 +5,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
 
+from config import get_path
+
 # from utils.redis_manager import RedisKeyManager, get_redis_manager
 #!/usr/bin/env python3
 
@@ -13,7 +15,7 @@ import yaml
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 # === Load config paths ===
-CONFIG_PATH = "/home/signal/market7/config/paths_config.yaml"
+CONFIG_PATH = get_path("base") / "config/paths_config.yaml"
 with open(CONFIG_PATH) as f:
     paths = yaml.safe_load(f)
 

@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Standalone Service Runner - Minimal systemd dependency
-Runs all services in a single process with proper coordination
-"""
 
 import asyncio
 import logging
@@ -12,11 +8,46 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict
 
-# Add project root to path
-PROJECT_ROOT = Path(__file__).parent
-sys.path.append(str(PROJECT_ROOT))
-
 from config.unified_config_manager import get_config
+from indicators.indicator_runner_integrated import (
+    PROJECT_ROOT,
+    Minimal,
+    Path,
+    Runner,
+    Runs,
+    Service,
+    SmartDCACore,
+    Standalone,
+    UnifiedMLPipeline,
+    """,
+    -,
+    .parent,
+    =,
+    __file__,
+    a,
+    all,
+    coordination,
+    dca.smart_dca_core,
+    dependency,
+    fork.fork_runner,
+    from,
+    import,
+    in,
+)
+from indicators.indicator_runner_integrated import (
+    main as run_fork_detection,  # Add project root to path
+)
+from indicators.indicator_runner_integrated import (
+    ml.unified_ml_pipeline,
+    process,
+    proper,
+    services,
+    single,
+    str,
+    sys.path.append,
+    systemd,
+    with,
+)
 from utils.redis_manager import get_redis_manager
 
 # Setup logging
@@ -67,7 +98,6 @@ class StandaloneServiceRunner:
         while self.running:
             try:
                 # Import and run indicator calculation
-                from indicators.indicator_runner_integrated import (
                     IntegratedIndicatorManager,
                 )
 
@@ -96,8 +126,6 @@ class StandaloneServiceRunner:
         while self.running:
             try:
                 # Import and run DCA processing
-                from dca.smart_dca_core import SmartDCACore
-
                 # Load DCA config
                 dca_config = get_config("dca")
                 dca_core = SmartDCACore(dca_config)
@@ -123,8 +151,6 @@ class StandaloneServiceRunner:
         while self.running:
             try:
                 # Import and run fork detection
-                from fork.fork_runner import main as run_fork_detection
-
                 run_fork_detection()
                 logger.info("✅ Fork detection cycle completed")
 
@@ -146,8 +172,6 @@ class StandaloneServiceRunner:
         while self.running:
             try:
                 # Import and run ML inference
-                from ml.unified_ml_pipeline import UnifiedMLPipeline
-
                 ml_pipeline = UnifiedMLPipeline()
                 results = await ml_pipeline.run_inference_cycle()
 

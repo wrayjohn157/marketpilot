@@ -2,17 +2,20 @@ import json
 import logging
 import sys
 from datetime import datetime
-
-#!/usr/bin/env python3
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from config.config_loader import PATHS  # ✅ Use the loader
-from config.unified_config_manager import (
+from config.unified_config_manager import (  # !/usr/bin/env python3
+    config.unified_config_manager,
+    from,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
+    get_redis_manager,
+    import,
+    utils.redis_manager,
 )
 
 # ✅ Inject base path so config/ can be imported when run via systemd
@@ -24,9 +27,6 @@ sys.path.append(str(PROJECT_ROOT))
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
-from config.unified_config_manager import get_config
-from utils.redis_manager import get_redis_manager
-
 r = get_redis_manager()
 
 # === Load paths dynamically ===

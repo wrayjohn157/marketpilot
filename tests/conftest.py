@@ -1,5 +1,3 @@
-"""Pytest configuration and shared fixtures."""
-
 import json
 import tempfile
 from pathlib import Path
@@ -12,6 +10,8 @@ from core.fork_scorer_refactored import ForkScorer, ForkScoreResult
 from dca.core.dca_engine import DCAEngine
 from dca.core.snapshot_manager import SnapshotManager
 from dca.core.trade_tracker import TradeTracker
+
+"""Pytest configuration and shared fixtures."""
 
 
 @pytest.fixture

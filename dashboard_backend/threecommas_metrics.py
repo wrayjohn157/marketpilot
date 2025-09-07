@@ -1,5 +1,3 @@
-# /home/signal/marketpilot/dashboard_backend/threecommas_metrics.py
-
 import hashlib
 import hmac
 import json
@@ -9,18 +7,26 @@ from pathlib import Path
 
 import requests
 
-# === Config Loader ===
-sys.path.append(str(Path(__file__).resolve().parent.parent))  # Up to /home/signal/marketpilot
-from config.unified_config_manager import (
+from config.unified_config_manager import (  # get_path("base") / dashboard_backend/threecommas_metrics.py; === Config Loader ===; Up to /home/signal/marketpilot
+    Path,
+    .parent.parent,
+    .resolve,
+    __file__,
+    from,
+    get_3commas_credentials,
+    import,
+    str,
+    sys.path.append,
+    utils.credential_manager,
+)
+
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
 )
-from utils.credential_manager import get_3commas_credentials
-
 # === Load credentials ===
-with open("/home/signal/marketpilot/config/paper_cred.json", "r") as f:
+with open(get_path("base") / "config/paper_cred.json", "r") as f:
     creds = json.load(f)
 
 API_KEY = creds["3commas_api_key"]

@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
-"""
-DCA Simulator - Clean, isolated simulation engine
-Simulates DCA strategies on historical data without affecting production systems
-"""
 
 import json
 import logging
-
-# Import production DCA logic (read-only)
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -15,8 +9,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
-
-sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 from dca.smart_dca_core import SmartDCACore
 from dca.utils.btc_filter import get_btc_status
@@ -26,6 +18,16 @@ from dca.utils.recovery_odds_utils import predict_recovery_odds
 from dca.utils.trade_health_evaluator import evaluate_trade_health
 from dca.utils.zombie_utils import is_zombie_trade
 from utils.unified_indicator_system import UnifiedIndicatorManager
+
+from .data_manager import HistoricalDataManager
+
+"""
+DCA Simulator - Clean, isolated simulation engine
+Simulates DCA strategies on historical data without affecting production systems
+"""
+
+# Import production DCA logic (read-only)
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 # === Logging ===
 logging.basicConfig(
@@ -72,8 +74,6 @@ class DCASimulator:
             end_time = entry_time + (simulation_days * 24 * 60 * 60 * 1000)
 
             # Load historical data
-            from .data_manager import HistoricalDataManager
-
             data_manager = HistoricalDataManager()
             df = data_manager.load_klines(symbol, timeframe, entry_time, end_time)
 

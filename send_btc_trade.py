@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Send a small BTC trade for $12 through 3Commas bot
-"""
 
 import hashlib
 import hmac
@@ -10,6 +7,10 @@ import time
 from pathlib import Path
 
 import requests
+
+"""
+Send a small BTC trade for $12 through 3Commas bot
+"""
 
 
 def send_btc_trade():

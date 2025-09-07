@@ -6,16 +6,18 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from dateutil import parser as dtparser
 
+from config import get_path
+
 # build_recovery_dataset.py
 
 
 # === Input directories ===
-ENRICHED_DIR = Path("/home/signal/market7/ml/datasets/enriched")
-SNAPSHOT_DIR = Path("/home/signal/market7/ml/datasets/recovery_snapshots")
-DCA_LOG_DIR = Path("/home/signal/market7/dca/logs")
+ENRICHED_DIR = get_path("base") / "ml/datasets/enriched"
+SNAPSHOT_DIR = get_path("base") / "ml/datasets/recovery_snapshots"
+DCA_LOG_DIR = get_path("base") / "dca/logs"
 
 # === Output directory ===
-OUTPUT_DIR = Path("/home/signal/market7/ml/datasets/recovery_training")
+OUTPUT_DIR = get_path("base") / "ml/datasets/recovery_training"
 
 REQUIRED_MODEL_FEATURES = [
 "step", "entry_score", "current_score", "drawdown_pct", "safu_score",

@@ -1,24 +1,28 @@
-# /market7/dashboard_backend/unified_fork_metrics.py
-import os
-import sys
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import hashlib
 import hmac
 import json
+import os
+import sys
 from datetime import datetime, timedelta
 
 import requests
 
-from config.unified_config_manager import (
+from config.unified_config_manager import (  # /market7/dashboard_backend/unified_fork_metrics.py
+    __file__,
+    from,
+    get_3commas_credentials,
+    import,
+    os.path.abspath,
+    os.path.dirname,
+    sys.path.append,
+    utils.credential_manager,
+)
+
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
 )
-from utils.credential_manager import get_3commas_credentials
-
 # === Load credentials properly ===
 with open(get_path("paper_cred"), "r") as f:
     creds = json.load(f)

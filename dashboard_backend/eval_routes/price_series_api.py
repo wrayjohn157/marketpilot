@@ -1,15 +1,16 @@
-# ~/market7/dashboard_backend/eval_routes/price_series_api.py
-
 import json
 from pathlib import Path
 
 from fastapi import APIRouter, Query
 
+from config import get_path
 from utils.redis_manager import RedisKeyManager, get_redis_manager
+
+# ~/market7/dashboard_backend/eval_routes/price_series_api.py
 
 router = APIRouter()
 
-BASE_DIR = Path("/home/signal/market7/data/snapshots")
+BASE_DIR = get_path("base") / "data/snapshots"
 
 
 @router.get_cache("/price-series")

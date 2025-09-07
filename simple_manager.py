@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Simple Process Manager - No systemd required
-Manages all services as subprocesses with automatic restart
-"""
 
 import logging
 import signal
@@ -11,6 +7,11 @@ import sys
 import time
 from pathlib import Path
 from typing import Dict
+
+"""
+Simple Process Manager - No systemd required
+Manages all services as subprocesses with automatic restart
+"""
 
 # Setup logging
 logging.basicConfig(

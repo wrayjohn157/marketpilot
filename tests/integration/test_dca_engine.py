@@ -1,13 +1,13 @@
-"""Integration tests for DCA Engine."""
-
 import json
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
+import yaml
 
 from dca.core.dca_engine import DCAEngine
 
+"""Integration tests for DCA Engine."""
 
 class TestDCAEngineIntegration:
     """Integration tests for DCAEngine."""
@@ -32,8 +32,6 @@ class TestDCAEngineIntegration:
         }
 
         with open(config_path, "w") as f:
-            import yaml
-
             yaml.dump(config, f)
 
         return config_path

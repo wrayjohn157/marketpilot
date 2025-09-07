@@ -70,11 +70,13 @@ class EnvironmentDetector:
         else:
             # Strategy 2: Path-based detection
             current_path = Path.cwd().as_posix()
-            if "/workspace" in current_path or "/tmp" in current_path:
+            if "/workspace" in current_path:
                 environment = Environment.DEVELOPMENT
-            elif "/home/signal" in current_path:
+            elif "/home/signal/marketpilot" in current_path:
                 environment = Environment.PRODUCTION
-            elif "/opt/market7" in current_path:
+            elif "/tmp" in current_path:
+                environment = Environment.TESTING
+            elif "/opt/marketpilot" in current_path:
                 environment = Environment.STAGING
             else:
                 # Strategy 3: Hostname-based detection
@@ -110,11 +112,11 @@ class EnvironmentDetector:
         if environment == Environment.DEVELOPMENT:
             return Path("/workspace")
         elif environment == Environment.STAGING:
-            return Path("/opt/market7")
+            return Path("/opt/marketpilot")
         elif environment == Environment.PRODUCTION:
-            return Path("/home/signal/market7")
+            return Path("/home/signal/marketpilot")
         else:  # TESTING
-            return Path("/tmp/market7_test")
+            return Path("/tmp/marketpilot_test")
 
     @staticmethod
     def _is_docker() -> bool:

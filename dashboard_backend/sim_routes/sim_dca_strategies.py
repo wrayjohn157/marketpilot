@@ -1,11 +1,11 @@
-# sim_dca_strategies.py
-
 from pathlib import Path
 
 import yaml
 from fastapi import APIRouter, HTTPException
 
 from utils.redis_manager import RedisKeyManager, get_redis_manager
+
+# sim_dca_strategies.py
 
 router = APIRouter()
 

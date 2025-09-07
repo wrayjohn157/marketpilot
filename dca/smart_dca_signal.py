@@ -1,39 +1,70 @@
+import json
+import logging
+import sys
+from datetime import datetime
+from pathlib import Path
 from typing import List
 
+import yaml
 
-def detect_local_reversal(prices: List[float]) -> bool:
-    """Detect local bottom reversal (V-shape) from price data."""
+from config.unified_config_manager import (
+    List[float],
+    RedisKeyManager,
+    V-shape,
+    """Detect,
+    ->,
+    adjust_volume,
+    bool:,
+    bottom,
+    compute_fork_score,
+    data.""",
+    dca.modules.dca_decision_engine,
+    dca.modules.fork_safu_evaluator,
+    dca.utils.btc_filter,
+    dca.utils.entry_utils,
+    dca.utils.fork_score_utils,
+    dca.utils.recovery_confidence_utils,
+    dca.utils.recovery_odds_utils,
+    dca.utils.spend_predictor,
+    dca.utils.trade_health_evaluator,
+    dca.utils.tv_utils,
+    dca.utils.zombie_utils,
+    def,
+    detect_local_reversal,
+    evaluate_trade_health,
+    from,
+    get_btc_status,
+    get_redis_manager,
+    get_safu_score,
+    import,
+    is_zombie_trade,
+    load_tv_kicker,
+    local,
+    predict_confidence_score,
+    predict_spend_volume,
+    price,
+    prices:,
+    reversal,
+    should_dca,
+    utils.redis_manager,
+)
+from modules.fork_safu_evaluator import get_safu_exit_decision, load_safu_exit_model
     if len(prices) < 5:
         return False
     return prices[-4] > prices[-3] > prices[-2] and prices[-2] < prices[-1]
 
 
 #!/usr/bin/env python3
-import json
-import logging
-import sys
-from datetime import datetime
-from pathlib import Path
-
-import yaml
-
-from modules.fork_safu_evaluator import get_safu_exit_decision, load_safu_exit_model
-
 safu_exit_model = load_safu_exit_model()
 
 # === Paths ===
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from config.unified_config_manager import (
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
 )
-from dca.modules.dca_decision_engine import should_dca
-from dca.modules.fork_safu_evaluator import get_safu_score
-from dca.utils.btc_filter import get_btc_status
-from dca.utils.entry_utils import (
     get_latest_indicators,
     get_live_3c_trades,
     get_macd_lift,
@@ -44,19 +75,10 @@ from dca.utils.entry_utils import (
     send_dca_signal,
     simulate_new_avg_price,
 )
-from dca.utils.fork_score_utils import compute_fork_score
-from dca.utils.recovery_confidence_utils import predict_confidence_score
-from dca.utils.recovery_odds_utils import (
     SNAPSHOT_PATH,
     get_latest_snapshot,
     predict_recovery_odds,
 )
-from dca.utils.spend_predictor import adjust_volume, predict_spend_volume
-from dca.utils.trade_health_evaluator import evaluate_trade_health
-from dca.utils.tv_utils import load_tv_kicker
-from dca.utils.zombie_utils import is_zombie_trade
-from utils.redis_manager import RedisKeyManager, get_redis_manager
-
 CONFIG_PATH = PATHS[
     "dca_config"
 ]  # CONFIG_PATH = get_path("dca_config") #CONFIG_PATH = get_path("base") / "dca" / "config" / "dca_config.yaml"
@@ -814,7 +836,6 @@ def run():
         # --- Spend model volume adjustment ---
         if config.get("use_ml_spend_model", False):
             # Use ML spend model if enabled in config
-            from dca.utils.spend_predictor import (
                 predict_spend_volume as predict_spend_amount,
             )
 

@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Simple service manager for MarketPilot supporting tech filters
-"""
 
 import os
 import signal
@@ -9,6 +6,10 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+
+"""
+Simple service manager for MarketPilot supporting tech filters
+"""
 
 
 class ServiceManager:

@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""
-Config override for MarketPilot
-Sets the correct paths for the current environment
-"""
 
 import os
 import sys
 from pathlib import Path
+
+"""
+Config override for MarketPilot
+Sets the correct paths for the current environment
+"""
 
 # Set the base path to the current directory
 BASE_PATH = Path(__file__).parent

@@ -1,11 +1,11 @@
 import json
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-# from utils.redis_manager import RedisKeyManager, get_redis_manager
 from .evaluate import evaluate_trade
 from .time_to_profit import analyze_time_to_tp1
 from .trend_slope import calculate_ema_slope
 
+# from utils.redis_manager import RedisKeyManager, get_redis_manager
 #!/usr/bin/env python3
 
 

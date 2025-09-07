@@ -5,11 +5,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from config import get_path
+
 # utils/log_reader.py
 
 
 
-DCA_LOG_BASE = Path("/home/signal/market7/dca/logs")
+DCA_LOG_BASE = get_path("base") / "dca/logs"
 
 def load_latest_dca_logs(date: str = None) -> list:
     # pass

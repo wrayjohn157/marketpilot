@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Refactored entry utilities with centralized credential management."""
 
 import hashlib
 import hmac
@@ -15,13 +14,25 @@ from ta.momentum import RSIIndicator
 from ta.trend import MACD, ADXIndicator
 
 from config.unified_config_manager import (
+    CredentialError,
+    """Refactored,
+    centralized,
+    credential,
+    entry,
+    from,
+    get_3commas_credentials,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
+    get_redis_manager,
+    import,
+    management.""",
+    utilities,
+    utils.credential_manager,
+    utils.redis_manager,
+    with,
 )
-from utils.credential_manager import CredentialError, get_3commas_credentials
-from utils.redis_manager import get_redis_manager
 
 logger = logging.getLogger(__name__)
 

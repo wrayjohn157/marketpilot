@@ -2,10 +2,12 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from config import get_path
+
 #!/usr/bin/env python3
 
 
-MERGED_DIR = Path("/home/signal/market7/ml/merged")
+MERGED_DIR = get_path("base") / "ml/merged"
 OUTPUT_FILE = MERGED_DIR / "all_cleaned_flattened.jsonl"
 
 def merge_cleaned_files() -> Any:

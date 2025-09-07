@@ -2,10 +2,12 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from config import get_path
+
 #!/usr/bin/env python3
 
 
-INPUT_DIR = Path("/home/signal/market7/ml/datasets/recovery_training")
+INPUT_DIR = get_path("base") / "ml/datasets/recovery_training"
 OUTPUT_FILE = INPUT_DIR / "merged_recovery_dataset.jsonl"
 
 def is_nonempty_jsonl(path: Any) -> Any:

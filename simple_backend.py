@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""
-Simple MarketPilot Backend
-A minimal FastAPI backend to get the system running
-"""
 
 import json
 from datetime import datetime
 from pathlib import Path
 
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+
+"""
+Simple MarketPilot Backend
+A minimal FastAPI backend to get the system running
+"""
 
 # === FastAPI ===
 app = FastAPI(title="MarketPilot API", version="1.0.0")
@@ -94,6 +96,4 @@ def threecommas_metrics():
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8000)

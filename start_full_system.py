@@ -1,10 +1,4 @@
 #!/usr/bin/env python3
-"""
-Full MarketPilot System Startup
-- Fixes all dependencies
-- Starts all services properly
-- End-to-end trading system
-"""
 
 import logging
 import os
@@ -13,6 +7,13 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+
+"""
+Full MarketPilot System Startup
+- Fixes all dependencies
+- Starts all services properly
+- End-to-end trading system
+"""
 
 # Setup logging
 logging.basicConfig(

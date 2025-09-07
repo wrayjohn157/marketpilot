@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Test runner script for Market7."""
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
 
+"""Test runner script for Market7."""
 
 def run_command(cmd: list, description: str) -> bool:
     """Run a command and return success status."""
@@ -61,8 +62,6 @@ def main():
     project_root = Path(__file__).parent
 
     # Change to project root
-import os
-
         os.chdir(project_root)
     # Unit tests
     if args.unit or args.all:

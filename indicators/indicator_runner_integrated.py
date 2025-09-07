@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Integrated Indicator Runner - Uses Unified Indicator System
-Replaces old fragmented indicator approach with new unified system
-"""
 
 import json
 import logging
@@ -13,6 +9,11 @@ from typing import Any, Dict, List, Optional
 from config.unified_config_manager import get_config, get_path
 from utils.redis_manager import get_redis_manager
 from utils.unified_indicator_system import IndicatorConfig, UnifiedIndicatorManager
+
+"""
+Integrated Indicator Runner - Uses Unified Indicator System
+Replaces old fragmented indicator approach with new unified system
+"""
 
 # Setup logging
 logging.basicConfig(

@@ -1,25 +1,28 @@
-# /market7/dashboard_backend/dca_status.py
-
 import json
 from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter
 
-from config.unified_config_manager import (
+from config.unified_config_manager import (  # /market7/dashboard_backend/dca_status.py
+    RedisKeyManager,
+    dca.utils.entry_utils,
+    from,
     get_all_configs,
     get_all_paths,
     get_config,
+    get_live_3c_trades,
     get_path,
+    get_redis_manager,
+    import,
+    utils.redis_manager,
 )
-from dca.utils.entry_utils import get_live_3c_trades
-from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 # === Paths ===
 today = datetime.now(datetime.UTC).strftime("%Y-%m-%d")
 DCA_LOG_PATH = get_path("live_logs") / today / "dca_log.jsonl"
 SNAPSHOT_BASE = get_path("kline_snapshots")
-RECOVERY_SNAPSHOT_PATH = Path("/home/signal/market7/ml/datasets/recovery_snapshots")
+RECOVERY_SNAPSHOT_PATH = get_path("base") / "ml/datasets/recovery_snapshots"
 
 
 # === Sparkline loader ===

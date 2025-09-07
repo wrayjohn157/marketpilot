@@ -1,10 +1,10 @@
-# /market7/config/config_loader.py
-
 from pathlib import Path
 
 import yaml
 
 from config.unified_config_manager import get_path
+
+# /market7/config/config_loader.py
 
 # === Load paths_config.yaml ===
 CONFIG_PATH = Path(__file__).resolve().parent / "paths_config.yaml"

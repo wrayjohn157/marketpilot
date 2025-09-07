@@ -9,6 +9,8 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
+from config import get_path
+
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
@@ -78,7 +80,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--output",
-        default="/home/signal/market7/ml/models/xgb_recovery_model.pkl",
+        default=get_path("base") / "ml/models/xgb_recovery_model.pkl",
         help="Output path",
     )
     args = parser.parse_args()

@@ -7,16 +7,18 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from dateutil import parser as dateparser
 
+from config import get_path
+
 #!/usr/bin/env python3
 
 
 
 # === Config Root Paths ===
-SCRUBBED_DIR = Path("/home/signal/marketpilot/ml/datasets/scrubbed_paper")
-FORK_DIR = Path("/home/signal/marketpilot/output/fork_history")
-TV_DIR = Path("/home/signal/marketpilot/output/tv_history")
-BTC_DIR = Path("/home/signal/marketpilot/dashboard_backend/btc_logs")
-OUTPUT_BASE = Path("/home/signal/marketpilot/ml/datasets/enriched")
+SCRUBBED_DIR = get_path("base") / "ml/datasets/scrubbed_paper"
+FORK_DIR = get_path("base") / "output/fork_history"
+TV_DIR = get_path("base") / "output/tv_history"
+BTC_DIR = get_path("base") / "dashboard_backend/btc_logs"
+OUTPUT_BASE = get_path("base") / "ml/datasets/enriched"
 
 def load_jsonl(path: Any) -> Any:
         if not path.exists():

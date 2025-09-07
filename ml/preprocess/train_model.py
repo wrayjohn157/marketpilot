@@ -1,8 +1,6 @@
 import argparse
 import json
 import os
-
-#!/usr/bin/env python3
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -17,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
+#!/usr/bin/env python3
 # === CONFIG ===
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "ml/datasets"

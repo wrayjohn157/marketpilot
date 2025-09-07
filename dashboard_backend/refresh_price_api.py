@@ -1,5 +1,3 @@
-# /market7/dashboard_backend/refresh_price_api.py
-
 import hashlib
 import hmac
 import json
@@ -9,17 +7,21 @@ from pathlib import Path
 import requests
 from fastapi import APIRouter
 
-from config.unified_config_manager import (
+from config.unified_config_manager import (  # /market7/dashboard_backend/refresh_price_api.py
+    RedisKeyManager,
+    from,
+    get_3commas_credentials,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
+    get_redis_manager,
+    import,
+    utils.credential_manager,
+    utils.redis_manager,
 )
 
 # === Correct import root ===
-from utils.credential_manager import get_3commas_credentials
-from utils.redis_manager import RedisKeyManager, get_redis_manager
-
 router = APIRouter()
 
 # === Load API credentials ===

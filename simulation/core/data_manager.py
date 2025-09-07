@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-"""
-Historical Data Manager for DCA Simulation
-Loads and manages historical klines data for simulation purposes
-"""
 
 import json
 import logging
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -14,6 +11,11 @@ import pandas as pd
 import requests
 
 from config.unified_config_manager import get_path
+
+"""
+Historical Data Manager for DCA Simulation
+Loads and manages historical klines data for simulation purposes
+"""
 
 # === Logging ===
 logging.basicConfig(
@@ -116,8 +118,6 @@ class HistoricalDataManager:
             current_start = klines[-1][6] + 1  # Next start time
 
             # Rate limiting
-            import time
-
             time.sleep(0.1)
 
         if not all_klines:

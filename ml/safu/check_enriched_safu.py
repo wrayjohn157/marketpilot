@@ -3,11 +3,13 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from config import get_path
+
 #!/usr/bin/env python3
 
 
 
-BASE_DIR = Path("/home/signal/market7/ml/datasets/enriched")
+BASE_DIR = get_path("base") / "ml/datasets/enriched"
 found_any = False
 
 for subdir in sorted(BASE_DIR.iterdir()):

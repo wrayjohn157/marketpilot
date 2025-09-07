@@ -1,10 +1,10 @@
-# /market7/dashboard_backend/redis_interface.py
-
 import json
 
-# === Redis connection ===
 from utils.redis_manager import get_redis_manager
 
+# /market7/dashboard_backend/redis_interface.py
+
+# === Redis connection ===
 r = get_redis_manager()
 
 

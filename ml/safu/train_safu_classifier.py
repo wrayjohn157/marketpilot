@@ -9,8 +9,10 @@ import xgboost as xgb
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
 
+from config import get_path
+
 # === Load labeled SAFU snapshot data ===
-INPUT_PATH = "/home/signal/market7/ml/datasets/safu_analysis/labeled_safu_dca.jsonl"
+INPUT_PATH = get_path("base") / "ml/datasets/safu_analysis/labeled_safu_dca.jsonl"
 df = pd.read_json(INPUT_PATH, lines=True)
 
 # === Encode labels ===

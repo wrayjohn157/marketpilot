@@ -1,7 +1,5 @@
 import argparse
 import logging
-
-#!/usr/bin/env python3
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -11,6 +9,7 @@ import xgboost as xgb
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
+#!/usr/bin/env python3
 # === Setup Logging ===
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"

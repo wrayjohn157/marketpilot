@@ -1,11 +1,4 @@
 #!/usr/bin/env python3
-"""
-Simple Dashboard API for MarketPilot
-- Minimal dependencies
-- Basic endpoints for frontend
-- 3Commas integration
-- Redis integration
-"""
 
 import hashlib
 import hmac
@@ -17,9 +10,18 @@ from typing import Any, Dict, List
 
 import redis
 import requests
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+
+"""
+Simple Dashboard API for MarketPilot
+- Minimal dependencies
+- Basic endpoints for frontend
+- 3Commas integration
+- Redis integration
+"""
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -406,6 +408,4 @@ def get_trade_health(symbol: str):
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8000)

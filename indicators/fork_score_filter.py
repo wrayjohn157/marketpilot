@@ -9,15 +9,18 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 import yaml
-
-#!/usr/bin/env python3
 from ta.momentum import RSIIndicator, StochRSIIndicator
 
-from config.unified_config_manager import (
+from config.unified_config_manager import (  # !/usr/bin/env python3
+    config.unified_config_manager,
+    from,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
+    get_redis_manager,
+    import,
+    utils.redis_manager,
 )
 
 # === Setup ===
@@ -36,9 +39,6 @@ SNAPSHOT_BASE = get_path("snapshots")
 
 REDIS_SET = "queues:fork_rrr_passed"
 REDIS_FINAL_TRADES = "FORK_FINAL_TRADES"
-
-from config.unified_config_manager import get_config
-from utils.redis_manager import get_redis_manager
 
 r = get_redis_manager()
 logging.basicConfig(

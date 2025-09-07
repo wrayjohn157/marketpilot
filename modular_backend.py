@@ -474,7 +474,7 @@ def get_dca_config():
 
         import yaml
 
-        config_path = Path("/home/signal/marketpilot/config/dca_config.yaml")
+        config_path = Path("config/dca_config.yaml")
         if config_path.exists():
             with open(config_path, "r") as f:
                 config = yaml.safe_load(f)
@@ -592,7 +592,7 @@ def save_dca_config(config_data: dict):
         import yaml
 
         # Ensure config directory exists
-        config_dir = Path("/home/signal/marketpilot/config")
+        config_dir = Path("config")
         config_dir.mkdir(exist_ok=True)
 
         config_path = config_dir / "dca_config.yaml"

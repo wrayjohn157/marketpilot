@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Tech Filter Data Collector
-Focused data collection for essential tech filter indicators
-"""
 
 import json
 import logging
@@ -18,6 +14,11 @@ from ta.trend import MACD, ADXIndicator, EMAIndicator, PSARIndicator
 from ta.volatility import AverageTrueRange
 
 from utils.redis_manager import get_redis_manager
+
+"""
+Tech Filter Data Collector
+Focused data collection for essential tech filter indicators
+"""
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)

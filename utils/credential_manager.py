@@ -1,5 +1,3 @@
-"""Centralized credential management for Market7."""
-
 import json
 import logging
 import os
@@ -9,10 +7,15 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from config.unified_config_manager import (
+    Market7.""",
+    """Centralized,
+    credential,
+    for,
     get_all_configs,
     get_all_paths,
     get_config,
     get_path,
+    management,
 )
 
 # Removed circular import - this function is defined later in this file

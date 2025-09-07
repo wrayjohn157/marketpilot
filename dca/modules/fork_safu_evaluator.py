@@ -2,8 +2,6 @@ import json
 import logging
 import os
 from datetime import datetime
-
-#!/usr/bin/env python3
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -14,7 +12,7 @@ import yaml
 from ta.momentum import RSIIndicator
 from ta.trend import MACD
 
-from config.unified_config_manager import (
+from config.unified_config_manager import (  # !/usr/bin/env python3
     get_all_configs,
     get_all_paths,
     get_config,

@@ -7,8 +7,6 @@ import subprocess
 import sys
 import time
 from datetime import datetime
-
-#!/usr/bin/env python3
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -16,16 +14,23 @@ import redis
 import requests
 import yaml
 
-from config.unified_config_manager import (
+from config.unified_config_manager import (  # !/usr/bin/env python3
+    compute_score_hash,
+    fork.utils.entry_utils,
+    fork.utils.fork_entry_logger,
+    from,
+    get_3commas_credentials,
     get_all_configs,
     get_all_paths,
     get_config,
+    get_entry_price,
     get_path,
+    get_redis_manager,
+    import,
+    log_fork_entry,
+    utils.credential_manager,
+    utils.redis_manager,
 )
-from fork.utils.entry_utils import compute_score_hash, get_entry_price
-from fork.utils.fork_entry_logger import log_fork_entry
-from utils.credential_manager import get_3commas_credentials
-from utils.redis_manager import get_redis_manager
 
 # === Setup ===
 CURRENT_FILE = Path(__file__).resolve()

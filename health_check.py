@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-MarketPilot Health Check Script
-Used by Docker containers for health monitoring
-"""
 
 import sys
 import time
@@ -10,12 +6,16 @@ from pathlib import Path
 
 import requests
 
+from utils.redis_manager import get_redis_manager
+
+"""
+MarketPilot Health Check Script
+Used by Docker containers for health monitoring
+"""
 
 def check_redis():
     """Check Redis connectivity"""
     try:
-        from utils.redis_manager import get_redis_manager
-
         r = get_redis_manager()
         r.ping()
         return True

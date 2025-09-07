@@ -1,17 +1,16 @@
-# /dashboard_backend/eval_routes/dca_eval_api.py
-
 import sys
 from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter
 
+from dca.utils.entry_utils import get_live_3c_trades
 from utils.log_reader import load_latest_dca_logs
+from utils.redis_manager import RedisKeyManager, get_redis_manager
+
+# /dashboard_backend/eval_routes/dca_eval_api.py
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-
-from dca.utils.entry_utils import get_live_3c_trades
-from utils.redis_manager import RedisKeyManager, get_redis_manager
 
 router = APIRouter()
 

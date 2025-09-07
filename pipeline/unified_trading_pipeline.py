@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Unified Trading Pipeline - Streamlined Tech Filter → Fork → TV Flow
-Replaces fragmented pipeline with unified, error-resistant system
-"""
 
 import asyncio
 import json
@@ -17,6 +13,11 @@ import yaml
 
 from utils.credential_manager import get_3commas_credentials
 from utils.redis_manager import RedisKeyManager, get_redis_manager
+
+"""
+Unified Trading Pipeline - Streamlined Tech Filter → Fork → TV Flow
+Replaces fragmented pipeline with unified, error-resistant system
+"""
 
 
 class PipelineStage(Enum):

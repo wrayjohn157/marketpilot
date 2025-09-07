@@ -5,6 +5,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import pandas as pd
 import ta
 
+from config import get_path
+
 # sim_indicators.py
 
 
@@ -12,7 +14,7 @@ import ta
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 def load_klines_from_disk(symbol: str, tf: str, date_str: str) -> pd.DataFrame:
-            filepath = f"/home/signal/market7/data/snapshots/{date_str}/{symbol}_{tf}_klines.json"
+            filepath = fget_path("base") / "data/snapshots/{date_str}/{symbol}_{tf}_klines.json"
 if not os.path.exists(filepath):
         raise FileNotFoundError(f"Snapshot file not found: {filepath}")
 

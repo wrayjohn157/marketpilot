@@ -5,6 +5,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
 
+from config import get_path
+
 #!/usr/bin/env python3
 
 
@@ -13,8 +15,8 @@ CONFIG_FILE = Path(__file__).resolve().parents[2] / "config" / "paths_config.yam
 with open(CONFIG_FILE) as f:
     paths = yaml.safe_load(f)
 
-TV_CONFIG_PATH = Path(paths.get("tv_screener_config_path", "/home/signal/market7/config/tv_screener_config.yaml"))
-RAW_FILE = Path(paths.get("tv_history_path", "/home/signal/market7/output/tv_history")) / "tv_screener_raw_dict.txt"
+TV_CONFIG_PATH = Path(paths.get("tv_screener_config_path", get_path("base") / "config/tv_screener_config.yaml"))
+RAW_FILE = Path(paths.get("tv_history_path", get_path("base") / "output/tv_history")) / "tv_screener_raw_dict.txt"
 
 def get_tv_rating(symbol: str, screener_data: dict) -> tuple[float, bool]:
     symbol = symbol.upper()

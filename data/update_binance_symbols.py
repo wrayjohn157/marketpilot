@@ -1,11 +1,12 @@
+#!/usr/bin/env python3
+
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 
-#!/usr/bin/env python3
-
+from config import get_path
 
 # [OK] Binance API Endpoint
 BINANCE_API_URL = "https://api.binance.com/api/v3/exchangeInfo"
@@ -17,7 +18,7 @@ EXCLUDE_TOKENS = {
 }
 
 # [OK] Output path
-OUTPUT_DIR = Path("/home/signal/market7/data")
+OUTPUT_DIR = get_path("base") / "data"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_FILE = OUTPUT_DIR / "binance_symbols.json"
 

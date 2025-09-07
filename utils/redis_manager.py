@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Redis Manager - Optimized Redis Operations with Proper Data Management
-Replaces scattered Redis usage with centralized, efficient operations
-"""
 
 import json
 import logging
@@ -14,6 +10,11 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import redis
 from redis.connection import ConnectionPool
 from redis.exceptions import ConnectionError, RedisError, TimeoutError
+
+"""
+Redis Manager - Optimized Redis Operations with Proper Data Management
+Replaces scattered Redis usage with centralized, efficient operations
+"""
 
 
 class RedisKeyType(Enum):

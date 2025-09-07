@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Standalone Indicator Service - No continuous loops
-Can be run via cron or external scheduler
-"""
 
 import json
 import logging
@@ -17,12 +13,17 @@ from ta.momentum import RSIIndicator, StochRSIIndicator
 from ta.trend import MACD, ADXIndicator, EMAIndicator, PSARIndicator
 from ta.volatility import AverageTrueRange
 
+from config.unified_config_manager import get_path
+from utils.redis_manager import get_redis_manager
+
+"""
+Standalone Indicator Service - No continuous loops
+Can be run via cron or external scheduler
+"""
+
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.append(str(PROJECT_ROOT))
-
-from config.unified_config_manager import get_path
-from utils.redis_manager import get_redis_manager
 
 # Setup logging
 logging.basicConfig(

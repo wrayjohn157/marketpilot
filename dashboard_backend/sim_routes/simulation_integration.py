@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
+
+import sys
+from pathlib import Path
+
+from api.simulation_routes import router as simulation_router
+from fastapi import APIRouter
+
 """
 Simulation Integration Routes
 Integrates the simulation system with the main dashboard backend
 """
 
-import sys
-from pathlib import Path
-
-from fastapi import APIRouter
-
 # Add simulation paths
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent / "simulation"))
-
-from api.simulation_routes import router as simulation_router
 
 # Create integrated router
 router = APIRouter()

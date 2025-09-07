@@ -1,5 +1,3 @@
-# /market7/dashboard_backend/api_control_router.py
-
 import os
 from pathlib import Path
 
@@ -9,6 +7,8 @@ from pydantic import BaseModel
 
 from config.unified_config_manager import get_path
 from utils.redis_manager import RedisKeyManager, get_redis_manager
+
+# /market7/dashboard_backend/api_control_router.py
 
 CONFIG_PATH = get_path("dca") / "config" / "dca_config.yaml"
 

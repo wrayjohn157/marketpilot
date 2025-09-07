@@ -1,26 +1,42 @@
-# Import config environment fix first
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
 import json
+import sys
 from datetime import datetime
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
 import config_environment
+from config.unified_config_manager import get_path
+from utils.redis_manager import get_redis_manager
 
-# Import custom decorators
+from .anal.capital_routes import router as capital_router
+from .config_routes import safu_config_api
+from .config_routes.dca_config_api import router as dca_config_router
+from .config_routes.fork_score_config_api import router as fork_score_config_router
+from .config_routes.tv_screener_config_api import router as tv_screener_config_router
+from .dca_status import router as dca_router
+from .dca_trades_api import router as dca_trades_api_router
 from .decorators import *
+from .eval_routes import dca_eval_api
+from .eval_routes.price_series_api import router as price_series_router
+from .ml_confidence_api import router as ml_confidence_router
+from .refresh_price_api import router as price_refresh_router
+from .sim_routes.dca_simulate_route import router as dca_simulate_router
+from .sim_routes.sim_dca_config_api import router as sim_dca_router
+from .sim_routes.sim_dca_strategies import router as sim_dca_strategy_router
+from .sim_routes.simulation_integration import router as simulation_router
+from .threecommas_metrics import get_3commas_metrics
+from .unified_fork_metrics import get_fork_trade_metrics
 
+# Import config environment fix first
+sys.path.insert(0, str(Path(__file__).parent.parent))
+# Import custom decorators
 # === FastAPI ===
 app = FastAPI()
 
 # === Redis ===
-from utils.redis_manager import get_redis_manager
-
 r = get_redis_manager()
 # === Allow CORS from anywhere (or restrict to your domain) ===
 app.add_middleware(
@@ -31,29 +47,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from config.unified_config_manager import get_path
-
-from .anal.capital_routes import router as capital_router
-
 # === Modular Route Imports ===
-from .config_routes import safu_config_api
-from .config_routes.dca_config_api import router as dca_config_router
-from .config_routes.fork_score_config_api import router as fork_score_config_router
-from .config_routes.tv_screener_config_api import router as tv_screener_config_router
-from .dca_status import router as dca_router
-from .dca_trades_api import router as dca_trades_api_router
-from .eval_routes import dca_eval_api
-from .eval_routes.price_series_api import router as price_series_router
-from .ml_confidence_api import router as ml_confidence_router
-from .refresh_price_api import router as price_refresh_router
-from .sim_routes.dca_simulate_route import router as dca_simulate_router
-from .sim_routes.sim_dca_config_api import router as sim_dca_router
-from .sim_routes.sim_dca_strategies import router as sim_dca_strategy_router
-from .sim_routes.simulation_integration import router as simulation_router
-
 # === Additional Route Imports ===
-from .unified_fork_metrics import get_fork_trade_metrics
-
 # === Include All Modular Routers ===
 app.include_router(dca_router)
 app.include_router(ml_confidence_router)
@@ -181,9 +176,6 @@ def trade_health(symbol: str):
         return {"symbol": symbol.upper(), "score": int(raw)}
     except:
         return {"error": "Invalid format"}
-
-
-from .threecommas_metrics import get_3commas_metrics
 
 
 @app.get("/3commas/metrics")

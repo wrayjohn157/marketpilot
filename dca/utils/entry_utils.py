@@ -11,6 +11,7 @@ import requests
 from ta.momentum import RSIIndicator
 from ta.trend import MACD, ADXIndicator
 
+from config import get_path
 from utils.credential_manager import get_3commas_credentials
 from utils.redis_manager import get_redis_manager
 
@@ -20,10 +21,10 @@ from utils.redis_manager import get_redis_manager
 logger = logging.getLogger(__name__)
 
 # === Paths ===
-CRED_PATH = Path("/home/signal/market7/config/paper_cred.json")
-SNAPSHOT_BASE = Path("/home/signal/market7/data/snapshots")
-FORK_HISTORY = Path("/home/signal/market7/output/fork_history")
-BTC_LOG_PATH = Path("/home/signal/market7/live/btc_logs")
+CRED_PATH = get_path("base") / "config/paper_cred.json"
+SNAPSHOT_BASE = get_path("base") / "data/snapshots"
+FORK_HISTORY = get_path("base") / "output/fork_history"
+BTC_LOG_PATH = get_path("base") / "live/btc_logs"
 
 # === Redis Setup ===
 REDIS = get_redis_manager()

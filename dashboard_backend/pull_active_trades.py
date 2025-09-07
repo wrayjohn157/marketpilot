@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import json
 
 from dca.utils.entry_utils import get_live_3c_trades

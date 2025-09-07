@@ -2,13 +2,15 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from config import get_path
+
  # datetime
 # No need for this anymore:
     pass
 # from fork.utils.entry_utils import save_daily_entry
 
 # Constants
-FORK_HISTORY_BASE = Path("/home/signal/market7/output/fork_history")
+FORK_HISTORY_BASE = get_path("base") / "output/fork_history"
 
 def log_fork_entry(entry: dict):
     pass

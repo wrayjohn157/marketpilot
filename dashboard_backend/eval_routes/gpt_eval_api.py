@@ -5,6 +5,8 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request
 from openai import OpenAI
 
+from config import get_path
+
 # from utils.credential_manager import get_3commas_credentials
 # gpt_eval_api.py
 
@@ -12,8 +14,8 @@ from openai import OpenAI
 router = APIRouter(prefix="/gpt")
 
 # === Load OpenAI key from paper_cred.json ===
-CRED_PATH = Path("/home/signal/market7/config/paper_cred.json")
-CONTEXT_PATH = Path("/home/signal/market7/config/gpt_context.md")
+CRED_PATH = get_path("base") / "config/paper_cred.json"
+CONTEXT_PATH = get_path("base") / "config/gpt_context.md"
 
 try:
     # pass

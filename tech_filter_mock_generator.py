@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Tech Filter Mock Data Generator
-Generates realistic technical indicators based on actual trade data
-"""
 
 import json
 import logging
@@ -14,6 +10,11 @@ from typing import Any, Dict, List
 import requests
 
 from utils.redis_manager import get_redis_manager
+
+"""
+Tech Filter Mock Data Generator
+Generates realistic technical indicators based on actual trade data
+"""
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)

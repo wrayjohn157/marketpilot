@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Trigger a BTC trade by updating bot settings to $12 base order volume
-"""
 
 import hashlib
 import hmac
@@ -10,6 +7,10 @@ import time
 from pathlib import Path
 
 import requests
+
+"""
+Trigger a BTC trade by updating bot settings to $12 base order volume
+"""
 
 
 def trigger_btc_trade():

@@ -3,9 +3,11 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from config import get_path
+
 # CONFIGURE THESE PATHS
-input_path = "/home/signal/market7/ml/datasets/safu_merged/2025-05-21/enriched_with_safu.jsonl"
-output_path = "/home/signal/market7/ml/datasets/safu_labeled/2025-05-21/labeled_safu_data.jsonl"
+input_path = get_path("base") / "ml/datasets/safu_merged/2025-05-21/enriched_with_safu.jsonl"
+output_path = get_path("base") / "ml/datasets/safu_labeled/2025-05-21/labeled_safu_data.jsonl"
 
 # CREATE OUTPUT DIR
 Path(os.path.dirname(output_path)).mkdir(parents=True, exist_ok=True)

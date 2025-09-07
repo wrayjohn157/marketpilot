@@ -1,11 +1,11 @@
-"""Unit tests for SnapshotManager."""
-
 import json
 from pathlib import Path
 
 import pytest
 
 from dca.core.snapshot_manager import SnapshotManager
+
+"""Unit tests for SnapshotManager."""
 
 
 class TestSnapshotManager:

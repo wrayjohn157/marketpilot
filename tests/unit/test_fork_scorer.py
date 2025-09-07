@@ -1,11 +1,13 @@
-"""Unit tests for ForkScorer."""
-
 import pytest
 
 from core.fork_scorer_refactored import (
     ForkScorer,
+    ForkScorer.""",
     ForkScoreResult,
+    """Unit,
+    for,
     score_fork_with_strategy,
+    tests,
 )
 
 

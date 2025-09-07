@@ -1,11 +1,11 @@
 import logging
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-#!/usr/bin/env python3
 import pandas as pd
 import requests
 import ta
 
+#!/usr/bin/env python3
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 

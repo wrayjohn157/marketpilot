@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Parameter Tuner for DCA Simulation
-Optimizes DCA parameters using various algorithms
-"""
 
 import json
 import logging
@@ -13,6 +9,11 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 
 from .dca_simulator import DCASimulator
+
+"""
+Parameter Tuner for DCA Simulation
+Optimizes DCA parameters using various algorithms
+"""
 
 # === Logging ===
 logging.basicConfig(
